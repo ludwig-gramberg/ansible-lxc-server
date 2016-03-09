@@ -1,39 +1,33 @@
+---
 - hosts: all
   vars:
-    initial_setup_root_password: xxx
-    initial_setup_admin_password: yyy
-    initial_setup_logwatch_email: mail@example.com
-    initial_setup_admin_user_name: admin
-    initial_setup_admin_public_keys:
-      - ~/.ssh/id_rsa_linode.pub
+     ansible_user: "{{ setup_ansible_user }}"
+     ansible_ssh_pass: "{{ setup_ansible_ssh_pass }}"
+  tasks:
 
-    initial_setup_ssh_port: 22    
+    - name: Add admin user
+      user: name="{{ config_user_name }}" password="{{ config_user_password }}" shell=/bin/bash
 
-    tasks:
-     
-      - name: Add admin user
-        user: name="{{ initial_setup_admin_user_name }}" password="{{ initial_setup_admin_password }}"
-      
-      - name: Add authorized keys for admin user
-        authorized_key: user="{{ initial_setup_admin_user_name }}" key="{{ lookup('file', initial_setup_admin_public_key) }}"      
-
-      - name: Add admin user to sudoers
-        lineinfile: dest=/etc/sudoers
-                    regexp="{{ initial_setup_admin_user_name }} ALL"
-                    line="{{ initial_setup_admin_user_name }} ALL=(ALL) ALL"
-                    state=present
-
-      - name: Disallow password authentication
-        lineinfile: dest=/etc/ssh/sshd_config
-                    regexp="^PasswordAuthentication"
-                    line="PasswordAuthentication no"
-                    state=present
-        
-      - name: Disallow root SSH access
-        lineinfile: dest=/etc/ssh/sshd_config
-                    regexp="^PermitRootLogin"
-                    line="PermitRootLogin no"
-                    state=present
-
-      - name: Restart ssh
-        command: service ssh restart
+    - name: Add authorized keys for admin user
+      authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}"
+#
+#    - name: Add admin user to sudoers
+#      lineinfile: dest=/etc/sudoers
+#                  regexp="{{ admin_user_name }} ALL"
+#                  line="{{ admin_user_name }} ALL=(ALL) ALL"
+#                  state=present
+#
+#    - name: Disallow password authentication
+#      lineinfile: dest=/etc/ssh/sshd_config
+#                  regexp="^PasswordAuthentication"
+#                  line="PasswordAuthentication no"
+#                  state=present
+#
+#    - name: Disallow root SSH access
+#      lineinfile: dest=/etc/ssh/sshd_config
+#                  regexp="^PermitRootLogin"
+#                  line="PermitRootLogin no"
+#                  state=present
+#
+#    - name: Restart ssh
+#      command: service ssh restart

@@ -1,2 +1,4 @@
 /.idea
-/inventory/hosts
+/hosts
+/host_vars/*
+!/host_vars/*.sample
