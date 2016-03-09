@@ -1,5 +1,7 @@
-# Generate password for user module:
+# ansible provisioning for a debian 8 lxc-host
+
+## Generate password for user module:
     openssl passwd -salt MySalt -1 MyPassword
 
-# call playbook
+## call playbook
     ansible-playbook -i hosts initial-setup.yml --extra-vars="setup_ansible_ssh_pass=root"
