@@ -1,8 +1,19 @@
-Ausgangspunkt: Frischer Server. Nichts drauf, nur root und Passwort.
+Starting point: Fresh Debian/Ubuntu server. Nothing there, only root account and password.
 
-- Neuer Ordner für den Server. Dort drin: inventory.ini mit Inhalt
-x.x.x.x # ip des servers
+- New folder for server with inventory.ini:
+x.x.x.x # ip of server
 
-- Test (in Ordner):
-ansible all -i inventory.ini -m ping -u root --ask-pass
+- Test (in folder):
+$ ansible all -i inventory.ini -m ping -u root --ask-pass
 
+- Generate private/public key for this server (here linode):
+$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/Users/rob/.ssh/id_rsa): /Users/username/.ssh/id_rsa_linode
+...
+
+- Edit Playbook. Generate password for admin user:
+$ openssl passwd -salt MySalt -1 MyPassword
+$1$MySalt$DW67zPSAQlpHwkG6uhjCj.
+
+- ansible-playbook initial-setup.yml -i inventory.ini -u root --ask-pass

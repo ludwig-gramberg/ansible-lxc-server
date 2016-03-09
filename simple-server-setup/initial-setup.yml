@@ -1,11 +1,11 @@
 - hosts: all
   vars:
-    initial_setup_root_password: 'xxx'
-    initial_setup_admin_password: 'yyy'
+    initial_setup_root_password: xxx
+    initial_setup_admin_password: yyy
     initial_setup_logwatch_email: mail@example.com
     initial_setup_admin_user_name: admin
     initial_setup_admin_public_keys:
-      - ~/.ssh/id_rsa.pub
+      - ~/.ssh/id_rsa_linode.pub
 
     initial_setup_ssh_port: 22    
 
