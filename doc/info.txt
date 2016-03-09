@@ -20,3 +20,13 @@ $1$MySalt$DW67zPSAQlpHwkG6uhjCj.
 
 - Login with
   ssh -i ~/.ssh/id_rsa_linode admin@x.x.x.x
+
+  or, in ~/.ssh/config
+
+Host linode
+ IdentityFile ~/.ssh/id_rsa_linode
+ HostName x.x.x.x
+ User admin
+
+ and 
+ $ ssh linode
