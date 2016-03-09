@@ -1,0 +1,8 @@
+Ausgangspunkt: Frischer Linode Server. Nichts drauf, nur root und Passwort.
+
+- Neuer Ordner für den Server. Dort drin: inventory.ini mit Inhalt
+x.x.x.x # ip des servers
+
+- Test (in Ordner):
+ansible all -i inventory.ini -m ping -u root --ask-pass
+

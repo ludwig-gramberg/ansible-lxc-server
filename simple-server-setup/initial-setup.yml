@@ -1,0 +1,38 @@
+- hosts: all
+  vars:
+    initial_setup_root_password: 'xxx'
+    initial_setup_admin_password: 'yyy'
+    initial_setup_logwatch_email: mail@example.com
+    initial_setup_admin_user_name: admin
+    initial_setup_admin_public_keys:
+      - ~/.ssh/id_rsa.pub
+
+    initial_setup_ssh_port: 22    
+
+  tasks:  
+    - name: Add admin user
+      user: name={{ initial_setup_admin_user_name }} password="{{ initial_setup_admin_password }}" shell=/bin/bash
+    
+    - name: Add authorized keys for admin user
+      authorized_key: user={{ initial_setup_admin_user_name }} key="{{ lookup('file', 'item') }}"
+      with_items: initial_setup_admin_public_keys
+
+    - name: Add admin user to sudoers
+      lineinfile: dest=/etc/sudoers
+                  regexp="{{ initial_setup_admin_user_name }} ALL"
+                  line="{{ initial_setup_admin_user_name }} ALL=(ALL) ALL"
+                  state=present
+
+    - name: Disallow password authentication
+      lineinfile: dest=/etc/ssh/sshd_config
+                  regexp="^PasswordAuthentication"
+                  line="PasswordAuthentication no"
+                  state=present
+      notify: Restart ssh
+
+    - name: Disallow root SSH access
+      lineinfile: dest=/etc/ssh/sshd_config
+                  regexp="^PermitRootLogin"
+                  line="PermitRootLogin no"
+                  state=present
+      notify: Restart ssh
