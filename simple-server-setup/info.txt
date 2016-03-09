@@ -17,3 +17,6 @@ $ openssl passwd -salt MySalt -1 MyPassword
 $1$MySalt$DW67zPSAQlpHwkG6uhjCj.
 
 - ansible-playbook initial-setup.yml -i inventory.ini -u root --ask-pass
+
+- Login with
+  ssh -i ~/.ssh/id_rsa_linode admin@x.x.x.x
