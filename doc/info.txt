@@ -4,7 +4,7 @@ Starting point: Fresh Debian/Ubuntu server. Nothing there, only root account and
 x.x.x.x # ip of server
 
 - Test (in folder):
-$ ansible all -i inventory.ini -m ping -u root --ask-pass
+$ ansible all -i inventory/hosts -m ping -u root --ask-pass
 
 - Generate private/public key for this server (here linode):
 $ ssh-keygen
