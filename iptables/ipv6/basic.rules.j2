@@ -1,0 +1,8 @@
+*filter
+
+#  allow out drop all incoming
+-P OUTPUT ACCEPT
+-P INPUT DROP
+-P FORWARD DROP
+
+COMMIT
