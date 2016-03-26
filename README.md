@@ -4,4 +4,10 @@
     openssl passwd -salt MySalt -1 MyPassword
 
 ## call playbook
-    ansible-playbook -i hosts initial-setup.yml --extra-vars="setup_ansible_ssh_pass=root"
+    ansible-playbook -i hosts setup.yml
+
+if you don't want to store passwords in the host_vars file
+    ansible-playbook -i hosts setup.yml --extra-vars="setup_ansible_ssh_pass=root"
+
+if you encrypt your host_vars file
+	ansible-playbook -i hosts setup.yml --ask-vault-pass
