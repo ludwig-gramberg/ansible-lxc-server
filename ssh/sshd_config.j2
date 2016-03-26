@@ -23,7 +23,7 @@ Protocol 2
 PubkeyAuthentication yes
 RSAAuthentication yes
 RhostsRSAAuthentication no
-ServerKeyBits 768
+ServerKeyBits 1024
 StrictModes yes
 Subsystem sftp /usr/lib/openssh/sftp-server
 SyslogFacility AUTH
@@ -34,4 +34,4 @@ UsePrivilegeSeparation yes
 X11DisplayOffset 10
 X11Forwarding no
 
-AllowUsers USER@IP/IPRANGE
+AllowUsers {{ config_user_name }}

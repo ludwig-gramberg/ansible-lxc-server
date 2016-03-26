@@ -1,47 +1,48 @@
 ---
 - hosts: all
   vars:
-     ansible_user: "{{ setup_ansible_user }}"
-     ansible_ssh_pass: "{{ setup_ansible_ssh_pass }}"
+    ansible_user: "{{ setup_ansible_user }}"
+    ansible_ssh_pass: "{{ setup_ansible_ssh_pass }}"
   tasks:
-    - apt: name={{ item }} update_cache=yes state=latest
+
+    # basic tools
+
+    - name: install basics
+      apt: name={{ item }} update_cache=yes state=latest
       with_items:
       - sudo
       - iptables-persistent
-    - command: iptables -X
+
+    # ipv4
+
+    - name: iptables v4
+      command: iptables -X
     - file: path=/etc/iptables/ipv4 state=directory mode=0755
     - template: dest=/etc/iptables/ipv4/basic.rules src=iptables/ipv4/basic.rules.j2 owner=root group=root mode=0644
     - command: bash -c "iptables-restore < /etc/iptables/ipv4/basic.rules"
     - command: bash -c "iptables-save > /etc/iptables/rules.v4"
-    - command: ip6tables -X
+
+    # ipv6
+
+    - name: iptables v6
+      command: ip6tables -X
     - file: path=/etc/iptables/ipv6 state=directory mode=0755
     - template: dest=/etc/iptables/ipv6/basic.rules src=iptables/ipv6/basic.rules.j2 owner=root group=root mode=0644
     - command: bash -c "ip6tables-restore < /etc/iptables/ipv6/basic.rules"
     - command: bash -c "ip6tables-save > /etc/iptables/rules.v6"
 
-#    - name: Add admin user
-#      user: name="{{ config_user_name }}" password="{{ config_user_password }}" shell=/bin/bash
-#
-#    - name: Add authorized keys for admin user
-#      authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}"
-#
-#    - name: Add admin user to sudoers
-#      lineinfile: dest=/etc/sudoers
-#                  regexp="{{ admin_user_name }} ALL"
-#                  line="{{ admin_user_name }} ALL=(ALL) ALL"
-#                  state=present
-#
-#    - name: Disallow password authentication
-#      lineinfile: dest=/etc/ssh/sshd_config
-#                  regexp="^PasswordAuthentication"
-#                  line="PasswordAuthentication no"
-#                  state=present
-#
-#    - name: Disallow root SSH access
-#      lineinfile: dest=/etc/ssh/sshd_config
-#                  regexp="^PermitRootLogin"
-#                  line="PermitRootLogin no"
-#                  state=present
-#
-#    - name: Restart ssh
-#      command: service ssh restart
+    # config user with group sudo
+
+    - name: create admin/config user
+      user: name="{{ config_user_name }}" password="{{ config_user_password }}" shell=/bin/bash groups=sudo append=yes
+
+    - name: config user authorized key
+      authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}"
+
+    # lock out root, allow only config user, harden ssh cfg
+
+    - name: sshd config
+      template: dest=/etc/ssh/sshd_config src=ssh/sshd_config.j2 owner=root group=root mode=0644
+
+    - name: reload ssh
+      command: systemctl reload ssh
