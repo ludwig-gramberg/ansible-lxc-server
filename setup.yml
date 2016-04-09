@@ -12,11 +12,12 @@
       with_items:
       - sudo
       - iptables-persistent
+      - fail2ban
 
     # ipv4
 
     - name: iptables v4
-      command: iptables -X
+      command: iptables -F
     - file: path=/etc/iptables/ipv4 state=directory mode=0755
     - template: dest=/etc/iptables/ipv4/basic.rules src=iptables/ipv4/basic.rules.j2 owner=root group=root mode=0644
     - command: bash -c "iptables-restore < /etc/iptables/ipv4/basic.rules"
@@ -25,11 +26,16 @@
     # ipv6
 
     - name: iptables v6
-      command: ip6tables -X
+      command: ip6tables -F
     - file: path=/etc/iptables/ipv6 state=directory mode=0755
     - template: dest=/etc/iptables/ipv6/basic.rules src=iptables/ipv6/basic.rules.j2 owner=root group=root mode=0644
     - command: bash -c "ip6tables-restore < /etc/iptables/ipv6/basic.rules"
     - command: bash -c "ip6tables-save > /etc/iptables/rules.v6"
+
+    # restart fail2ban
+
+    - name: restart fail2ban
+      command: systemctl restart fail2ban
 
     # config user with group sudo
 
