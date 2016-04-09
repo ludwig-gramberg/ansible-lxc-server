@@ -1,0 +1,25 @@
+group {{container_user}} {
+  perm {
+    task {
+      uid = {{container_user}};
+      gid = {{container_user}};
+    }
+    admin {
+      uid = {{container_user}};
+      gid = {{container_user}};
+    }
+  }
+  cpu {}
+  blkio {}
+  cpuacct {}
+  cpuset {
+    cgroup.clone_children = 1;
+    cpuset.mems = 0;
+    cpuset.cpus = 0-3;
+  }
+  devices {}
+  freezer {}
+  perf_event {}
+  net_cls {}
+  net_prio {}
+}

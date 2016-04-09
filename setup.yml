@@ -13,6 +13,9 @@
       - sudo
       - iptables-persistent
       - fail2ban
+      - lxc
+      - cgroup-tools
+      - uidmap
 
     # ipv4
 
@@ -37,6 +40,26 @@
     - name: restart fail2ban
       command: systemctl restart fail2ban
 
+    # lxc preparation
+    # source: https://myles.sh/configuring-lxc-unprivileged-containers-in-debian-jessie/
+
+    - name: kernel allow unprivileged user to create namespace
+      sysctl: name=kernel.unprivileged_userns_clone value=1 state=present
+    - name: mkdir /etc/sysconfig
+      file: path=/etc/sysconfig state=directory mode=0755
+    - name: /etc/sysconfig/cgred.conf
+      template: dest=/etc/sysconfig/cgred.conf src=lxc/cgred.conf.j2 owner=root group=root mode=0644
+    - name: /etc/cgconfig.conf
+      file: path=/etc/cgconfig.conf state=touch owner=root group=root mode=0644
+    - name: /etc/cgrules.conf
+      file: path=/etc/cgrules.conf state=touch owner=root group=root mode=0644
+    - name: cgconfig.service
+      template: dest=/lib/systemd/system/cgconfig.service src=lxc/cgconfig.service.j2 owner=root group=root mode=0644
+    - name: cgred.service
+      template: dest=/lib/systemd/system/cgred.service src=lxc/cgred.service.j2 owner=root group=root mode=0644
+    - service: name=cgconfig enabled=yes state=started
+    - service: name=cgred enabled=yes state=started
+
     # config user with group sudo
 
     - name: create admin/config user
@@ -47,8 +70,8 @@
 
     # lock out root, allow only config user, harden ssh cfg
 
-    - name: sshd config
-      template: dest=/etc/ssh/sshd_config src=ssh/sshd_config.j2 owner=root group=root mode=0644
+    #- name: sshd config
+    #  template: dest=/etc/ssh/sshd_config src=ssh/sshd_config.j2 owner=root group=root mode=0644
 
-    - name: reload ssh
-      command: systemctl reload ssh
+    #- name: reload ssh
+    #  command: systemctl reload ssh.service
