@@ -7,6 +7,21 @@
 - name: create container user
   user: name="{{ container_user }}" password="{{ container_user }}" shell=/bin/bash append=yes
 
+# file layout lxc user homefolder
+
+- name: homefolder create dir layout
+  file: path=/home/{{ container_user }}/{{ item }} owner={{ container_user }} group={{ container_user }} mode=0750 state=directory
+  with_items:
+    - .config/lxc
+    - .local/share/lxc
+    - .local/share/lxcsnaps
+    - .cache/lxc
+- name: homefolder create cfg files
+  file: path=/home/{{ container_user }}/{{ item }} owner={{ container_user }} group={{ container_user }} mode=0640 state=file
+  with_items:
+    - .config/lxc/lxc.conf
+    - .config/lxc/default.conf
+
 # sub uid/gid
 
 - name: uid for container user
