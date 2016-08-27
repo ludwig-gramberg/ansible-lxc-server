@@ -1,0 +1,14 @@
+---
+
+- name: upgrade system
+  apt: upgrade=dist update_cache=yes
+
+- name: install basics
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items:
+  - sudo
+  - iptables-persistent
+  - fail2ban
+  - lxc
+  - cgroup-tools
+  - uidmap

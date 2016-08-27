@@ -1,0 +1,49 @@
+---
+
+# source: https://myles.sh/configuring-lxc-unprivileged-containers-in-debian-jessie/
+
+# create container user
+
+- name: create container user
+  user: name="{{ container_user }}" password="{{ container_user }}" shell=/bin/bash append=yes
+
+# sub uid/gid
+
+- name: uid for container user
+  raw: usermod --add-subuids 100000-165536 {{ container_user }}
+- name: gid for container user
+  raw: usermod --add-subgids 100000-165536 {{ container_user }}
+
+# kernel flag
+
+- name: kernel allow unprivileged user to create namespace
+  sysctl: name=kernel.unprivileged_userns_clone value=1 state=present
+
+# cgred.conf
+
+- name: mkdir /etc/sysconfig
+  file: path=/etc/sysconfig state=directory mode=0755
+- name: /etc/sysconfig/cgred.conf
+  template: dest=/etc/sysconfig/cgred.conf src=lxc/cgred.conf.j2 owner=root group=root mode=0644
+
+# cgconfig
+
+- name: /etc/cgconfig.conf
+  template: dest=/etc/cgconfig.conf src=lxc/cgconfig.conf.j2 owner=root group=root mode=0644
+- name: /etc/cgrules.conf
+  template: dest=/etc/cgrules.conf src=lxc/cgrules.conf.j2 owner=root group=root mode=0644
+
+# install cgroup services
+
+- name: cgconfig.service
+  template: dest=/lib/systemd/system/cgconfig.service src=lxc/cgconfig.service.j2 owner=root group=root mode=0644
+- name: cgred.service
+  template: dest=/lib/systemd/system/cgred.service src=lxc/cgred.service.j2 owner=root group=root mode=0644
+
+- service: name=cgconfig enabled=yes state=started
+- service: name=cgred enabled=yes state=started
+
+# prepare template download
+
+- name: set DOWNLOAD_COMPAT_LEVEL to allow download unprivileged container templates
+  lineinfile: dest=/usr/share/lxc/templates/lxc-download regexp=^DOWNLOAD_COMPAT_LEVEL=1 line=DOWNLOAD_COMPAT_LEVEL=
