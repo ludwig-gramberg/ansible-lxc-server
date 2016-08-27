@@ -7,7 +7,7 @@ besides the configuration or any necessary manual preparation on the host it aim
 
 ## disclaimer
 
-use at your own risk. yout found this somewhere on the internet ;-)
+use at your own risk. you found this somewhere on the internet ;-)
 
 ---
 
