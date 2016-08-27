@@ -9,18 +9,22 @@
 
 # file layout lxc user homefolder
 
-- name: homefolder create dir layout
+- name: homefolder create dir layout 1/2
   file: path=/home/{{ container_user }}/{{ item }} owner={{ container_user }} group={{ container_user }} mode=0750 state=directory
   with_items:
-    - .config/lxc
     - .local/share/lxc
     - .local/share/lxcsnaps
     - .cache/lxc
+- name: homefolder create dir layout 2/2
+  file: path=/home/{{ container_user }}/{{ item }} owner=root group=root mode=0755 state=directory
+  with_items:
+    - .config/lxc
 - name: homefolder create cfg files
-  file: path=/home/{{ container_user }}/{{ item }} owner={{ container_user }} group={{ container_user }} mode=0640 state=file
+  file: path=/home/{{ container_user }}/{{ item }} owner=root group=root mode=0644 state=touch
   with_items:
     - .config/lxc/lxc.conf
-    - .config/lxc/default.conf
+- name: homefolder cfg file uid/gid mapping
+  template: dest=/home/{{ container_user }}/.config/lxc/default.conf src=lxc/user/default.conf.j2 owner=root group=root mode=0644
 
 # sub uid/gid
 
