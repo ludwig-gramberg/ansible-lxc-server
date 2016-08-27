@@ -47,3 +47,8 @@
 
 - name: set DOWNLOAD_COMPAT_LEVEL to allow download unprivileged container templates
   lineinfile: dest=/usr/share/lxc/templates/lxc-download regexp=^DOWNLOAD_COMPAT_LEVEL=1 line=DOWNLOAD_COMPAT_LEVEL=
+
+# allow container user access to lxc bridge
+
+- name: lxc bridge access
+  template: dest=/etc/lxc/lxc-usernet src=lxc/lxc-usernet.j2 owner=root group=root mode=0644
