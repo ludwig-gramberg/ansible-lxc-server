@@ -19,7 +19,7 @@ very basic setup which prepares the host. can only be run once because it uses r
   
 ### common.yml
 
-uses admin user established in `rootsetup.yml` using public key authentication. prepares basic lxc setup and networking fo lxc.
+uses admin user established in `rootsetup.yml` using public key authentication. prepares basic lxc setup and networking for lxc.
 
 ---
 
