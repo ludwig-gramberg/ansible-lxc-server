@@ -1,0 +1,25 @@
+---
+
+- name: install libvirt and requirements
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items:
+  - python
+  - python-libvirt
+  - python-lxml
+  - libvirt-bin
+  - ebtables
+  - dnsmasq
+
+- name: define network
+  virt_net: command=define name=lxc xml='{{ lookup("template", "bridge/bridge.xml.j2") }}'
+
+- name: gather facts
+  virt_net: command=facts
+
+- name: start network
+  virt_net: command=create name=lxc
+  when: ansible_libvirt_networks.lxc.state != "active"
+
+- name: ensure network active at boot
+  virt_net: autostart=yes name=lxc
+  when: ansible_libvirt_networks.lxc.autostart != "yes"

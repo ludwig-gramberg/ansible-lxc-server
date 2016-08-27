@@ -1,0 +1,8 @@
+<network>
+  <name>lxc</name>
+  <uuid>{{ container_bridge_uuid }}</uuid>
+  <forward mode="nat" />
+  <bridge name="lxc" stp="on" delay="0" />
+  <mac address="{{ container_bridge_mac }}" />
+  <ip address="{{ container_bridge_subnet }}.1" netmask="255.255.255.0"></ip>
+</network>
