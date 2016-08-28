@@ -5,8 +5,7 @@
 - name: install lxc from backports
   apt: name={{ item }} update_cache=yes state=latest default_release=jessie-backports
   with_items:
-     - lxc
-     - lxc-dev
+   - lxc
 
 # create container user
 

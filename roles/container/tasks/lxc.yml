@@ -1,3 +1,9 @@
 ---
 
-- debug: msg="create container for {{ container_host }} ({{ container_hostname }})"
+- name: create barebone container
+  command: lxc-create --name {{ container_hostname }} --template download -- --release jessie --arch amd64 --dist debian
+  args:
+    chdir: ~/
+    creates: "~/.local/share/lxc/{{ container_hostname }}/config"
+  become: true
+  become_user: "{{ container_user }}"

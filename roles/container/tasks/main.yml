@@ -1,18 +1,5 @@
 ---
 
-- name: install requirements
-  apt: name={{ item }} update_cache=yes state=latest
-  with_items:
-  - lxc
-  - lxc-dev
-  - python
-  - python-dev
-  - python-pip
-  - git
-
-- name: install lxc-python2
-  pip: name='git+https://github.com/lxc/python2-lxc' editable=false
-
 - name: spawn containers
   include: tasks/lxc.yml
   vars:

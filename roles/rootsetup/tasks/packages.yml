@@ -11,3 +11,7 @@
   - fail2ban
   - cgroup-tools
   - uidmap
+  - ntp
+
+- name: restart ntp
+  service: name=ntp state=restarted enabled=yes
