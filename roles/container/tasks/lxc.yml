@@ -1,0 +1,3 @@
+---
+
+- debug: msg="create container for {{ container_host }} ({{ container_hostname }})"

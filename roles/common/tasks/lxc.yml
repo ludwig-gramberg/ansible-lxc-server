@@ -2,6 +2,12 @@
 
 # source: https://myles.sh/configuring-lxc-unprivileged-containers-in-debian-jessie/
 
+- name: install lxc from backports
+  apt: name={{ item }} update_cache=yes state=latest default_release=jessie-backports
+  with_items:
+     - lxc
+     - lxc-dev
+
 # create container user
 
 - name: create container user

@@ -1,0 +1,6 @@
+---
+
+- name: add backports
+  lineinfile: dest=/etc/apt/sources.list line="deb http://ftp.debian.org/debian jessie-backports main"
+- name: upgrade
+  apt: upgrade=dist update_cache=yes

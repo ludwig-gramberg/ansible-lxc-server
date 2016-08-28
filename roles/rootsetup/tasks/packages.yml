@@ -9,6 +9,5 @@
   - sudo
   - iptables-persistent
   - fail2ban
-  - lxc
   - cgroup-tools
   - uidmap

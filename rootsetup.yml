@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: master
   vars:
     ansible_user: "{{ setup_ansible_user }}"
     ansible_ssh_pass: "{{ setup_ansible_ssh_pass }}"
