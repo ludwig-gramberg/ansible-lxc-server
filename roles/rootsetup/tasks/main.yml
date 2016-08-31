@@ -3,4 +3,5 @@
 - include: tasks/backports.yml
 - include: tasks/packages.yml
 - include: tasks/iptables.yml
+- include: tasks/systemd.yml
 - include: tasks/configuser.yml

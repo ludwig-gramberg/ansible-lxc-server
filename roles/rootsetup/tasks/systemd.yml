@@ -1,0 +1,7 @@
+---
+
+- name: persist sshd
+  lineinfile: dest=/lib/systemd/system/ssh.service line="Restart=always" regexp="^Restart=" insertafter="^\[Service\]"
+
+- name: systemd reload
+  command: systemctl daemon-reload
