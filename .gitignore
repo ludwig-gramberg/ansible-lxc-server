@@ -1,4 +1,8 @@
 /.idea
-/hosts
+/hosts*
+!/hosts.sample
 *.retry
 /keys
+/projects/*
+!/projects/sample
+!/projects/sample/*

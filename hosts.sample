@@ -21,6 +21,7 @@ container_bridge_uuid=a147a941-2b48-e94c-2fea-a0ccbe9454bb
 container_bridge_mac=52:54:00:6A:F0:80
 
 public_ip=0.0.0.0
+project=sample
 
 # === containers definition ===
 

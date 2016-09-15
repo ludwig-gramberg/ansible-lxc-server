@@ -1,0 +1,22 @@
+---
+
+- name: include vars
+  include_vars: "../../../projects/{{ project }}/admins.yml"
+
+- name: create admin
+  user: name="{{ item.admin.name }}" password="{{ item.admin.password }}" shell=/bin/bash groups=sudo append=yes
+  with_items: "{{ admins }}"
+
+- name: config user authorized key
+  authorized_key: user="{{ item.admin.name }}" key="{{ item.admin.ssh_key }}"
+  with_items: "{{ admins }}"
+
+- name: prep ssh_config_allow_users
+  set_fact:
+     ssh_config_allow_users: "{{ admins | map(attribute='admin.name') | join(' ') }}"
+
+- name: allow users in ssh
+  template: dest=/etc/ssh/sshd_config src=../../rootsetup/templates/sshd_config.j2 owner=root group=root mode=0644
+
+- name: reload ssh
+  command: systemctl reload ssh.service
