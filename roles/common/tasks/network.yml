@@ -1,0 +1,8 @@
+---
+
+# prevent problems with ipv6 later when downloading keys etc. during install
+# source: http://askubuntu.com/questions/32298/prefer-a-ipv4-dns-lookups-before-aaaaipv6-lookups
+# maybe further changes are necessary
+
+- name: ipv4 precedence over ipv6
+  lineinfile: dest=/etc/gai.conf line="precedence ::ffff:0:0/96  100"

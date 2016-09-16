@@ -1,7 +1,10 @@
+# IDE
 /.idea
-/hosts*
-!/hosts.sample
+
+# ansible
 *.retry
+
+# files
 /keys
 /projects/*
 !/projects/sample
