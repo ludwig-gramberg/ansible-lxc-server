@@ -16,7 +16,7 @@
   include_vars: "../../../projects/{{ project }}/vars/admins.yml"
 
 - name: container user ssh keys
-  authorized_key: user="{{ container_user }}" key="{{ item.admin.ssh_key }}"
+  authorized_key: user="{{ container_user }}" key="{{ item.ssh_key }}"
   with_items: "{{ admins }}"
 
 # file layout lxc user homefolder

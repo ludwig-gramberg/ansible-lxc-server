@@ -4,16 +4,16 @@
   include_vars: "../../../projects/{{ project }}/vars/admins.yml"
 
 - name: create admin
-  user: name="{{ item.admin.name }}" password="{{ item.admin.password }}" shell=/bin/bash groups=sudo append=yes
+  user: name="{{ item.name }}" password="{{ item.password }}" shell=/bin/bash groups=sudo append=yes
   with_items: "{{ admins }}"
 
 - name: config user authorized key
-  authorized_key: user="{{ item.admin.name }}" key="{{ item.admin.ssh_key }}"
+  authorized_key: user="{{ item.name }}" key="{{ item.ssh_key }}"
   with_items: "{{ admins }}"
 
 - name: prep ssh_config_allow_users
   set_fact:
-     ssh_config_allow_users: "{{ container_user }} {{ admins | map(attribute='admin.name') | join(' ') }}"
+     ssh_config_allow_users: "{{ container_user }} {{ admins | map(attribute='name') | join(' ') }}"
 
 - name: allow users in ssh
   template: dest=/etc/ssh/sshd_config src=shared/sshd_config.j2 owner=root group=root mode=0644

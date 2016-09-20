@@ -2,34 +2,65 @@
 
 # get container ready to be used directly via ssh bastion by ansible
 
-- name: create barebone container
-  command: lxc-create --name {{ container.hostname }} --template download -- --release jessie --arch amd64 --dist debian
+#- name: create barebone container
+#  command: lxc-create --name {{ container.hostname }} --template download -- --release jessie --arch amd64 --dist debian
+#  args:
+#    chdir: ~/
+#    creates: "~/.local/share/lxc/{{ container.hostname }}/config"
+#
+#- name: container config
+#  template: dest=~/.local/share/lxc/{{ container.hostname }}/config src=lxc.config.j2
+#
+## preparing some container files from outside container as root
+## mostly getting container network ready
+#
+#- name: ipv4 precedence over ipv6
+#  lineinfile: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
+#  become: yes
+#  become_user: root
+#
+#- name: network interfaces
+#  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
+#  become: yes
+#  become_user: root
+#
+#- name: resolve.conf
+#  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
+#  become: yes
+#  become_user: root
+#
+#- name: apt/sources.list
+#  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=apt.sources.list.j2
+#  become: yes
+#  become_user: root
+#
+## prep inside containers
+#
+#- name: start container
+#  command: lxc-start -d -n {{ container.hostname }}
+#  args:
+#    chdir: ~/
+#
+#- name: apt-get update via lxc-attach
+#  command: lxc-attach -n {{ container.hostname }} -- apt-get update
+#  args:
+#    chdir: ~/
+#
+#- name: install ssh server
+#  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y openssh-server
+#  args:
+#    chdir: ~/
+#    creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/etc/ssh/sshd_config
+
+# add admin users to each container and set public key
+
+- name: add admin users to container
+  command: lxc-attach -n {{ container.hostname }} -- adduser --disabled-password --gecos "" {{ config_user_name }}
   args:
     chdir: ~/
-    creates: "~/.local/share/lxc/{{ container.hostname }}/config"
+    creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}
 
-- name: container config
-  template: dest=~/.local/share/lxc/{{ container.hostname }}/config src=lxc.config.j2
-
-# preparing some container files from outside container as root
-# mostly getting container network ready
-
-- name: ipv4 precedence over ipv6
-  lineinfile: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
-  become: yes
-  become_user: root
-
-- name: network interfaces
-  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
-  become: yes
-  become_user: root
-
-- name: resolve.conf
-  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
-  become: yes
-  become_user: root
-
-- name: apt/sources.list
-  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=apt.sources.list.j2
+- name: add admin users public keys to container
+  authorized_key: user="{{ config_user_name }}" key="{{ config_user_public_key_file }}" path="/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
   become: yes
   become_user: root
