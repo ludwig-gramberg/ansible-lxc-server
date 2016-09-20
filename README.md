@@ -30,10 +30,10 @@ use at your own risk. you found this somewhere on the internet ;-)
 
 ## cfg files
 
-- ``ansible.cfg``: mainly used to realize ssh bastion connection
-- ``ssh.cfg``: ssh bastion setup
-- ``inventory``: ansible inventory
-- ``vars/admins.yml``: admin users which will have access to the system via ssh publickey
+- [``ansible.cfg``](ansible.cfg.sample): mainly used to realize ssh bastion connection
+- [``ssh.cfg``](ssh.cfg.sample): ssh bastion setup
+- [``inventory``](inventory.sample): ansible inventory
+- [``vars/admins.yml``](vars/admins.yml.sample): admin users which will have access to the system via ssh publickey
 
 ---
 
