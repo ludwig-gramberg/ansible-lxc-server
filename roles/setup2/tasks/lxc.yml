@@ -46,8 +46,8 @@
   args:
     chdir: ~/
 
-- name: install ssh server
-  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y openssh-server
+- name: install ssh server and python for ansible
+  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y openssh-server python
   args:
     chdir: ~/
     creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/etc/ssh/sshd_config

@@ -1,0 +1,11 @@
+Host HOST_SUBNET.*
+  IdentityFile KEYPATH
+  ProxyCommand ssh -W %h:%p HOSTIP
+
+Host HOSTIP
+  IdentityFile KEYPATH
+  HostName HOSTIP
+  User ludwig
+  ControlMaster auto
+  ControlPath  ~/.ssh/ansible-%r@%h:%p
+  ControlPersist 5m

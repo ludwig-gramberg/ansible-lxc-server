@@ -13,9 +13,8 @@ use at your own risk. you found this somewhere on the internet ;-)
 
 ## playbooks
 
-### rootsetup.yml
-  
-very basic setup which prepares the host. can only be run once because it uses root over ssh which it locks out at the end.
+run the setup0 to setup2 playbooks in order. reboot if the playbook tells you to at the end.  
+afterwards you can run container.yml to provision the containers.
   
 ### common.yml
 

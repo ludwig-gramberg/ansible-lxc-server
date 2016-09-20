@@ -3,3 +3,5 @@
 - include: tasks/admins.yml
 - include: tasks/bridge.yml
 - include: tasks/lxc.yml
+
+- debug: msg="reboot now"
