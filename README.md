@@ -13,12 +13,24 @@ use at your own risk. you found this somewhere on the internet ;-)
 
 ## playbooks
 
-run the setup0 to setup2 playbooks in order. reboot if the playbook tells you to at the end.  
-afterwards you can run container.yml to provision the containers.
-  
-### common.yml
+- ``setup0_basics.yml``
+  - prepares the host for secure ssh plublickey connection
+- ``setup1_lxc-env.yml``
+  - prepares the host for unprivileged lxc containers
+- ``setup2_container.yml``
+  - creates the containers with a minimal setup
+  - creates user inside container to be used by ansible
+- ``container.yml``
+  - provisions the containers directly via ssh
 
-uses admin user established in `rootsetup.yml` using public key authentication. prepares basic lxc setup and networking for lxc.
+---
+
+## cfg files
+
+- ``ansible.cfg``: mainly used to realize ssh bastion connection
+- ``ssh.cfg``: ssh bastion setup
+- ``inventory``: ansible inventory
+- ``vars/admins.yml``: admin users which will have access to the system via ssh publickey
 
 ---
 
