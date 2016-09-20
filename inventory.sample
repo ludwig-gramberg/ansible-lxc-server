@@ -38,6 +38,10 @@ hostname=c1
 
 # === containers in scope ===
 
+[container:vars]
+ansible_connection=ssh
+config_user_name=admin
+
 [container:children]
 c0
 c1
