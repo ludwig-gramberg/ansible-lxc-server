@@ -67,11 +67,6 @@
 - service: name=cgconfig enabled=yes state=started
 - service: name=cgred enabled=yes state=started
 
-# prepare template download
-
-- name: set DOWNLOAD_COMPAT_LEVEL to allow download unprivileged container templates
-  lineinfile: dest=/usr/share/lxc/templates/lxc-download regexp=^DOWNLOAD_COMPAT_LEVEL=1 line=DOWNLOAD_COMPAT_LEVEL=
-
 # allow container user access to lxc bridge
 
 - name: lxc bridge access
