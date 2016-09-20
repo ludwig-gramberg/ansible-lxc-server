@@ -14,11 +14,6 @@
 # preparing some container files from outside container as root
 # mostly getting container network ready
 
-#- name: give +x on container-folder
-#  file: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }} mode="a+x"
-#  become: yes
-#  become_user: root
-
 - name: ipv4 precedence over ipv6
   lineinfile: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
   become: yes
