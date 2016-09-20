@@ -25,7 +25,7 @@
   become_user: root
 
 - name: resolve.conf
-  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolve.conf src=resolve.conf.j2
+  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
   become: yes
   become_user: root
 
