@@ -1,7 +1,7 @@
 ---
 
 - name: include vars
-  include_vars: "../../../projects/{{ project }}/vars/admins.yml"
+  include_vars: "vars/admins.yml"
 
 - name: create admin
   user: name="{{ item.name }}" password="{{ item.password }}" shell=/bin/bash groups=sudo append=yes

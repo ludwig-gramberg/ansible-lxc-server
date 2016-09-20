@@ -13,7 +13,7 @@
   user: name="{{ container_user }}" password="{{ container_user }}" shell=/bin/bash append=yes
 
 - name: include vars
-  include_vars: "../../../projects/{{ project }}/vars/admins.yml"
+  include_vars: "vars/admins.yml"
 
 - name: container user ssh keys
   authorized_key: user="{{ container_user }}" key="{{ item.ssh_key }}"

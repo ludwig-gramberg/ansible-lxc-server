@@ -46,19 +46,23 @@
   args:
     chdir: ~/
 
-- name: install ssh server and python for ansible
-  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y openssh-server python
+- name: install ssh server and ansible requirements
+  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y openssh-server python sudo
   args:
     chdir: ~/
-    creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/etc/ssh/sshd_config
 
 # add admin users to each container and set public key
 
-- name: add admin users to container
-  command: lxc-attach -n {{ container.hostname }} -- adduser --disabled-password --gecos "" {{ config_user_name }}
+- name: add config user to container
+  command: lxc-attach -n {{ container.hostname }} -- useradd -p {{ config_user_password }} -s /bin/bash -m {{ config_user_name }}
   args:
     chdir: ~/
     creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}
+
+- name: sudo for config user
+  command: lxc-attach -n {{ container.hostname }} -- usermod -a -G sudo {{ config_user_name }}
+  args:
+    chdir: ~/
 
 - name: add admin users public keys to container
   authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
