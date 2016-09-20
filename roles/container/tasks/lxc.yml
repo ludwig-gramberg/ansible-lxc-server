@@ -64,3 +64,8 @@
   authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
   become: yes
   become_user: root
+
+- name: ownership of .ssh/authorized_keys
+  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner=100000 group=100000 mode=0755 recurse=yes
+  become: yes
+  become_user: root
