@@ -1,9 +1,40 @@
 ---
 
+# get container ready to be used directly via ssh bastion by ansible
+
 - name: create barebone container
-  command: lxc-create --name {{ container_hostname }} --template download -- --release jessie --arch amd64 --dist debian
+  command: lxc-create --name {{ container.hostname }} --template download -- --release jessie --arch amd64 --dist debian
   args:
     chdir: ~/
-    creates: "~/.local/share/lxc/{{ container_hostname }}/config"
-  become: true
-  become_user: "{{ container_user }}"
+    creates: "~/.local/share/lxc/{{ container.hostname }}/config"
+
+- name: container config
+  template: dest=~/.local/share/lxc/{{ container.hostname }}/config src=lxc.config.j2
+
+# preparing some container files from outside container as root
+# mostly getting container network ready
+
+#- name: give +x on container-folder
+#  file: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }} mode="a+x"
+#  become: yes
+#  become_user: root
+
+- name: ipv4 precedence over ipv6
+  lineinfile: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
+  become: yes
+  become_user: root
+
+- name: network interfaces
+  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
+  become: yes
+  become_user: root
+
+- name: resolve.conf
+  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolve.conf src=resolve.conf.j2
+  become: yes
+  become_user: root
+
+- name: apt/sources.list
+  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=apt.sources.list.j2
+  become: yes
+  become_user: root

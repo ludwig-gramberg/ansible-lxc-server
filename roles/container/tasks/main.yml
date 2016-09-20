@@ -3,6 +3,8 @@
 - name: spawn containers
   include: tasks/lxc.yml
   vars:
-     container_host: "{{ hostvars[item]['inventory_hostname'] }}"
-     container_hostname: "{{ hostvars[item]['hostname'] }}"
+     container: "{{ hostvars[item] }}"
+     container_ip: "{{ hostvars[item]['inventory_hostname'] }}"
   with_items: "{{ groups['container'] }}"
+  become: true
+  become_user: "{{ container_user }}"

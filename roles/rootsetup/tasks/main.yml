@@ -4,4 +4,6 @@
 - include: tasks/packages.yml
 - include: tasks/iptables.yml
 - include: tasks/systemd.yml
+- include: tasks/network.yml
 - include: tasks/configuser.yml
+- include: tasks/reboot.yml

@@ -12,10 +12,17 @@
 - name: create container user
   user: name="{{ container_user }}" password="{{ container_user }}" shell=/bin/bash append=yes
 
+- name: include vars
+  include_vars: "../../../projects/{{ project }}/vars/admins.yml"
+
+- name: container user ssh keys
+  authorized_key: user="{{ container_user }}" key="{{ item.admin.ssh_key }}"
+  with_items: "{{ admins }}"
+
 # file layout lxc user homefolder
 
 - name: homefolder create dir layout 1/2
-  file: path=/home/{{ container_user }}/{{ item }} owner={{ container_user }} group={{ container_user }} mode=0750 state=directory
+  file: path=/home/{{ container_user }}/{{ item }} owner={{ container_user }} group={{ container_user }} mode=0755 state=directory
   with_items:
     - .local/share/lxc
     - .local/share/lxcsnaps

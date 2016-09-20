@@ -1,6 +1,5 @@
 ---
 
 - include: tasks/admins.yml
-- include: tasks/network.yml
 - include: tasks/bridge.yml
 - include: tasks/lxc.yml

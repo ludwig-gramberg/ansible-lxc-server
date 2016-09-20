@@ -1,0 +1,18 @@
+# Distribution configuration
+lxc.include = /usr/share/lxc/config/debian.common.conf
+lxc.include = /usr/share/lxc/config/debian.userns.conf
+lxc.arch = x86_64
+
+# Container specific configuration
+lxc.id_map = u 0 100000 65536
+lxc.id_map = g 0 100000 65536
+lxc.rootfs = /home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs
+lxc.rootfs.backend = dir
+lxc.utsname = {{ container.hostname }}
+
+# Network configuration
+lxc.network.type = veth
+lxc.network.link = lxc
+lxc.network.flags = up
+lxc.network.ipv4 = {{ container_ip }}/24
+lxc.network.ipv4.gateway = {{ container_bridge_subnet }}.1
