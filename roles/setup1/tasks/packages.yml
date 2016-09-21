@@ -1,0 +1,24 @@
+---
+
+- name: apt/sources.list
+  template: dest=/etc/apt/sources.list src=apt.sources.list.j2
+
+- name: upgrade system
+  apt: upgrade=dist update_cache=yes
+
+- name: include vars
+  include_vars: "vars/packages.yml"
+
+- name: install basics 1/2
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items: "{{ essentials }}"
+
+- name: install basics 2/2
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items: "{{ essentials_master }}"
+
+- name: mysql-client
+  apt: name=mysql-client update_cache=yes state=latest
+
+- name: restart ntp
+  service: name=ntp state=restarted enabled=yes

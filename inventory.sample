@@ -3,25 +3,25 @@
 [master]
 mynode
 
-[master:vars]
-ansible_connection=ssh
-
-setup_ansible_user=root
-setup_ansible_ssh_pass=root
-
+[all:vars]
 config_user_name=admin
 config_user_password_clear=somepass
 config_user_password=somepass_encrypted
+container_bridge_subnet=10.11.0
+ansible_connection=ssh
+
+[master:vars]
+setup_ansible_user=root
+setup_ansible_ssh_pass=root
+
 config_user_public_key_file=~/.ssh/id_rsa.pub
 config_user_private_key_file=~/.ssh/id_rsa
 
 container_user=runlxc
-container_bridge_subnet=10.11.0
 container_bridge_uuid=a147a941-2b48-e94c-2fea-a0ccbe9454bb
 container_bridge_mac=52:54:00:6A:F0:80
 
 public_ip=0.0.0.0
-project=sample
 
 # === containers definition ===
 
@@ -37,10 +37,6 @@ hostname=c0
 hostname=c1
 
 # === containers in scope ===
-
-[container:vars]
-ansible_connection=ssh
-config_user_name=admin
 
 [container:children]
 c0

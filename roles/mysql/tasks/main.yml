@@ -1,6 +1,13 @@
 ---
 
-- name: install mysql-server
-  apt: name={{ item }} update_cache=yes state=latest
-  with_items:
-  - mysql-server-5.6
+- name: set vars
+  set_fact:
+     public_ip: "{{ ansible_default_ipv4.address }}"
+     iptables:
+       tcp:
+         inbound:
+           - port: 3306
+             source: "{{ container_bridge_subnet }}.0/24"
+
+- include: tasks/mysql-server.yml
+- include: tasks/iptables.yml

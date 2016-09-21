@@ -13,14 +13,14 @@ use at your own risk. you found this somewhere on the internet ;-)
 
 ## playbooks
 
-- ``setup0_basics.yml``
+- ``setup0.yml``
   - prepares the host for secure ssh plublickey connection
   - :exclamation: reboot after running this
   - :exclamation: can only be run once
-- ``setup1_lxc-env.yml``
+- ``setup1.yml``
   - prepares the host for unprivileged lxc containers
   - :exclamation: reboot after running this for the first time
-- ``setup2_container.yml``
+- ``setup2.yml``
   - creates the containers with a minimal setup
   - creates user inside container to be used by ansible
 - ``container.yml``

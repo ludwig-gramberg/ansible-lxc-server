@@ -6,7 +6,6 @@
 
 # files
 /keys
-/projects/*
 /ansible.cfg
 /ssh.cfg
 /inventory.*

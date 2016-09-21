@@ -1,0 +1,14 @@
+---
+
+- name: hosts file
+  template: dest=/etc/hosts src=hosts.j2
+
+- name: include vars
+  include_vars: "vars/packages.yml"
+
+- name: install essentials
+  environment:
+       DEBIAN_FRONTEND: noninteractive
+  apt: name={{ item }} state=latest
+  with_items: "{{ essentials }}"
+

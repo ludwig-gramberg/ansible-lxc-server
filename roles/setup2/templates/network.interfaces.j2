@@ -3,6 +3,8 @@ iface lo inet loopback
 
 auto eth0
 iface eth0 inet static
+   pre-up iptables-restore < /etc/iptables/rules.v4.source
+   pre-up ip6tables-restore < /etc/iptables/rules.v6.source
    netmask 255.255.255.0
    address {{ container_ip }}
    gateway {{ container_bridge_subnet }}.1

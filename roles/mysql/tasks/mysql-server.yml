@@ -1,0 +1,14 @@
+---
+
+- name: install mysql-server
+  apt: name={{ item }} state=latest default_release=jessie-backports
+  with_items:
+  - mysql-server-5.6
+
+- name: my.cnf
+  template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src=my.cnf.j2 backup=yes
+  register: mysqlcfg
+
+- name: enable and (re)start mysql
+  service: name=mysql state=restarted enabled=yes
+  when: mysqlcfg.changed

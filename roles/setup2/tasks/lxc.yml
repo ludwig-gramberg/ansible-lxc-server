@@ -24,6 +24,21 @@
   become: yes
   become_user: root
 
+- name: ipables dir
+  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables state=directory owner=100000 group=100000 mode=0644
+  become: yes
+  become_user: root
+
+- name: empty iptables rules v4
+  become: yes
+  become_user: root
+  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v4.source state=touch owner=100000 group=100000
+
+- name: empty iptables rules v6
+  become: yes
+  become_user: root
+  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v6.source state=touch owner=100000 group=100000
+
 - name: resolve.conf
   template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
   become: yes

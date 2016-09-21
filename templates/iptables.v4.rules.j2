@@ -13,6 +13,13 @@
 #  Allows SSH connections
 -A INPUT -p tcp -m state --state NEW --dport 22 -d {{ public_ip }} -j ACCEPT
 
+# Inbound TCP ports
+{% if iptables is defined %}
+{% for entry in iptables.tcp.inbound %}
+-A INPUT -p tcp -m state --state NEW {% if entry.source is defined %}-s {{ entry.source }}{% endif %} --dport {{ entry.port }} -d {{ public_ip }} -j ACCEPT
+{% endfor %}
+{% endif %}
+
 # Allow ping
 -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
 
