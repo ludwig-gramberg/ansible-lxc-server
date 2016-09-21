@@ -1,3 +1,5 @@
+UserKnownHostsFile = ./known_hosts
+
 Host HOST_SUBNET.*
   IdentityFile KEYPATH
   ProxyCommand ssh -W %h:%p HOSTIP

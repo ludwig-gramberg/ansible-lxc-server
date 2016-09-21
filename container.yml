@@ -1,10 +1,20 @@
-- hosts: container
-  vars:
-    ansible_user: "{{ config_user_name }}"
-#  ansible_become_pass: "{{ config_user_password_clear }}"
+#- hosts: container
+#  vars:
+#    ansible_user: "{{ config_user_name }}"
+#    ansible_become_pass: "{{ config_user_password_clear }}"
 #  become: true
 #  become_user: root
 #  become_method: sudo
-  tasks:
-   - name: test ssh
-     debug: var=vars
+#  tasks:
+#   - name: test ssh
+#     debug: var=vars.hostname
+
+- hosts: mysql
+  vars:
+    ansible_user: "{{ config_user_name }}"
+    ansible_become_pass: "{{ config_user_password_clear }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+   - mysql

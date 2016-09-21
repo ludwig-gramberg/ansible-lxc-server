@@ -12,3 +12,4 @@
 /inventory.*
 !/inventory.sample
 /vars/*.yml
+/known_hosts
