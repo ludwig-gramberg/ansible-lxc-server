@@ -1,0 +1,15 @@
+---
+
+- name: set vars
+  set_fact:
+     aptsources:
+       - "deb http://packages.dotdeb.org jessie all"
+       - "deb-src http://packages.dotdeb.org jessie all"
+     aptkeys:
+       - "https://www.dotdeb.org/dotdeb.gpg"
+
+- include: tasks/apt.sources.yml
+- include: tasks/packages.yml
+
+- name: enable php7.0
+  apache2_module: state=present name=php7.0

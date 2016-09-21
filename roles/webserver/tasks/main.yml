@@ -1,0 +1,19 @@
+---
+
+- name: set vars
+  set_fact:
+     public_ip: "{{ ansible_default_ipv4.address }}"
+     iptables:
+       tcp:
+         inbound:
+           - port: 80
+             source: "{{ container_bridge_subnet }}.0/24"
+           - port: 443
+             source: "{{ container_bridge_subnet }}.0/24"
+
+- include: tasks/packages.yml
+- include: tasks/iptables.yml
+
+# restart apache
+- name: start/enable apache
+  service: name=apache2 state=restarted enabled=yes

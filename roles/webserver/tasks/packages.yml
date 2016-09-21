@@ -1,0 +1,23 @@
+---
+
+- name: install requirements
+  environment:
+      DEBIAN_FRONTEND: noninteractive
+  apt: name={{ item }} state=latest
+  with_items:
+    - mysql-client
+    - apache2
+    - apache2-mpm-prefork
+    - apache2-utils
+    - apache2.2-bin
+    - apache2.2-common
+    - openssl
+    - ca-certificates
+
+- name: apache moduels
+  apache2_module: state=present name={{ item }}
+  with_items:
+    - ssl
+    - headers
+    - rewrite
+    - expires

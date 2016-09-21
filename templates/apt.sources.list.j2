@@ -8,3 +8,9 @@ deb http://ftp.de.debian.org/debian/ jessie-updates main
 deb-src http://ftp.de.debian.org/debian/ jessie-updates main
 
 deb http://ftp.debian.org/debian jessie-backports main
+
+{% if aptsources is defined %}
+{% for entry in aptsources %}
+{{ entry }}
+{% endfor %}
+{% endif %}

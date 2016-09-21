@@ -3,6 +3,8 @@
 - name: install mysql-server
   apt: name={{ item }} state=latest default_release=jessie-backports
   with_items:
+  - python
+  - python-mysqldb
   - mysql-server-5.6
 
 - name: my.cnf

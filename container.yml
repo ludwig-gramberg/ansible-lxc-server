@@ -8,12 +8,23 @@
   roles:
    - container
 
-#- hosts: mysql
-#  vars:
-#    ansible_user: "{{ config_user_name }}"
-#    ansible_become_pass: "{{ config_user_password_clear }}"
-#  become: true
-#  become_user: root
-#  become_method: sudo
-#  roles:
-#   - mysql
+- hosts: mysql
+  vars:
+    ansible_user: "{{ config_user_name }}"
+    ansible_become_pass: "{{ config_user_password_clear }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+   - mysql
+
+- hosts: ribbl
+  vars:
+    ansible_user: "{{ config_user_name }}"
+    ansible_become_pass: "{{ config_user_password_clear }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+   - webserver
+   - php7
