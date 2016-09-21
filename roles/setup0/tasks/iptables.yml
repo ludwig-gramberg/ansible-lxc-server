@@ -5,7 +5,7 @@
 - name: iptables v4 cfg folder
   file: path=/etc/iptables/ipv4 state=directory mode=0755
 - name: iptables v4 rules template
-  template: dest=/etc/iptables/ipv4/basic.rules src=shared/iptables.v4.basic.rules.j2 owner=root group=root mode=0644
+  template: dest=/etc/iptables/ipv4/basic.rules src=iptables.v4.basic.rules.j2 owner=root group=root mode=0644
 - name: iptables v4 load rules
   command: bash -c "iptables-restore < /etc/iptables/ipv4/basic.rules"
 - name: iptables v4 write back rules
@@ -16,7 +16,7 @@
 - name: iptables v6 cfg folder
   file: path=/etc/iptables/ipv6 state=directory mode=0755
 - name: iptables v6 rules template
-  template: dest=/etc/iptables/ipv6/basic.rules src=shared/iptables.v6.basic.rules.j2 owner=root group=root mode=0644
+  template: dest=/etc/iptables/ipv6/basic.rules src=iptables.v6.basic.rules.j2 owner=root group=root mode=0644
 - name: iptables v6 load rules
   command: bash -c "ip6tables-restore < /etc/iptables/ipv6/basic.rules"
 - name: iptables v6 write back rules

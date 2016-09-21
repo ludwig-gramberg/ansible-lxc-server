@@ -1,5 +1,8 @@
 ---
 
+- name: apt/sources.list
+  template: dest=/etc/apt/sources.list src=apt.sources.list.j2
+
 - name: upgrade system
   apt: upgrade=dist update_cache=yes
 
