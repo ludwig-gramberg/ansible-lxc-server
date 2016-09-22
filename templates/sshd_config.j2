@@ -35,3 +35,14 @@ X11DisplayOffset 10
 X11Forwarding no
 
 AllowUsers {{ ssh_config_allow_users }}
+
+{% if deploy_users is defined %}
+{% for d in deploy_users %}
+{% if d.name %}
+AllowUsers {{ d.name }}{% if d.net %}@{{ d.net }}{% endif %}
+
+Match User {{ d.name }}
+   ForceCommand internal-sftp
+{% endif %}
+{% endfor %}
+{% endif %}

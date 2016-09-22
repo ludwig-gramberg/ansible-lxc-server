@@ -27,5 +27,15 @@
   authorized_key: user="{{ item.name }}" key="{{ item.ssh_key }}"
   with_items: "{{ admins }}"
 
+- name: create deploy user group
+  group: name={{ deploy_user }} gid={{ deploy_user_uid }}
+  when: deploy_user is defined
+
+- name: create deploy user
+  user: name={{ deploy_user }} group={{ deploy_user }} shell=/bin/bash uid={{ deploy_user_uid }} append=yes
+  when: deploy_user is defined
+
 - name: ssh config
   template: dest=/etc/ssh/sshd_config src=sshd_config.j2
+  notify:
+    - reload sshd
