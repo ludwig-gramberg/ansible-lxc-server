@@ -5,16 +5,13 @@
       DEBIAN_FRONTEND: noninteractive
   apt: name={{ item }} state=latest
   with_items:
-    - libapache2-mod-php7.0
-    - php7.0
-    - php7.0-cli
-    - php7.0-common
+    - libapache2-mod-php
     - php7.0-curl
-    - php7.0-gd
     - php7.0-mcrypt
     - php7.0-mysql
     - php7.0-readline
     - php7.0-imap
+    - php7.0-gd
     - php7.0-imagick
     - php7.0-json
     - php7.0-xml

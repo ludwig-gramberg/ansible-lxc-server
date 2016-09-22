@@ -66,6 +66,11 @@
   args:
     chdir: ~/
 
+- name: update systemd from backports
+  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y systemd -t jessie-backports
+  args:
+    chdir: ~/
+
 # add admin users to each container and set public key
 
 - name: add config user to container
@@ -88,3 +93,15 @@
   file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner=100000 group=100000 mode=0755 recurse=yes
   become: yes
   become_user: root
+
+# restart container
+
+- name: restart container 1/2
+  command: lxc-stop -n {{ container.hostname }}
+  args:
+    chdir: ~/
+
+- name: restart container 2/2
+  command: lxc-start -d -n {{ container.hostname }}
+  args:
+    chdir: ~/

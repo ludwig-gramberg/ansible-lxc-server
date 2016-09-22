@@ -7,6 +7,11 @@
   with_items:
    - lxc
 
+# prepare download template
+
+- name: set DOWNLOAD_COMPAT_LEVEL to allow download unprivileged container templates
+  lineinfile: dest=/usr/share/lxc/templates/lxc-download regexp=^DOWNLOAD_COMPAT_LEVEL= line=DOWNLOAD_COMPAT_LEVEL=3
+
 # create container user
 
 - name: create container user
