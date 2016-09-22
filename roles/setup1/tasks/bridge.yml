@@ -7,8 +7,6 @@
   - python-libvirt
   - python-lxml
   - libvirt-bin
-  - ebtables
-  - dnsmasq
 
 - name: define network
   virt_net: command=define name=lxc xml='{{ lookup("template", "bridge/bridge.xml.j2") }}'
