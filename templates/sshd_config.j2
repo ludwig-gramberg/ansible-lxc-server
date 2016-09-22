@@ -36,13 +36,8 @@ X11Forwarding no
 
 AllowUsers {{ ssh_config_allow_users }}
 
-{% if deploy_users is defined %}
-{% for d in deploy_users %}
-{% if d.name %}
-AllowUsers {{ d.name }}{% if d.net %}@{{ d.net }}{% endif %}
-
-Match User {{ d.name }}
+{% if deploy_user is defined %}
+AllowUsers {{ deploy_user }}
+Match User {{ deploy_user }}
    ForceCommand internal-sftp
-{% endif %}
-{% endfor %}
 {% endif %}

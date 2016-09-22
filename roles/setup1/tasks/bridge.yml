@@ -8,6 +8,12 @@
   - python-lxml
   - libvirt-bin
 
+- name: include vars
+  include_vars: "vars/ports.yml"
+
+- name: create libvirt network hook
+  template: dest=/etc/libvirt/hooks/network src=templates/libvirt-hook-network.j2
+
 - name: define network
   virt_net: command=define name=lxc xml='{{ lookup("template", "bridge/bridge.xml.j2") }}'
 

@@ -9,36 +9,4 @@
   become: true
   become_user: "{{ container_user }}"
 
-- name: build deploy_users dict
-  set_fact:
-    deploy_users: "{{ deploy_users|default([]) | union( [ { 'name': hostvars[item].deploy_user|default(false), 'net': hostvars[item].deploy_user_net|default(false), 'host_uid': hostvars[item].deploy_user_host_uid|default(false), 'key': hostvars[item].deploy_user_key|default(false) } ] ) }}"
-  with_items: "{{ groups['container'] }}"
-
-- debug: var=deploy_users
-
-- name: include vars
-  include_vars: "vars/admins.yml"
-
-- name: prep ssh_config_allow_users
-  set_fact:
-     ssh_config_allow_users: "{{ admins | map(attribute='name') | join(' ') }}"
-
-- name: add deploy users to sshd config of host
-  template: dest=/etc/ssh/sshd_config src=templates/sshd_config.j2 backup=yes
-  notify:
-    - reload sshd
-
-- name: create deploy user group
-  group: name={{ item.name }} state=present gid={{ item.host_uid }}
-  when: item.name and item.host_uid and item.key
-  with_items: "{{ deploy_users }}"
-
-- name: create deploy user
-  user: name="{{ item.name }}" shell=/bin/bash uid={{ item.host_uid }} group={{ item.name }} groups="runlxc" append=yes
-  when: item.name and item.host_uid and item.key
-  with_items: "{{ deploy_users }}"
-
-- name: add deploy users key
-  authorized_key: user="{{ item.name }}" key="{{ item.key }}"
-  when: item.name and item.host_uid and item.key
-  with_items: "{{ deploy_users }}"
+- include: tasks/ports.yml
