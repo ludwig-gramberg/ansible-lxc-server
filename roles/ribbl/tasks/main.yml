@@ -1,0 +1,17 @@
+---
+
+- name: vars required for template vhost.internal.j2
+  set_fact:
+    asset_access: "css|txt|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html"
+    files_access: "css|txt|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html|doc|docx|xls|xlsx|tiff|zip|gz|tar|bz|bz2|mp3|mp4"
+
+- name: ribble vhost
+  template: dest=/etc/apache2/sites-available/project.conf src=templates/vhost.conf.j2
+  notify:
+    - restart apache
+
+- name: enable vhost
+  file: src=/etc/apache2/sites-available/project.conf dest=/etc/apache2/sites-enabled/000-project.conf owner=root group=root state=link
+  notify:
+    - restart apache
+

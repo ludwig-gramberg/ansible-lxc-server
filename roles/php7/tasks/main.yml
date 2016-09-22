@@ -10,6 +10,18 @@
 
 - include: tasks/apt.sources.yml
 - include: tasks/packages.yml
+- name: php-logdir
+  file: path=/var/log/php state=directory owner=www-data group=www-data mode=0755
+
+- name: php ini
+  template: dest=/etc/php/7.0/{{ item }}/php.ini src=templates/php.{{ item }}.ini.j2 backup=yes
+  with_items:
+    - "apache2"
+    - "cli"
+  notify:
+   - restart apache
 
 - name: enable php7.0
   apache2_module: state=present name=php7.0
+  notify:
+   - restart apache

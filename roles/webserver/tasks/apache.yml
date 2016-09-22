@@ -1,0 +1,9 @@
+- name: remove default enabled site
+  file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+  notify:
+    - restart apache
+
+- name: set server name
+  template: dest=/etc/apache2/conf-enabled/server-name.conf src=templates/server-name.conf.j2
+  notify:
+    - restart apache

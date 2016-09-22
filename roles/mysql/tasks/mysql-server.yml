@@ -9,8 +9,8 @@
 
 - name: my.cnf
   template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src=my.cnf.j2 backup=yes
-  register: mysqlcfg
+  notify:
+   - restart mysql
 
-- name: enable and (re)start mysql
-  service: name=mysql state=restarted enabled=yes
-  when: mysqlcfg.changed
+- name: enable mysql
+  service: name=mysql enabled=yes

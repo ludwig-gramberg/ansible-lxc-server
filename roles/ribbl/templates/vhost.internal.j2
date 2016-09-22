@@ -1,0 +1,93 @@
+ServerAdmin admin@{{ domain_name }}
+ServerName {{ domain_name }}
+DocumentRoot /var/www/project/
+
+<Directory />
+	Options +FollowSymLinks
+	AllowOverride None
+</Directory>
+<Directory /var/www/project/>
+	Options -Indexes +FollowSymLinks
+	AllowOverride None
+	require all granted
+
+	RewriteEngine on
+	RewriteBase /
+
+	RewriteCond %{HTTPS} off
+    RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+
+	RewriteRule ^cometchat/(.*)$ tools/cometchat/$1 [L]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^(.*)$ index.php?page=/$1 [L,QSA]
+
+	<FilesMatch "\.(ico|png|jpg|jpeg|gif|svg|svgz|webp|ogg|oga|mp3|wav|flac|m4a|ogv|mp4|webm|js|css|eot|ttf|otf|woff)$">
+		 Header set Cache-Control "max-age=604800, public"
+	</FilesMatch>
+</Directory>
+
+# ribble can write but no php execution is allowed:
+
+<Directory /var/www/project/files/>
+	php_admin_flag engine off
+	require all denied
+	<FilesMatch "\.({{ files_access }})$">
+	  require all granted
+	</FilesMatch>
+</Directory>
+<Directory /var/www/project/tools/cometchat/cache/>
+	php_admin_flag engine off
+	require all denied
+	<FilesMatch "\.({{ asset_access }})$">
+	  require all granted
+	</FilesMatch>
+</Directory>
+<Directory /var/www/project/style/>
+	php_admin_flag engine off
+	require all denied
+	<FilesMatch "\.({{ asset_access }})$">
+	  require all granted
+	</FilesMatch>
+</Directory>
+
+# asset access in mixed content area
+
+<Directory /var/www/project/vendor/>
+	php_admin_flag engine off
+	require all denied
+	<FilesMatch "\.({{ asset_access }})$">
+	  require all granted
+	</FilesMatch>
+</Directory>
+
+<Directory /var/www/project/modules/>
+	php_admin_flag engine off
+	require all denied
+	<FilesMatch "\.({{ asset_access }})$">
+	  require all granted
+	</FilesMatch>
+</Directory>
+
+# no public access
+
+<Directory /var/www/project/css/>
+	require all denied
+</Directory>
+<Directory /var/www/project/files/dbb/>
+	require all denied
+</Directory>
+<Directory /var/www/project/files/scenario/>
+	require all denied
+</Directory>
+<Directory /var/www/project/lib/>
+	require all denied
+</Directory>
+<Directory /var/www/project/src/>
+	require all denied
+</Directory>
+<Directory /var/www/project/templates/>
+	require all denied
+</Directory>
+<Directory /var/www/project/tmp/>
+	require all denied
+</Directory>

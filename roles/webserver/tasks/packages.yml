@@ -11,7 +11,7 @@
     - openssl
     - ca-certificates
 
-- name: apache moduels
+- name: apache modules
   apache2_module: state=present name={{ item }}
   with_items:
     - ssl

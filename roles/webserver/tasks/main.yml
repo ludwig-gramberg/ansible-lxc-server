@@ -13,7 +13,4 @@
 
 - include: tasks/packages.yml
 - include: tasks/iptables.yml
-
-# restart apache
-- name: start/enable apache
-  service: name=apache2 state=restarted enabled=yes
+- include: tasks/apache.yml

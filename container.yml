@@ -28,3 +28,4 @@
   roles:
    - webserver
    - php7
+   - ribbl
