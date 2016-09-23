@@ -1,5 +1,14 @@
 ---
 
+- include_vars: vars/ports.yml
+
+- set_fact:
+    iptables:
+      inbound: "{{ ports.inbound }}"
+
+- name: iptables
+  include: tasks/iptables.yml
+
 - name: spawn containers
   include: tasks/lxc.yml
   vars:

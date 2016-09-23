@@ -1,4 +1,9 @@
 ---
+- set_fact:
+    iptables:
+       inbound:
+         - port: 22
+           proto: tcp
 
 - include: tasks/packages.yml
 - include: tasks/iptables.yml
