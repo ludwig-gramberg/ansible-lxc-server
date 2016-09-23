@@ -5,6 +5,8 @@
      public_ip: "{{ ansible_default_ipv4.address }}"
      iptables:
        inbound:
+         - port: 22
+           proto: tcp
          - port: 3306
            proto: tcp
            source: "{{ container_bridge_subnet }}.0/24"

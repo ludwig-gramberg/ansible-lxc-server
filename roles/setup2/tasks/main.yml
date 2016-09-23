@@ -9,6 +9,15 @@
 - name: iptables
   include: tasks/iptables.yml
 
+# iptables rules dont include udp/tcp set by libvirt to allow dns for containers
+# thus a restart of the lxc-network is necessary
+
+- name: restart lxc network 1/2
+  virt_net: command=destroy name=lxc
+
+- name: restart lxc network 2/2
+  virt_net: command=start name=lxc
+
 - name: spawn containers
   include: tasks/lxc.yml
   vars:

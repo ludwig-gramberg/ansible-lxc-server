@@ -17,8 +17,6 @@
 
 - include_vars: vars/databases.yml
 
-- debug: var=databases
-
 - name: create databases
   mysql_db: name={{ item.name }} encoding={{ item.encoding }} collation={{ item.collation }} login_user=root
   with_items: "{{ databases.mysql }}"

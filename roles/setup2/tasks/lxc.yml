@@ -19,69 +19,66 @@
   lineinfile: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
   become: yes
   become_user: root
-  when: container_created.changed
 
 - name: network interfaces
   template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
   become: yes
   become_user: root
-  when: container_created.changed
 
 - name: ipables dir
   file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables state=directory owner=100000 group=100000 mode=0644
   become: yes
   become_user: root
-  when: container_created.changed
 
 - name: empty iptables rules v4
   become: yes
   become_user: root
   file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v4.source state=touch owner=100000 group=100000
-  when: container_created.changed
 
 - name: empty iptables rules v6
   become: yes
   become_user: root
   file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v6.source state=touch owner=100000 group=100000
-  when: container_created.changed
 
 - name: resolve.conf
   template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
   become: yes
   become_user: root
-  when: container_created.changed
 
 - name: apt/sources.list
   template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=apt.sources.list.j2
   become: yes
   become_user: root
-  when: container_created.changed
 
-# prep inside containers
+# restart container
 
-- name: start container
+- name: restart container 1/2
+  command: lxc-stop -k -n {{ container.hostname }}
+  args:
+    chdir: ~/
+  ignore_errors: yes
+
+- name: restart container 2/2
   command: lxc-start -d -n {{ container.hostname }}
   args:
     chdir: ~/
-  when: container_created.changed
+
+# attach and run commands
 
 - name: apt-get update via lxc-attach
   command: lxc-attach -n {{ container.hostname }} -- apt-get update
   args:
     chdir: ~/
-  when: container_created.changed
 
 - name: install ssh server and ansible requirements
   command: lxc-attach -n {{ container.hostname }} -- apt-get install -y openssh-server python sudo
   args:
     chdir: ~/
-  when: container_created.changed
 
 - name: update systemd from backports
   command: lxc-attach -n {{ container.hostname }} -- apt-get install -y systemd -t jessie-backports
   args:
     chdir: ~/
-  when: container_created.changed
 
 # add admin users to each container and set public key
 
@@ -90,36 +87,18 @@
   args:
     chdir: ~/
     creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}
-  when: container_created.changed
 
 - name: sudo for config user
   command: lxc-attach -n {{ container.hostname }} -- usermod -a -G sudo {{ config_user_name }}
   args:
     chdir: ~/
-  when: container_created.changed
 
 - name: add admin users public keys to container
   authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
   become: yes
   become_user: root
-  when: container_created.changed
 
 - name: ownership of .ssh/authorized_keys
   file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner=100000 group=100000 mode=0755 recurse=yes
   become: yes
   become_user: root
-  when: container_created.changed
-
-# restart container
-
-- name: restart container 1/2
-  command: lxc-stop -k -n {{ container.hostname }}
-  args:
-    chdir: ~/
-  when: container_created.changed
-
-- name: restart container 2/2
-  command: lxc-start -d -n {{ container.hostname }}
-  args:
-    chdir: ~/
-  when: container_created.changed
