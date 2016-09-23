@@ -21,6 +21,9 @@
     - dir: /var/www/project/tools/cometcache/cache
       owner: www-data
 
+- name: ribble cfg
+  template: dest=/var/www/project/config.php src=templates/config.php.j2 owner=root group=root mode=0755
+
 - name: ribble vhost
   template: dest=/etc/apache2/sites-available/project.conf src=templates/vhost.conf.j2
   notify:
