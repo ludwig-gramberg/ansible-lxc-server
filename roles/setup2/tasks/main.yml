@@ -8,3 +8,6 @@
   with_items: "{{ groups['container'] }}"
   become: true
   become_user: "{{ container_user }}"
+
+- name: container autostart
+  cron: name="lxc-autostart" special_time=reboot job="sleep 30 ; lxc-autostart" user={{ container_user }}

@@ -14,8 +14,8 @@ DocumentRoot /var/www/project/
 	RewriteEngine on
 	RewriteBase /
 
-	RewriteCond %{HTTPS} off
-    RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+	#RewriteCond %{HTTPS} off
+    #RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 
 	RewriteRule ^cometchat/(.*)$ tools/cometchat/$1 [L]
 	RewriteCond %{REQUEST_FILENAME} !-f

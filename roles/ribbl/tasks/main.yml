@@ -5,6 +5,22 @@
     asset_access: "css|txt|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html"
     files_access: "css|txt|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html|doc|docx|xls|xlsx|tiff|zip|gz|tar|bz|bz2|mp3|mp4"
 
+- name: directories
+  file: dest={{ item.dir }} state=directory mode=755 owner={{ item.owner }} group={{ item.owner }}
+  with_items:
+    - dir: /var/www/project
+      owner: "{{ deploy_user }}"
+    - dir: /var/www/project/files
+      owner: www-data
+    - dir: /var/www/project/tmp
+      owner: www-data
+    - dir: /var/www/project/tools
+      owner: "{{ deploy_user }}"
+    - dir: /var/www/project/tools/cometcache
+      owner: "{{ deploy_user }}"
+    - dir: /var/www/project/tools/cometcache/cache
+      owner: www-data
+
 - name: ribble vhost
   template: dest=/etc/apache2/sites-available/project.conf src=templates/vhost.conf.j2
   notify:
