@@ -1,0 +1,20 @@
+---
+
+- name: remove default enabled site
+  file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+  notify:
+    - restart apache
+
+- include_vars: vars/sites.yml
+
+- name: reverse proxy vhosts
+  template: dest=/etc/apache2/sites-available/reverse-{{ item.domain }}.conf src=templates/vhost.conf.j2
+  with_items: "{{ sites }}"
+  notify:
+    - restart apache
+
+- name: enable vhost
+  file: src=/etc/apache2/sites-available/reverse-{{ item.domain }}.conf dest=/etc/apache2/sites-enabled/reverse-{{ item.domain }}.conf owner=root group=root state=link
+  with_items: "{{ sites }}"
+  notify:
+    - restart apache

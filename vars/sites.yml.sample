@@ -1,0 +1,9 @@
+---
+
+# sites the master provides reverse proxy for
+
+sites:
+  - domain: somedomain
+    admin: some email
+    public_ip: someip
+    target_ip: someip

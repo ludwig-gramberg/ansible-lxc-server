@@ -13,3 +13,5 @@
   with_items: "{{ essentials }}"
 
 - include: tasks/users.yml
+
+# todo: ssmtp

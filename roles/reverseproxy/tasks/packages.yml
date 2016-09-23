@@ -1,0 +1,22 @@
+---
+
+- name: install requirements
+  environment:
+      DEBIAN_FRONTEND: noninteractive
+  apt: name={{ item }} state=latest
+  with_items:
+    - apache2
+    - apache2-mpm-prefork
+    - libapache2-mod-proxy-html
+    - openssl
+    - ca-certificates
+
+- name: apache modules
+  apache2_module: state=present name={{ item }}
+  with_items:
+    - ssl
+    - headers
+    - rewrite
+    - expires
+    - proxy
+    - proxy_http

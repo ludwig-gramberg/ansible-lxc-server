@@ -1,0 +1,53 @@
+
+<VirtualHost {{ item.public_ip }}:80>
+
+	ServerAdmin {{ item.admin }}
+	ServerName {{ item.domain }}
+	{% if item.aliases is defined %}
+	{% for alias in item.alias %}
+    ServerAlias alias
+    {% endfor %}
+    {% endif %}
+
+    ProxyRequests Off
+    ProxyPreserveHost On
+	ProxyPass / http://{{ item.target_ip }}/ disableReuse=On retry=5
+	ProxyPassReverse / http://{{ item.target_ip }}/
+    ProxyVia On
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+	LogLevel warn
+
+</VirtualHost>
+
+{% if item.ssl is defined %}
+<VirtualHost {{ item.public_ip }}:443>
+
+    ServerAdmin {{ item.admin }}
+	ServerName {{ item.domain }}
+	{% if item.aliases is defined %}
+	{% for alias in item.alias %}
+	ServerAlias alias
+	{% endfor %}
+	{% endif %}
+
+    ProxyRequests Off
+	ProxyPreserveHost On
+	ProxyPass / https://{{ item.target_ip }}/ disableReuse=On retry=5
+	ProxyPassReverse / https://{{ item.target_ip }}/
+	ProxyVia On
+
+    SSLProxyEngine On
+    SSLProxyCheckPeerCN Off
+    SSLProxyCheckPeerExpire Off
+
+    SSLEngine ON
+	SSLCertificateFile {{ item.ssl.cert_file }}
+	SSLCertificateKeyFile {{ item.ssl.cert_key_file }}
+	SSLCertificateChainFile {{ item.ssl.cert_chain_file }}
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    LogLevel warn
+
+</VirtualHost>
+{% endif  %}
