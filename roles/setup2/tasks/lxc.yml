@@ -11,7 +11,6 @@
 
 - name: container config
   template: dest=~/.local/share/lxc/{{ container.hostname }}/config src=lxc.config.j2
-  when: container_created.changed
 
 # preparing some container files from outside container as root
 # mostly getting container network ready

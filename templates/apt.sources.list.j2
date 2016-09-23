@@ -1,13 +1,13 @@
-deb http://ftp.de.debian.org/debian/ jessie main
-deb-src http://ftp.de.debian.org/debian/ jessie main
+deb http://{{ apt_server }}/debian/ jessie main
+deb-src http://{{ apt_server }}/debian/ jessie main
 
 deb http://security.debian.org/ jessie/updates main
 deb-src http://security.debian.org/ jessie/updates main
 
-deb http://ftp.de.debian.org/debian/ jessie-updates main
-deb-src http://ftp.de.debian.org/debian/ jessie-updates main
+deb http://{{ apt_server }}/debian/ jessie-updates main
+deb-src http://{{ apt_server }}/debian/ jessie-updates main
 
-deb http://ftp.debian.org/debian jessie-backports main
+deb http://{{ apt_server }}/debian jessie-backports main
 
 {% if aptsources is defined %}
 {% for entry in aptsources %}

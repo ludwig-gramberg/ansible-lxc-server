@@ -8,5 +8,3 @@
   with_items: "{{ groups['container'] }}"
   become: true
   become_user: "{{ container_user }}"
-
-- include: tasks/ports.yml

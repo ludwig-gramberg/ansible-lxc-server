@@ -16,7 +16,7 @@
   with_items: "{{ admins }}"
 
 - name: create deploy user
-  user: name={{ deploy_user }} group={{ deploy_user }} shell=/bin/bash uid={{ deploy_user_uid }} append=yes
+  user: name={{ deploy_user }} shell=/bin/bash append=yes
   when: deploy_user is defined
 
 - name: deploy user authorized key
