@@ -20,6 +20,8 @@
       owner: "{{ deploy_user }}"
     - dir: /var/www/project/tools/cometchat/cache
       owner: www-data
+    - dir: /var/www/project/tools/cometchat/temp
+      owner: www-data
 
 - name: ribbl cfg
   template: dest=/var/www/project/config.php src=templates/config.php.j2 owner=root group=root mode=0755
