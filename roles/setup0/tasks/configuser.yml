@@ -1,6 +1,6 @@
 ---
 
-- name: create admin/config user
+- name: create config user
   user: name="{{ config_user_name }}" password="{{ config_user_password }}" shell=/bin/bash groups=sudo append=yes
 
 - name: config user authorized key

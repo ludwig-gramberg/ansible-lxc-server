@@ -3,15 +3,11 @@
 - name: include vars
   include_vars: "vars/admins.yml"
 
-- name: prep ssh_config_allow_users
-  set_fact:
-     ssh_config_allow_users: "{{ admins | map(attribute='name') | join(' ') }}"
-
 - name: create admin
   user: name="{{ item.name }}" password="{{ item.password }}" shell=/bin/bash groups=sudo append=yes
   with_items: "{{ admins }}"
 
-- name: config user authorized key
+- name: admin authorized key
   authorized_key: user="{{ item.name }}" key="{{ item.ssh_key }}"
   with_items: "{{ admins }}"
 

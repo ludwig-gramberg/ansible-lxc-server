@@ -34,7 +34,13 @@ UsePrivilegeSeparation yes
 X11DisplayOffset 10
 X11Forwarding no
 
-AllowUsers {{ ssh_config_allow_users }}
+AllowUsers {{ config_user_name }}
+
+{% if admins is defined %}
+{% for a in admins %}
+AllowUsers {{ a.name }}
+{% endfor %}
+{% endif %}
 
 {% if deploy_user is defined %}
 AllowUsers {{ deploy_user }}
