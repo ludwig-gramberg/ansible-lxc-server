@@ -25,7 +25,7 @@
   become: yes
   become_user: root
 
-- name: ipables dir
+- name: iptables dir
   file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables state=directory owner=100000 group=100000 mode=0644
   become: yes
   become_user: root
