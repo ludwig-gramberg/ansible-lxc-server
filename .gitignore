@@ -9,6 +9,7 @@
 /certs
 /ansible.cfg
 /ssh.cfg
+/inventory
 /inventory.*
 !/inventory.sample
 /vars/*.yml
