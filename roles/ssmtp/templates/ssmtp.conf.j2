@@ -1,0 +1,7 @@
+root={{ ssmtp_email }}
+mailhub={{ ssmtp_server }}
+hostname={{ ansible_hostname }}
+FromLineOverride=YES
+UseSTARTTLS=YES
+AuthUser={{ ssmtp_user }}
+AuthPass={{ ssmtp_pass }}
