@@ -21,10 +21,20 @@
     - dir: /var/www/project/tools/cometcache/cache
       owner: www-data
 
-- name: ribble cfg
+- name: ribbl cfg
   template: dest=/var/www/project/config.php src=templates/config.php.j2 owner=root group=root mode=0755
 
-- name: ribble vhost
+- include_vars: vars/sites.yml
+
+- name: ssl settings
+  set_fact:
+     ssl: "{{ item.ssl }}"
+  with_items: "{{ sites }}"
+  when: item.target_ip == "{{ ansible_default_ipv4.address }}"
+
+- debug: var=ssl
+
+- name: ribbl vhost
   template: dest=/etc/apache2/sites-available/project.conf src=templates/vhost.conf.j2
   notify:
     - restart apache

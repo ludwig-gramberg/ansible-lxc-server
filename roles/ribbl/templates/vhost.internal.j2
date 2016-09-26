@@ -14,9 +14,10 @@ DocumentRoot /var/www/project/
 	RewriteEngine on
 	RewriteBase /
 
-    # todo: fix this, make ssl optional
-	#RewriteCond %{HTTPS} off
-    #RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+	{% if ssl is defined %}
+	RewriteCond %{HTTPS} off
+    RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+    {% endif %}
 
 	RewriteRule ^cometchat/(.*)$ tools/cometchat/$1 [L]
 	RewriteCond %{REQUEST_FILENAME} !-f
@@ -27,7 +28,7 @@ DocumentRoot /var/www/project/
 	</FilesMatch>
 </Directory>
 
-# ribble can write but no php execution is allowed:
+# ribbl can write but no php execution is allowed:
 
 <Directory /var/www/project/files/>
 	php_admin_flag engine off
