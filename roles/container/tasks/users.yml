@@ -8,8 +8,10 @@
   with_items: "{{ admins }}"
 
 - name: admin authorized key
-  authorized_key: user="{{ item.name }}" key="{{ item.ssh_key }}"
-  with_items: "{{ admins }}"
+  authorized_key: user="{{ item.0.name }}" key="{{ item.1.key }}"
+  with_subelements:
+    - "{{ admins }}"
+    - ssh_keys
 
 - name: create deploy user
   user: name={{ deploy_user }} shell=/bin/bash append=yes

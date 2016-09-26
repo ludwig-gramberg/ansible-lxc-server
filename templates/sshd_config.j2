@@ -36,6 +36,10 @@ X11Forwarding no
 
 AllowUsers {{ config_user_name }}
 
+{% if container_user is defined %}
+AllowUsers {{ container_user }}
+{% endif %}
+
 {% if admins is defined %}
 {% for a in admins %}
 AllowUsers {{ a.name }}
