@@ -1,5 +1,12 @@
 ServerAdmin admin@{{ domain_name }}
+
 ServerName {{ domain_name }}
+{% if site.aliases is defined %}
+{% for alias in site.aliases %}
+ServerAlias alias
+{% endfor %}
+{% endif %}
+
 DocumentRoot /var/www/project/
 
 <Directory />
@@ -14,10 +21,13 @@ DocumentRoot /var/www/project/
 	RewriteEngine on
 	RewriteBase /
 
-	{% if ssl is defined %}
+	{% if site.ssl is defined %}
 	RewriteCond %{HTTPS} off
-    RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+    RewriteRule .* https://{{ site.domain }}%{REQUEST_URI} [R=301,L]
     {% endif %}
+
+    RewriteCond %{HTTP_HOST} !^{{ site.domain | replace('.', '\.') }}$
+    RewriteRule .* http{% if site.ssl is defined %}s{% endif %}://{{ site.domain }}%{REQUEST_URI} [R=301,L]
 
 	RewriteRule ^cometchat/(.*)$ tools/cometchat/$1 [L]
 	RewriteCond %{REQUEST_FILENAME} !-f

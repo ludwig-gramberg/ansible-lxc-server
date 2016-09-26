@@ -16,9 +16,9 @@
       owner: www-data
     - dir: /var/www/project/tools
       owner: "{{ deploy_user }}"
-    - dir: /var/www/project/tools/cometcache
+    - dir: /var/www/project/tools/cometchat
       owner: "{{ deploy_user }}"
-    - dir: /var/www/project/tools/cometcache/cache
+    - dir: /var/www/project/tools/cometchat/cache
       owner: www-data
 
 - name: ribbl cfg
@@ -26,13 +26,11 @@
 
 - include_vars: vars/sites.yml
 
-- name: ssl settings
+- name: populate site
   set_fact:
-     ssl: "{{ item.ssl }}"
+     site: "{{ item }}"
   with_items: "{{ sites }}"
   when: item.target_ip == "{{ ansible_default_ipv4.address }}"
-
-- debug: var=ssl
 
 - name: ribbl vhost
   template: dest=/etc/apache2/sites-available/project.conf src=templates/vhost.conf.j2
