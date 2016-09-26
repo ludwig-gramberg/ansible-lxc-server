@@ -7,7 +7,5 @@
   become_user: root
   become_method: sudo
   roles:
-   - ssmtp
-   - reverseproxy
-
-# todo: ssmtp
+    - ssmtp
+    - reverseproxy

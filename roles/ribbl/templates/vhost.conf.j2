@@ -7,6 +7,7 @@
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 
+{% if ssl_cert_file is defined %}
 <VirtualHost *:443>
 
 	{% include "templates/vhost.internal.j2" ignore missing %}
@@ -15,7 +16,9 @@
 	LogLevel warn
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 
-	#SSLEngine On
-    #SSLCertificateFile /etc/ssl/certs/web/{{ domain_name }}.pem
-    #SSLCertificateKeyFile /etc/ssl/certs/web/{{ domain_name }}.key
+	SSLEngine ON
+	SSLCertificateFile {{ ssl_cert_file }}
+	SSLCertificateKeyFile {{ ssl_cert_key_file }}
+	SSLCertificateChainFile {{ ssl_cert_chain_file }}
 </VirtualHost>
+{% endif %}

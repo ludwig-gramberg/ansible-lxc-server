@@ -42,9 +42,9 @@
     SSLProxyCheckPeerExpire Off
 
     SSLEngine ON
-	SSLCertificateFile {{ item.ssl.cert_file }}
-	SSLCertificateKeyFile {{ item.ssl.cert_key_file }}
-	SSLCertificateChainFile {{ item.ssl.cert_chain_file }}
+    SSLCertificateFile /etc/ssl-site-certs/{{ item.ssl.cert_file }}
+    SSLCertificateKeyFile /etc/ssl-site-certs/{{ item.ssl.cert_key_file }}
+    SSLCertificateChainFile /etc/ssl-site-certs/{{ item.ssl.cert_chain_file }}
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
     LogLevel warn

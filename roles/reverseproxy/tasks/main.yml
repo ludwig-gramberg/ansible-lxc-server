@@ -2,3 +2,18 @@
 
 - include: tasks/packages.yml
 - include: tasks/apache.yml
+
+# prepare list of ssl-certs to be deployed
+
+- include_vars: vars/sites.yml
+
+- name: build deploy_certs list 1/2
+  set_fact:
+    deploy_certs_tmp: "{{ deploy_certs_tmp|default([]) | union( [  item.ssl.cert_file|default(false), item.ssl.cert_key_file|default(false), item.ssl.cert_chain_file|default(false), item.ssl.cert_sign_file|default(false)  ] ) }}"
+  with_items: "{{ sites }}"
+
+- name: build deploy_certs list 2/2
+  set_fact:
+    deploy_certs: "{{ deploy_certs_tmp|select()|list }}"
+
+- include: tasks/ssl.certs.yml

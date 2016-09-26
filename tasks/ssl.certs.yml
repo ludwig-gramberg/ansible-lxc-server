@@ -1,0 +1,10 @@
+---
+
+- name: cert dir
+  file: path=/etc/ssl-site-certs/ owner=root group=root mode=0755 state=directory
+
+- name: deploy certs
+  copy: dest=/etc/ssl-site-certs/{{ item }} src=certs/{{ item }} owner=root group=root mode=0400
+  with_items: "{{ deploy_certs }}"
+  notify:
+    - restart apache
