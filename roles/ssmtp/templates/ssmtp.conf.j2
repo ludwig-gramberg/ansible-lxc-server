@@ -3,5 +3,7 @@ mailhub={{ ssmtp_server }}
 hostname={{ ansible_hostname }}
 FromLineOverride=YES
 UseSTARTTLS=YES
+UseTLS=yes
 AuthUser={{ ssmtp_user }}
 AuthPass={{ ssmtp_pass }}
+AuthMethod=Login

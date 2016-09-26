@@ -4,7 +4,7 @@
   apt: pkg=ssmtp state=latest
 
 - name: ssmtp conf file
-  template: src=templates/ssmtp.conf.j2 dest=/etc/ssmtp/ssmtp.conf backup=yes
+  template: src=templates/ssmtp.conf.j2 dest=/etc/ssmtp/ssmtp.conf backup=yes owner=root group=root mode=0600
 
 - name: ssmtp revaliases file
-  template: src=templates/revaliases.j2 dest=/etc/ssmtp/revaliases backup=yes
+  template: src=templates/revaliases.j2 dest=/etc/ssmtp/revaliases backup=yes owner=root group=root mode=0600
