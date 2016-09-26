@@ -1,6 +1,7 @@
 ---
 
 - include: tasks/packages.yml
+- include: tasks/apticron.yml
 - include: tasks/admins.yml
 - include: tasks/bridge.yml
 - include: tasks/lxc.yml

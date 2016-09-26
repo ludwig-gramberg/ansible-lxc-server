@@ -11,6 +11,12 @@ container_bridge_subnet=10.11.0
 ansible_connection=ssh
 apt_server=ftp.cz.debian.org
 
+ssmtp_email=""
+ssmtp_server=""
+ssmtp_user=""
+ssmtp_pass=""
+ssmtp_port=""
+
 [master:vars]
 setup_ansible_user=root
 setup_ansible_ssh_pass=root

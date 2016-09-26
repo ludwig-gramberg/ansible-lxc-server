@@ -13,5 +13,6 @@
   with_items: "{{ essentials }}"
 
 - include: tasks/users.yml
+- include: tasks/apticron.yml
 
 # todo: ssmtp
