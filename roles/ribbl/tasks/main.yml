@@ -12,6 +12,10 @@
       owner: "{{ deploy_user }}"
     - dir: /var/www/project/files
       owner: www-data
+    - dir: /var/www/project/files/dbb
+      owner: www-data
+    - dir: /var/www/project/files/dbb/backups
+      owner: www-data
     - dir: /var/www/project/tmp
       owner: www-data
     - dir: /var/www/project/tools
