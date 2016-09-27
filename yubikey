@@ -1,0 +1,17 @@
+sshd_config:
+
+# yubi
+ChallengeResponseAuthentication yes
+PasswordAuthentication no
+Match User test
+  AuthenticationMethods publickey,keyboard-interactive
+# not yubi
+Match User pubkey
+  AuthenticationMethods publickey
+
+apt-get install libpam-yubico
+
+/etc/pam.d/sshd:
+
+#@include common-auth
+auth    required        pam_yubico.so id=13442 debug
