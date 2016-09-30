@@ -3,7 +3,7 @@ ServerAdmin admin@{{ domain_name }}
 ServerName {{ domain_name }}
 {% if site.aliases is defined %}
 {% for alias in site.aliases %}
-ServerAlias alias
+ServerAlias {{ alias }}
 {% endfor %}
 {% endif %}
 

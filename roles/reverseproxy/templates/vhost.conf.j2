@@ -5,14 +5,14 @@
 	ServerName {{ item.domain }}
 	{% if item.aliases is defined %}
 	{% for alias in item.aliases %}
-    ServerAlias alias
+    ServerAlias {{ alias }}
     {% endfor %}
     {% endif %}
 
     ProxyRequests Off
     ProxyPreserveHost On
-	ProxyPass / http://{{ item.target_ip }}/ disableReuse=On retry=5
-	ProxyPassReverse / http://{{ item.target_ip }}/
+	ProxyPass / http://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/ disableReuse=On retry=5
+	ProxyPassReverse / http://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/
     ProxyVia On
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
@@ -27,14 +27,14 @@
 	ServerName {{ item.domain }}
 	{% if item.aliases is defined %}
 	{% for alias in item.aliases %}
-	ServerAlias alias
+	ServerAlias {{ alias }}
 	{% endfor %}
 	{% endif %}
 
     ProxyRequests Off
 	ProxyPreserveHost On
-	ProxyPass / https://{{ item.target_ip }}/ disableReuse=On retry=5
-	ProxyPassReverse / https://{{ item.target_ip }}/
+	ProxyPass / https://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/ disableReuse=On retry=5
+	ProxyPassReverse / https://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/
 	ProxyVia On
 
     SSLProxyEngine On
