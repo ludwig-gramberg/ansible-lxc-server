@@ -9,7 +9,7 @@
            proto: tcp
          - port: 80
            proto: tcp
-           source: "{{ container_bridge_subnet }}.0/24"
+           source: "{{ container_bridge_subnet }}.1/32"
          - port: 443
            proto: tcp
            source: "{{ container_bridge_subnet }}.0/24"
