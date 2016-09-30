@@ -23,8 +23,10 @@ use at your own risk. you found this somewhere on the internet ;-)
 - ``setup2.yml``
   - creates the containers with a minimal setup
   - creates user inside container to be used by ansible
+- ``master.yml``
+  - provisions the master
 - ``container.yml``
-  - provisions the containers directly via ssh
+  - provisions the containers via ssh bastion
 
 ---
 
