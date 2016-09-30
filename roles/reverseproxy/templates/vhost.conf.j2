@@ -1,4 +1,3 @@
-
 <VirtualHost {{ item.public_ip }}:80>
 
 	ServerAdmin {{ item.admin }}
@@ -11,8 +10,8 @@
 
     ProxyRequests Off
     ProxyPreserveHost On
-	ProxyPass / http://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/ disableReuse=On retry=5
-	ProxyPassReverse / http://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/
+	ProxyPass {{ item.source_request|default('/') }} {{ item.target_request }} disableReuse=On retry=5
+    ProxyPassReverse {{ item.source_request|default('/') }} {{ item.target_request }}
     ProxyVia On
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
@@ -33,8 +32,8 @@
 
     ProxyRequests Off
 	ProxyPreserveHost On
-	ProxyPass / https://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/ disableReuse=On retry=5
-	ProxyPassReverse / https://{{ item.target_ip }}{% if item.target_port is defined %}:{{ item.target_port }}{% endif %}/
+	ProxyPass {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request }} disableReuse=On retry=5
+	ProxyPassReverse {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request }}
 	ProxyVia On
 
     SSLProxyEngine On
