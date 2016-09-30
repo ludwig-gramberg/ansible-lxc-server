@@ -36,6 +36,10 @@ use at your own risk. you found this somewhere on the internet ;-)
 - [``ssh.cfg``](ssh.cfg.sample): ssh bastion setup
 - [``inventory``](inventory.sample): ansible inventory
 - [``vars/admins.yml``](vars/admins.yml.sample): admin users which will have access to the system via ssh publickey
+- [``vars/sites.yml``](vars/sites.yml.sample): (web)sites definition
+- [``vars/ports.yml``](vars/ports.yml.sample): master ports definition (allowed ports, forwarded ports)
+- [``vars/databases.yml``](vars/databases.yml.sample): databases and their users
+- [``vars/packages.yml``](vars/packages.yml.sample): default packages to install on master and nodes
 
 ---
 
