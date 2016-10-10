@@ -1,13 +1,11 @@
 UserKnownHostsFile = ./known_hosts
 
-Host HOST_SUBNET.*
-  IdentityFile KEYPATH
-  ProxyCommand ssh -W %h:%p HOSTIP
+# change according to your server subnet
+Host 10.11.0.*
+  IdentityFile ./keys/%r_ed25519
+  ProxyCommand ssh -F ./ssh.cfg -W %h:%p %r@your-server.domain
 
-Host HOSTIP
-  IdentityFile KEYPATH
-  HostName HOSTIP
-  User ludwig
-  ControlMaster auto
-  ControlPath  ~/.ssh/ansible-%r@%h:%p
-  ControlPersist 5m
+Host your-server.domain
+  IdentityFile ./keys/%r_ed25519
+  HostName your-server.domain
+
