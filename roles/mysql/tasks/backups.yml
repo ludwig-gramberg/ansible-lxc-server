@@ -1,0 +1,13 @@
+---
+
+- name: create backup_user if he doesnt exist yet
+  user: name={{ backup_user }} append=yes
+
+- name: create backup_dir
+  file: path={{ backup_dir }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
+
+- name: deploy backup-script into backup_dir
+  template: dest={{ backup_dir }}/run.sh src=backup/run.sh.j2 owner={{ backup_user }} group={{ backup_user }} mode=0700
+
+- name: install backup in backup_users crontab
+  cron: name="mysql-backup" user={{ backup_user }} minute="45" job="bash {{ backup_dir }}/run.sh >> {{ backup_dir }}/cron.log 2>&1"

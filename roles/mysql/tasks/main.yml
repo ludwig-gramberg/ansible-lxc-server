@@ -12,4 +12,5 @@
            source: "{{ container_bridge_subnet }}.0/24"
 
 - include: tasks/mysql-server.yml
+- include: tasks/backups.yml
 - include: tasks/iptables.yml

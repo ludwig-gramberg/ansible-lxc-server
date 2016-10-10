@@ -1,0 +1,145 @@
+#!/bin/sh
+
+# cfg
+KEEP_DAY_HOUR="12" # keep the backup from this hour as the daily backup
+KEEP_MONTH_DAY="01" # keep the backup from this day as the monthly backup
+KEEP_DAYS="{{ backups_days|default(30) }}" # keep as many daily backups
+KEEP_HOURS="{{ backups_hour|default(48) }}" # keep as many hourly backups
+KEEP_MONTHS="{{ backup_months|default(24) }}" # keep as many monthly backups
+BACKUP_DIR="{{ backup_dir }}"
+
+# vars
+HOSTNAME=$(hostname)
+DBS=$(mysql -uroot -N -e 'show databases')
+DATE=$(date +"%Y-%m-%d")
+TIME=$(date +"%Y-%m-%d-%H")
+DAY=$(date +"%d")
+HOUR=$(date +"%H")
+NOTES="backup.log"
+
+cd $BACKUP_DIR
+
+echo "" >> $NOTES
+echo "starting backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $NOTES
+
+for DB in $DBS
+do
+   # if ignore.cfg exists skip each db with machting name in file
+   if [ -f ignore.cfg ]
+   then
+       if grep -Fxq "$DB" ignore.cfg
+       then
+           continue
+       fi
+   fi
+
+   # create required dirs
+   if [ ! -d $DB/daily ]
+   then
+      mkdir -p $DB/daily
+   fi
+   if [ ! -d $DB/hourly ]
+   then
+      mkdir -p $DB/houry
+   fi
+   if [ ! -d $DB/monthly ]
+   then
+      mkdir -p $DB/monthly
+   fi
+
+   # build mysql command
+   dump_cmd="mysqldump --no-create-info -uroot -q --single-transaction"
+
+   if [ -f $DB/ignore.cfg ]
+   then
+      while read table; do
+         dump_cmd="$dump_cmd --ignore-table=${DB}.${table}"
+      done <$DB/ignore.cfg
+   fi
+
+   dump_cmd="$dump_cmd $DB >> $DB/dump.sql"
+
+   # dump structure
+   mysqldump -d -uroot -q --single-transaction $DB > $DB/dump.sql
+   eval $dump_cmd
+
+   # check if backup is complete
+   check_complete=$(grep "Dump completed on" $DB/dump.sql | wc -l)
+
+   if [ "$check_complete" != "2" ]
+   then
+      rm $DB/dump.sql
+      echo "ERROR: backup of $DB incomplete" >> $NOTES
+      # skip any other steps like rotation if this fails
+      continue
+   fi
+   echo "NOTE: backup of $DB completed" >> $NOTES
+
+   # remove dump completed line from dump to compare them
+   sed -i '/Dump completed on/d' $DB/dump.sql
+
+   # last backup in hourly
+   last_backup=$(ls -rtp $DB/hourly/ | tail -1)
+
+   echo "NOTE: last backup to compare to: $DB/hourly/$last_backup" >> $NOTES
+
+   # copy backup or just link to last one?
+   copy_backup=0
+
+   if [ "$last_backup" == "" ]
+   then
+      echo "NOTE: no last backup for $DB found" >> $NOTES
+      copy_backup=1
+   else
+       backup_hash_new=$(cat $DB/dump.sql | md5sum | cut -c 1-32)
+       backup_hash_old=$(zcat $DB/hourly/$last_backup | md5sum | cut -c 1-32)
+
+       if [ "$backup_hash_new" != "$backup_hash_old" ]
+       then
+           copy_backup=1
+       fi
+   fi
+
+   if [ "$copy_backup" == "1" ]
+   then
+      mv $DB/dump.sql $DB/hourly/$TIME.sql
+      gzip -f $DB/hourly/$TIME.sql
+      size=$(du -k $DB/hourly/$TIME.sql.gz | cut -f1)
+      echo "NOTE: backup of $DB stored $size bytes as new backup under $DB/hourly/${TIME}.sql.gz" >> $NOTES
+   else
+      if [ "${DB}/hourly/${last_backup}" == "${DB}/hourly/${TIME}.sql.gz" ]
+      then
+         echo "NOTE: backup of $DB at $TIME with same content already exists, doing nothing" >> $NOTES
+      else
+         ln -f $DB/hourly/$last_backup $DB/hourly/$TIME.sql.gz
+         echo "NOTE: backup of $DB at $TIME hardlinked to $DB/hourly/$last_back, data has not changed" >> $NOTES
+      fi
+      rm $DB/dump.sql
+   fi
+
+   # begin rotation and cleanup
+
+   # hardlink daily backup
+   if [ "$KEEP_DAY_HOUR" == "$HOUR" ]
+   then
+       ln -f $DB/hourly/$TIME.sql.gz $DB/daily/$DATE.sql.gz
+
+       # hardlink monthly backup
+       if [ "$KEEP_MONTH_DAY" == "$DAY" ]
+       then
+           ln -f $DB/hourly/$TIME.sql.gz $DB/monthly/$DATE.sql.gz
+       fi
+   fi
+
+   # cleanup rotation
+
+   let max_h=KEEP_HOURS+1
+   let max_d=KEEP_DAYS+1
+   let max_m=KEEP_MONTHS+1
+
+   ls -tp $DB/hourly/*.sql.gz | grep -v '/$' | tail -n +$max_h | xargs -I {} rm -- {}
+   ls -tp $DB/daily/*.sql.gz | grep -v '/$' | tail -n +$max_d | xargs -I {} rm -- {}
+   ls -tp $DB/monthly/*.sql.gz | grep -v '/$' | tail -n +$max_m | xargs -I {} rm -- {}
+done
+
+echo "completed backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $NOTES
