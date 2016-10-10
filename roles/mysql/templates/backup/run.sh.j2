@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # cfg
 KEEP_DAY_HOUR="12" # keep the backup from this hour as the daily backup
@@ -7,6 +7,7 @@ KEEP_DAYS="{{ backups_days|default(30) }}" # keep as many daily backups
 KEEP_HOURS="{{ backups_hour|default(48) }}" # keep as many hourly backups
 KEEP_MONTHS="{{ backup_months|default(24) }}" # keep as many monthly backups
 BACKUP_DIR="{{ backup_dir }}"
+LOG="{{ backup_log }}"
 
 # vars
 HOSTNAME=$(hostname)
@@ -15,12 +16,11 @@ DATE=$(date +"%Y-%m-%d")
 TIME=$(date +"%Y-%m-%d-%H")
 DAY=$(date +"%d")
 HOUR=$(date +"%H")
-NOTES="backup.log"
 
 cd $BACKUP_DIR
 
-echo "" >> $NOTES
-echo "starting backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $NOTES
+echo "" >> $LOG
+echo "starting backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $LOG
 
 for DB in $DBS
 do
@@ -40,7 +40,7 @@ do
    fi
    if [ ! -d $DB/hourly ]
    then
-      mkdir -p $DB/houry
+      mkdir -p $DB/hourly
    fi
    if [ ! -d $DB/monthly ]
    then
@@ -69,11 +69,11 @@ do
    if [ "$check_complete" != "2" ]
    then
       rm $DB/dump.sql
-      echo "ERROR: backup of $DB incomplete" >> $NOTES
+      echo "ERROR: backup of $DB incomplete" >> $LOG
       # skip any other steps like rotation if this fails
       continue
    fi
-   echo "NOTE: backup of $DB completed" >> $NOTES
+   echo "NOTE: backup of $DB completed" >> $LOG
 
    # remove dump completed line from dump to compare them
    sed -i '/Dump completed on/d' $DB/dump.sql
@@ -81,14 +81,14 @@ do
    # last backup in hourly
    last_backup=$(ls -rtp $DB/hourly/ | tail -1)
 
-   echo "NOTE: last backup to compare to: $DB/hourly/$last_backup" >> $NOTES
+   echo "NOTE: last backup to compare to: $DB/hourly/$last_backup" >> $LOG
 
    # copy backup or just link to last one?
    copy_backup=0
 
    if [ "$last_backup" == "" ]
    then
-      echo "NOTE: no last backup for $DB found" >> $NOTES
+      echo "NOTE: no last backup for $DB found" >> $LOG
       copy_backup=1
    else
        backup_hash_new=$(cat $DB/dump.sql | md5sum | cut -c 1-32)
@@ -105,14 +105,14 @@ do
       mv $DB/dump.sql $DB/hourly/$TIME.sql
       gzip -f $DB/hourly/$TIME.sql
       size=$(du -k $DB/hourly/$TIME.sql.gz | cut -f1)
-      echo "NOTE: backup of $DB stored $size bytes as new backup under $DB/hourly/${TIME}.sql.gz" >> $NOTES
+      echo "NOTE: backup of $DB stored $size bytes as new backup under $DB/hourly/${TIME}.sql.gz" >> $LOG
    else
       if [ "${DB}/hourly/${last_backup}" == "${DB}/hourly/${TIME}.sql.gz" ]
       then
-         echo "NOTE: backup of $DB at $TIME with same content already exists, doing nothing" >> $NOTES
+         echo "NOTE: backup of $DB at $TIME with same content already exists, doing nothing" >> $LOG
       else
          ln -f $DB/hourly/$last_backup $DB/hourly/$TIME.sql.gz
-         echo "NOTE: backup of $DB at $TIME hardlinked to $DB/hourly/$last_back, data has not changed" >> $NOTES
+         echo "NOTE: backup of $DB at $TIME hardlinked to $DB/hourly/$last_back, data has not changed" >> $LOG
       fi
       rm $DB/dump.sql
    fi
@@ -137,9 +137,9 @@ do
    let max_d=KEEP_DAYS+1
    let max_m=KEEP_MONTHS+1
 
-   ls -tp $DB/hourly/*.sql.gz | grep -v '/$' | tail -n +$max_h | xargs -I {} rm -- {}
-   ls -tp $DB/daily/*.sql.gz | grep -v '/$' | tail -n +$max_d | xargs -I {} rm -- {}
-   ls -tp $DB/monthly/*.sql.gz | grep -v '/$' | tail -n +$max_m | xargs -I {} rm -- {}
+   ls -tp $DB/hourly/ | grep -v '/$' | tail -n +$max_h | xargs -I {} rm -- {}
+   ls -tp $DB/daily/ | grep -v '/$' | tail -n +$max_d | xargs -I {} rm -- {}
+   ls -tp $DB/monthly/ | grep -v '/$' | tail -n +$max_m | xargs -I {} rm -- {}
 done
 
-echo "completed backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $NOTES
+echo "completed backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $LOG

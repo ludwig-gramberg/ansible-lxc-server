@@ -1,13 +1,31 @@
 ---
 
+# user and script, backup_dir
+
 - name: create backup_user if he doesnt exist yet
   user: name={{ backup_user }} append=yes
 
 - name: create backup_dir
   file: path={{ backup_dir }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
 
-- name: deploy backup-script into backup_dir
-  template: dest={{ backup_dir }}/run.sh src=backup/run.sh.j2 owner={{ backup_user }} group={{ backup_user }} mode=0700
+- name: create run dir
+  file: path=/home/{{ backup_user }}/bin/ state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
+
+- name: symlink backup dir into home of backup_user
+  file: src={{ backup_dir }} dest=/home/{{ backup_user }}/backups state=link
+
+- name: deploy backup-script into home of backup_user
+  template: dest=/home/{{ backup_user }}/bin/run-backup.sh src=backup/run.sh.j2 owner={{ backup_user }} group={{ backup_user }} mode=0700
+
+# logs
+
+- name: create log-dir
+  file: path={{ backup_log | dirname }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
+
+- name: logrotate for logs
+  template: dest=/etc/logrotate.d/{{ backup_user }}-backup-cron src=templates/logrotate.simple.j2 owner=root group=root
+
+# cron
 
 - name: install backup in backup_users crontab
-  cron: name="mysql-backup" user={{ backup_user }} minute="45" job="bash {{ backup_dir }}/run.sh >> {{ backup_dir }}/cron.log 2>&1"
+  cron: name="mysql-backup" user={{ backup_user }} minute="45" job="/home/{{ backup_user }}/bin/run-backup.sh >> {{ backup_log | dirname }}/cron.log 2>&1"

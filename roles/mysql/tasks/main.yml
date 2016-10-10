@@ -10,6 +10,10 @@
          - port: 3306
            proto: tcp
            source: "{{ container_bridge_subnet }}.0/24"
+     rotate:
+       pattern: "{{ backup_dir }}*.log"
+       interval: "daily"
+       files: 7
 
 - include: tasks/mysql-server.yml
 - include: tasks/backups.yml

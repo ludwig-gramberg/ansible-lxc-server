@@ -1,0 +1,7 @@
+{{ rotate.pattern }} {
+   rotate {{ rotate.files|default(7) }}
+   {{ rotate.interval|default(daily) }}
+   missingok
+   notifempty
+   compress
+}
