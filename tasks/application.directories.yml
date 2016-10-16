@@ -1,0 +1,5 @@
+---
+
+- name: directories
+  file: dest={{ item.dir }} state=directory mode=755 owner={{ item.owner }} group={{ item.owner }}
+  with_items: "{{ application.directories }}"

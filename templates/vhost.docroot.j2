@@ -1,0 +1,37 @@
+	ServerAdmin admin@{{ domain_name }}
+
+	ServerName {{ domain_name }}
+{% if site.aliases is defined %}
+{% for alias in site.aliases %}
+	ServerAlias {{ alias }}
+{% endfor %}
+{% endif %}
+
+	DocumentRoot {{ application.document_root }}
+
+	<Directory />
+		Options +FollowSymLinks
+		AllowOverride None
+	</Directory>
+
+	<Directory {{ application.document_root }}>
+		Options -Indexes +FollowSymLinks
+		AllowOverride None
+
+		RewriteEngine on
+		RewriteBase /
+
+{% if site.ssl is defined %}
+		RewriteCond %{HTTPS} off
+		RewriteRule .* https://{{ site.domain }}%{REQUEST_URI} [R=301,L]
+{% endif %}
+
+		RewriteCond %{HTTP_HOST} !^{{ site.domain | replace('.', '\.') }}$
+		RewriteRule .* http{% if site.ssl is defined %}s{% endif %}://{{ site.domain }}%{REQUEST_URI} [R=301,L]
+
+{% if application.mod_rewrite is defined %}
+{% for rewrite in application.mod_rewrite %}
+		{{ rewrite.rewrite }}
+{% endfor  %}
+{% endif %}
+	</Directory>

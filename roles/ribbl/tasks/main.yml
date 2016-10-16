@@ -1,31 +1,110 @@
 ---
 
-- name: vars required for template vhost.internal.j2
+- name: vars required for template vhost.directories.j2 1/2
   set_fact:
-    asset_access: "css|txt|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html"
-    files_access: "css|txt|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html|doc|docx|xls|xlsx|tiff|zip|gz|tar|bz|bz2|mp3|mp4"
+    asset_access: "\\.(css|txt|ioc|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html)$"
+    files_access: "\\.(css|txt|ioc|xml|js|png|gif|jpeg|jpg|woff|woff2|eot|svg|ttf|otf|htm|html|doc|docx|xls|xlsx|tiff|zip|gz|tar|bz|bz2|mp3|mp4)$"
 
-- name: directories
-  file: dest={{ item.dir }} state=directory mode=755 owner={{ item.owner }} group={{ item.owner }}
-  with_items:
-    - dir: /var/www/project
-      owner: "{{ deploy_user }}"
-    - dir: /var/www/project/files
-      owner: www-data
-    - dir: /var/www/project/files/dbb
-      owner: www-data
-    - dir: /var/www/project/files/dbb/backups
-      owner: www-data
-    - dir: /var/www/project/tmp
-      owner: www-data
-    - dir: /var/www/project/tools
-      owner: "{{ deploy_user }}"
-    - dir: /var/www/project/tools/cometchat
-      owner: "{{ deploy_user }}"
-    - dir: /var/www/project/tools/cometchat/cache
-      owner: www-data
-    - dir: /var/www/project/tools/cometchat/temp
-      owner: www-data
+- name: vars required for template vhost.directories.j2 2/2
+  set_fact:
+    application:
+      document_root: "/var/www/project"
+      mod_rewrite:
+        - rewrite: "RewriteRule ^cometchat/(.*)$ tools/cometchat/$1 [L]"
+        - rewrite: "RewriteCond %{REQUEST_FILENAME} !-f"
+        - rewrite: "RewriteRule ^(.*)$ index.php?page=/$1 [L,QSA]"
+      directories:
+        - dir: /var/www/project
+          owner: "{{ deploy_user }}"
+          vhost:
+            access:
+              - require: "all granted"
+            cache:
+              - files_match: "{{ files_access }}"
+                max_age: 604800
+        - dir: /var/www/project/files
+          owner: www-data
+          vhost:
+            access:
+              - require: "all denied"
+              - require: "all granted"
+                files_match: "{{ files_access }}"
+            php: "off"
+        - dir: /var/www/project/tools
+          owner: "{{ deploy_user }}"
+        - dir: /var/www/project/tools/cometchat
+          owner: "{{ deploy_user }}"
+        - dir: /var/www/project/tools/cometchat/cache
+          owner: www-data
+          vhost:
+            access:
+              - require: "all denied"
+              - require: "all granted"
+                files_match: "{{ files_access }}"
+            php: "off"
+        - dir: /var/www/project/tools/cometchat/temp
+          owner: www-data
+        - dir: /var/www/project/style
+          owner: "{{ deploy_user }}"
+          vhost:
+            access:
+              - require: "all denied"
+              - require: "all granted"
+                files_match: "{{ asset_access }}"
+            php: "off"
+        - dir: /var/www/project/src
+          owner: "{{ deploy_user }}"
+          vhost:
+            access:
+              - require: "all denied"
+              - require: "all granted"
+                files_match: "{{ asset_access }}"
+            php: "off"
+        - dir: /var/www/project/vendor
+          owner: "{{ deploy_user }}"
+          vhost:
+            access:
+              - require: "all denied"
+              - require: "all granted"
+                files_match: "{{ asset_access }}"
+            php: "off"
+        - dir: /var/www/project/modules
+          owner: "{{ deploy_user }}"
+          vhost:
+            access:
+              - require: "all denied"
+              - require: "all granted"
+                files_match: "{{ asset_access }}"
+            php: "off"
+        - dir: /var/www/project/css
+          owner: "{{ deploy_user }}"
+          vhost:
+            access:
+              - require: "all denied"
+        - dir: /var/www/project/files/dbb
+          owner: www-data
+          vhost:
+            access:
+              - require: "all denied"
+        - dir: /var/www/project/files/dbb/backups
+          owner: www-data
+        - dir: /var/www/project/files/scenario
+          owner: www-data
+          vhost:
+            access:
+              - require: "all denied"
+        - dir: /var/www/project/lib
+          owner: "{{ deploy_user }}"
+          vhost:
+            access:
+              - require: "all denied"
+        - dir: /var/www/project/tmp
+          owner: www-data
+          vhost:
+            access:
+              - require: "all denied"
+
+- include: tasks/application.directories.yml
 
 - name: ribbl cfg
   template: dest=/var/www/project/config.php src=templates/config.php.j2 owner=root group=root mode=0755
@@ -39,7 +118,7 @@
   when: item.target_ip == "{{ ansible_default_ipv4.address }}"
 
 - name: ribbl vhost
-  template: dest=/etc/apache2/sites-available/project.conf src=templates/vhost.conf.j2
+  template: dest=/etc/apache2/sites-available/project.conf src=templates/vhost.conf.j2 backup=yes
   notify:
     - restart apache
 

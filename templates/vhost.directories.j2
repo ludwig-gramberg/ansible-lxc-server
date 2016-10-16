@@ -1,0 +1,34 @@
+
+{% if application.directories is defined %}
+{% for directory in application.directories %}
+{% if directory.vhost is defined %}
+	<Directory {{ directory.dir }}>
+{% if directory.vhost.php is defined %}
+		php_admin_flag engine {{ directory.vhost.php }}
+{% endif %}
+{% if directory.vhost.access is defined %}
+{% for access in directory.vhost.access %}
+{% if access.require is defined %}
+{% if access.files_match is defined %}
+		<FilesMatch "{{ access.files_match }}">
+			require {{ access.require }}
+		</FilesMatch>
+{% else %}
+		require {{ access.require }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if directory.cache is defined %}
+{% for cache in directory.cache %}
+{% if cache.files_match is defined %}
+		<FilesMatch "{{ cache.files_match }}">
+			Header set Cache-Control "max-age={{ cache.max_age }}, public"
+		</FilesMatch>
+{% endif %}
+{% endfor %}
+{% endif %}
+	</Directory>
+{% endif %}
+{% endfor %}
+{% endif %}
