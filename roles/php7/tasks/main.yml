@@ -8,7 +8,16 @@
      aptkeys:
        - "https://www.dotdeb.org/dotdeb.gpg"
 
-- include: tasks/apt.sources.yml
+- name: update sources.list
+  template: dest=/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
+
+- name: install keys
+  apt_key: url={{ item }} state=present
+  with_items: "{{ aptkeys }}"
+
+- name: apt update
+  apt: update_cache=yes
+
 - include: tasks/packages.yml
 - name: php-logdir
   file: path=/var/log/php state=directory owner=www-data group=www-data mode=0755

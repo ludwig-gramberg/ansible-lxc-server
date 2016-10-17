@@ -25,6 +25,6 @@
   when: deploy_user is defined
 
 - name: ssh config
-  template: dest=/etc/ssh/sshd_config src=sshd_config.j2
+  template: dest=/etc/ssh/sshd_config src=../../../templates/sshd_config.j2
   notify:
     - reload sshd

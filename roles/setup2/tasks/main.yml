@@ -11,7 +11,7 @@
       inbound: "{{ ports.inbound }}"
 
 - name: iptables
-  include: tasks/iptables.yml
+  include: ../../../tasks/iptables.yml
 
 # iptables rules dont include udp/tcp set by libvirt to allow dns for containers
 # thus a restart of the lxc-network is necessary

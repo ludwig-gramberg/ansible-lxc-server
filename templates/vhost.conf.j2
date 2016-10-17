@@ -2,7 +2,7 @@
 
 <VirtualHost *:80>
 
-{% include "templates/vhost.docroot.j2" ignore missing %}
+{% include "./vhost.docroot.j2" ignore missing %}
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	LogLevel warn
@@ -11,8 +11,8 @@
 
 <VirtualHost *:443>
 
-{% include "templates/vhost.docroot.j2" ignore missing %}
-{% include "templates/vhost.directories.j2" ignore missing %}
+{% include "./vhost.docroot.j2" ignore missing %}
+{% include "./vhost.directories.j2" ignore missing %}
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	LogLevel warn
@@ -28,8 +28,8 @@
 
 <VirtualHost *:80>
 
-{% include "templates/vhost.docroot.j2" ignore missing %}
-{% include "templates/vhost.directories.j2" ignore missing %}
+{% include "./vhost.docroot.j2" ignore missing %}
+{% include "./vhost.directories.j2" ignore missing %}
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	LogLevel warn

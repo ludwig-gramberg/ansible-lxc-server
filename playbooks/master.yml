@@ -9,4 +9,5 @@
   roles:
     - apticron
     - ssmtp
+    - apticron
     - reverseproxy

@@ -6,7 +6,6 @@
 
 # files
 /keys
-/certs
 /ansible.cfg
 /ssh.cfg
 /inventory
@@ -14,3 +13,4 @@
 !/inventory.sample
 /vars/*.yml
 /known_hosts
+/vault_password

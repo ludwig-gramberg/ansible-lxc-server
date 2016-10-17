@@ -23,7 +23,7 @@
   file: path={{ backup_log | dirname }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
 
 - name: logrotate for logs
-  template: dest=/etc/logrotate.d/{{ backup_user }}-backup-cron src=templates/logrotate.simple.j2 owner=root group=root
+  template: dest=/etc/logrotate.d/{{ backup_user }}-backup-cron src=../../../templates/logrotate.simple.j2 owner=root group=root
 
 # cron
 

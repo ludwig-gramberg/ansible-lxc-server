@@ -11,7 +11,7 @@
      ssh_config_allow_users: "{{ config_user_name }}"
 
 - name: sshd config
-  template: dest=/etc/ssh/sshd_config src=sshd_config.j2 owner=root group=root mode=0644
+  template: dest=/etc/ssh/sshd_config src=../../../templates/sshd_config.j2 owner=root group=root mode=0644
 
 - name: reload ssh
   command: systemctl reload ssh.service
