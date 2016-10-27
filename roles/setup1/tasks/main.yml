@@ -1,9 +1,17 @@
 ---
 
 - include: tasks/packages.yml
-- include: tasks/apticron.yml
 - include: tasks/admins.yml
 - include: tasks/bridge.yml
 - include: tasks/lxc.yml
+
+- name: prepare for containers
+  include: tasks/container/lxc.yml
+  vars:
+     container: "{{ hostvars[container_item] }}"
+     container_ip: "{{ hostvars[container_item]['inventory_hostname'] }}"
+  with_items: "{{ groups['container'] }}"
+  loop_control:
+    loop_var: "container_item"
 
 - debug: msg="reboot now"

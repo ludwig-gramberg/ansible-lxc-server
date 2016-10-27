@@ -4,7 +4,10 @@
   template: dest=/etc/hosts src=hosts.j2
 
 - name: include vars
-  include_vars: "vars/packages.yml"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/packages.yml"
+    - "{{ path_ansible_base }}vars/packages.yml"
 
 - name: install essentials
   environment:
@@ -13,6 +16,3 @@
   with_items: "{{ essentials }}"
 
 - include: tasks/users.yml
-- include: tasks/apticron.yml
-
-# todo: ssmtp

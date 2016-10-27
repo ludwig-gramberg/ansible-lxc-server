@@ -7,5 +7,6 @@
   become_user: root
   become_method: sudo
   roles:
+    - apticron
     - ssmtp
     - reverseproxy

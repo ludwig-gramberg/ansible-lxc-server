@@ -18,7 +18,11 @@
 - include: tasks/iptables.yml
 - include: tasks/apache.yml
 
-- include_vars: vars/sites.yml
+- name: include sites
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/sites.yml"
+    - "{{ path_ansible_base }}vars/sites.yml"
 
 - name: build deploy_certs list 1/2
   set_fact:
