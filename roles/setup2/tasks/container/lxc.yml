@@ -52,7 +52,7 @@
   become_user: root
 
 - name: apt/sources.list
-  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=apt.sources.list.j2
+  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
   become: yes
   become_user: root
 
