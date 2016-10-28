@@ -11,12 +11,17 @@
     - "{{ path_ansible_local }}vars/sites.yml"
     - "{{ path_ansible_base }}vars/sites.yml"
 
-- name: build deploy_certs list 1/2
+- name: build deploy_certs list 1/3
   set_fact:
-    deploy_certs_tmp: "{{ deploy_certs_tmp|default([]) | union( [  item.ssl.cert_file|default(false), item.ssl.cert_key_file|default(false), item.ssl.cert_chain_file|default(false), item.ssl.cert_sign_file|default(false)  ] ) }}"
-  with_items: "{{ sites }}"
+    deploy_certs_tmp: []
 
-- name: build deploy_certs list 2/2
+- name: build deploy_certs list 1/3
+  set_fact:
+    deploy_certs_tmp: "{{ deploy_certs_tmp | union( [  item.ssl.cert_file|default(false), item.ssl.cert_key_file|default(false), item.ssl.cert_chain_file|default(false), item.ssl.cert_sign_file|default(false)  ] ) }}"
+  with_items: "{{ sites }}"
+  when: (item.ssl is defined)
+
+- name: build deploy_certs list 2/3
   set_fact:
     deploy_certs: "{{ deploy_certs_tmp|select()|list }}"
 
