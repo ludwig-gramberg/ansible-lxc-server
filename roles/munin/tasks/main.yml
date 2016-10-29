@@ -1,0 +1,37 @@
+---
+
+- name: install packages
+  apt: name={{ item }} state=latest
+  with_items:
+  - munin
+  - python-passlib
+
+- name: create directory for basic auth files
+  file: path=/etc/apache2/basic-auth state=directory
+
+- name: create password file for basic auth
+  htpasswd: path=/etc/apache2/basic-auth/munin name={{ munin_user }} password={{ munin_pass }} owner=root group=www-data mode=0640
+
+- name: enable cgi module
+  apache2_module: state=present name=cgi
+  notify:
+    - restart apache
+
+- name: disable default apache conf
+  file: path=/etc/apache2/conf-enabled/munin.conf state=absent
+  notify:
+    - reload apache
+
+- name: deploy apache munin site .conf
+  template: src={{ item }} dest=/etc/apache2/sites-available/munin.conf
+  with_first_found:
+    - "{{ path_ansible_local }}templates/munin.conf.j2"
+    - "{{ path_ansible_base }}roles/munin/templates/munin.conf.j2"
+  notify:
+    - reload apache
+
+- name: enable apache munin site .conf
+  file: src=/etc/apache2/sites-available/munin.conf dest=/etc/apache2/sites-enabled/munin.conf state=link
+  notify:
+    - reload apache
+
