@@ -8,5 +8,5 @@ includedir /etc/munin/munin-conf.d
 {% for host in groups['container'] %}
 [container;{{ hostvars[host].hostname }}]
 	address {{ hostvars[host].ansible_default_ipv4.address }}
-    use_node_name yes
+	use_node_name yes
 {% endfor %}
