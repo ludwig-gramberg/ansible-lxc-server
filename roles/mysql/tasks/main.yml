@@ -21,3 +21,5 @@
 - include: tasks/mysql-server.yml
 - include: tasks/backups.yml
 - include: ../../../tasks/iptables.yml
+- include: tasks/munin.yml
+  tags: munin
