@@ -1,0 +1,39 @@
+---
+
+- name: deploy debmon sources.list
+  template: dest=/etc/apt/sources.list.d/debmon.list src=apt.debmon.list.j2
+
+- name: install keys
+  apt_key: url={{ item }} state=present
+  with_items:
+    - "http://debmon.org/debmon/repo.key"
+
+- name: apt update
+  apt: update_cache=yes
+
+- name: install icinga
+  apt: name={{ item }} state=present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  with_items:
+    - icinga2
+    - icinga2-ido-mysql
+    - icingaweb2
+
+- name: check if database is tempy (no tables exist yet)
+  command: "mysql -h{{ icinga_mysql_host }} -u{{ icinga_mysql_user }} -p{{ icinga_mysql_pass }} {{ icinga_mysql_name }} -e 'show tables;'"
+  register: icinga_tables
+
+- name: install icinga schema
+  shell: "mysql -h{{ icinga_mysql_host }} -u{{ icinga_mysql_user }} -p{{ icinga_mysql_pass }} {{ icinga_mysql_name }} < /usr/share/icinga2-ido-mysql/schema/mysql.sql"
+  when: (icinga_tables.stdout_lines|length == 0)
+
+- name: configure mysql ido
+  template: src=ido-mysql.conf.j2 dest=/etc/icinga2/features-available/ido-mysql.conf owner=nagios group=nagios mode=0600
+  notify:
+    - restart icinga
+
+- name: enable ido mysql
+  file: src=/etc/icinga2/features-available/ido-mysql.conf dest=/etc/icinga2/features-enabled/ido-mysql.conf state=link
+  notify:
+    - restart icinga
