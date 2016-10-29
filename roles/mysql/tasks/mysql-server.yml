@@ -8,7 +8,10 @@
   - mysql-server-5.6
 
 - name: my.cnf
-  template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src=my.cnf.j2 backup=yes
+  template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src={{ item }} backup=yes
+  with_first_found:
+   - "{{ path_ansible_local }}templates/my.cnf.j2"
+   - "{{ path_ansible_base }}roles/mysql/templates/my.cnf.j2"
   notify:
    - restart mysql
 
