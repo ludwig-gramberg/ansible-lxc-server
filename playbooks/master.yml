@@ -7,6 +7,10 @@
   become_user: root
   become_method: sudo
   roles:
-    - apticron
-    - ssmtp
-    - reverseproxy
+    - role: munin
+      tags: munin
+    - role: apticron
+      tags: apticron
+    - role: ssmtp
+      tags: ssmtp
+    - role: reverseproxy

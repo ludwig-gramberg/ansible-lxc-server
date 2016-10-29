@@ -2,19 +2,34 @@
 
 - name: set vars
   set_fact:
-     public_ip: "{{ ansible_default_ipv4.address }}"
-     iptables:
-       inbound:
-         - port: 22
-           proto: tcp
-         - port: 80
-           proto: tcp
-           source: "{{ container_bridge_subnet }}.1/32"
-         - port: 443
-           proto: tcp
-           source: "{{ container_bridge_subnet }}.0/24"
+    public_ip: "{{ ansible_default_ipv4.address }}"
+    iptables:
+      inbound:
+        - port: 22
+          proto: tcp
+        - port: 80
+          proto: tcp
+          source: "{{ container_bridge_subnet }}.1/32"
+        - port: 443
+          proto: tcp
+          source: "{{ container_bridge_subnet }}.1/32"
+        - port: 4949
+          proto: tcp
+          source: "{{ container_bridge_subnet }}.1/32"
+
+- name: set vars
+  set_fact:
+    munin:
+      plugins:
+        - plugin: apache_accesses # machine specific
+        - plugin: apache_processes
+        - plugin: apache_volume
+        - plugin: http_loadtime
+  tags: munin
 
 - include: ../../../tasks/iptables.yml
+- include: ../../../tasks/munin-plugins.yml
+  tags: munin
 - include: tasks/packages.yml
 - include: tasks/apache.yml
 

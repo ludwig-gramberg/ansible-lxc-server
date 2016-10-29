@@ -1,10 +1,51 @@
 ---
 
+- name: set vars
+  set_fact:
+    munin:
+      plugins:
+        - plugin: netstat
+        - plugin: fw_forwarded_local
+        - plugin: fw_packets
+        - plugin: fw_conntrack
+        - plugin: "if_{{ public_eth }}"
+          source: if_
+        - plugin: "if_err_{{ public_eth }}"
+          source: if_err_
+        - plugin: ntp_kernel_pll_freq
+        - plugin: ntp_kernel_pll_off
+        - plugin: ntp_kernel_err
+        - plugin: ntp_offset
+        - plugin: entropy
+        - plugin: interrupts
+        - plugin: irqstats
+        - plugin: open_files
+        - plugin: df
+        - plugin: df_inode
+        - plugin: diskstats
+        - plugin: open_inodes
+        - plugin: cpu
+        - plugin: forks
+        - plugin: swap
+        - plugin: memory
+        - plugin: munin_stats
+        - plugin: load
+        - plugin: threads
+        - plugin: proc_pri
+        - plugin: processes
+        - plugin: users
+        - plugin: uptime
+        - plugin: vmstat
+
+- name: install packages
+  apt: name=munin state=present
+  register: munin_node_installed
+
 - name: install packages
   apt: name={{ item }} state=latest
   with_items:
-  - munin
-  - python-passlib
+    - munin
+    - python-passlib
 
 - name: create directory for basic auth files
   file: path=/etc/apache2/basic-auth state=directory
@@ -35,3 +76,8 @@
   notify:
     - reload apache
 
+- name: remove all (default) plugins
+  shell: rm -f /etc/munin/plugins/*
+  when: munin_node_installed.changed
+
+- include: ../../../tasks/munin-plugins.yml
