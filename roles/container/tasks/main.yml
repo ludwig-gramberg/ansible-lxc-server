@@ -12,7 +12,7 @@
 - name: install essentials
   environment:
        DEBIAN_FRONTEND: noninteractive
-  apt: name={{ item }} state=latest
+  apt: name={{ item }} state=present
   with_items: "{{ essentials }}"
 
 - include: tasks/users.yml

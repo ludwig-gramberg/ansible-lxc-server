@@ -3,7 +3,7 @@
 - name: install requirements
   environment:
       DEBIAN_FRONTEND: noninteractive
-  apt: name={{ item }} state=latest
+  apt: name={{ item }} state=present
   with_items:
     - apache2
     - apache2-mpm-prefork

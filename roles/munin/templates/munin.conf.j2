@@ -1,39 +1,12 @@
-<VirtualHost {{ public_ip }}:80>
+includedir /etc/munin/munin-conf.d
 
-    ServerAdmin {{ munin_vhost_admin }}
-    ServerName {{ munin_vhost_domain }}
+[localhost]
+    address 127.0.0.1
+    use_node_name yes
 
-    DocumentRoot /var/cache/munin/www
-    <Directory /var/cache/munin/www>
-
-        AuthType Basic
-		AuthName "Munin Access"
-		AuthBasicProvider file
-		AuthUserFile "/etc/apache2/basic-auth/munin"
-		Require user {{ munin_user }}
-        Options None
-
-    </Directory>
-
-    ScriptAlias /munin-cgi/munin-cgi-graph /usr/lib/munin/cgi/munin-cgi-graph
-    <Location /munin-cgi/munin-cgi-graph>
-
-		AuthType Basic
-		AuthName "Munin Access"
-		AuthBasicProvider file
-		AuthUserFile "/etc/apache2/basic-auth/munin"
-		Require user {{ munin_user }}
-
-		<IfModule mod_fcgid.c>
-			SetHandler fcgid-script
-		</IfModule>
-        <IfModule !mod_fcgid.c>
-            SetHandler cgi-script
-        </IfModule>
-
-    </Location>
-
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    LogLevel warn
-
-</VirtualHost>
+[container;]
+{% for host in groups['container'] %}
+[container;{{ hostvars[host].hostname }}]
+	address {{ hostvars[host].ansible_default_ipv4.address }}
+    use_node_name yes
+{% endfor %}

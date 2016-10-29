@@ -1,7 +1,7 @@
 ---
 
 - name: install requirements
-  apt: name={{ item }} update_cache=yes state=latest
+  apt: name={{ item }} update_cache=yes state=present
   with_items:
   - python
   - python-libvirt

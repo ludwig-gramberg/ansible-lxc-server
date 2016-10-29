@@ -1,7 +1,7 @@
 ---
 
 - name: install mysql-server
-  apt: name={{ item }} state=latest default_release=jessie-backports
+  apt: name={{ item }} state=present default_release=jessie-backports
   with_items:
   - python
   - python-mysqldb

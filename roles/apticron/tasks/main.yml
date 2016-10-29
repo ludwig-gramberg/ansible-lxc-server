@@ -1,5 +1,5 @@
 - name: install apticron
-  apt: name=apticron state=latest
+  apt: name=apticron state=present
 
 - name: apticron conf
   template: dest=/etc/apticron/apticron.conf src=apticron.conf.j2 backup=yes

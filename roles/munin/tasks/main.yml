@@ -38,14 +38,11 @@
         - plugin: vmstat
 
 - name: install packages
-  apt: name=munin state=present
-  register: munin_node_installed
-
-- name: install packages
-  apt: name={{ item }} state=latest
+  apt: name={{ item }} state=present
   with_items:
     - munin
     - python-passlib
+  register: munin_node_installed
 
 - name: create directory for basic auth files
   file: path=/etc/apache2/basic-auth state=directory
@@ -66,8 +63,8 @@
 - name: deploy apache munin site .conf
   template: src={{ item }} dest=/etc/apache2/sites-available/munin.conf
   with_first_found:
-    - "{{ path_ansible_local }}templates/munin.conf.j2"
-    - "{{ path_ansible_base }}roles/munin/templates/munin.conf.j2"
+    - "{{ path_ansible_local }}templates/apache.conf.j2"
+    - "{{ path_ansible_base }}roles/munin/templates/apache.conf.j2"
   notify:
     - reload apache
 
@@ -81,3 +78,8 @@
   when: munin_node_installed.changed
 
 - include: ../../../tasks/munin-plugins.yml
+
+- name: munin-node.conf
+  template: src=munin.conf.j2 dest=/etc/munin/munin.conf owner=root group=root
+  notify:
+    - restart munin

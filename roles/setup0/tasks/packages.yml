@@ -7,7 +7,7 @@
   apt: upgrade=dist update_cache=yes
 
 - name: install basics
-  apt: name={{ item }} update_cache=yes state=latest
+  apt: name={{ item }} update_cache=yes state=present
   with_items:
   - sudo
   - iptables-persistent

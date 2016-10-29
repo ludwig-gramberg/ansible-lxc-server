@@ -1,9 +1,8 @@
-# Todos
+# Todos / Notes
 
 ## Roles
 
-- certbot/simp_le installation and configuration on master and optional cert-deployment to containers
-  - used certbot
+- certbot installation and configuration on master and optional cert-deployment to containers
   - exposing directory on master via alias and proxypassmatch:
     ``` 
         Alias /.well-known/ /var/www/lets-encrypt/.well-known/
@@ -13,7 +12,7 @@
 - full youtrack setup via ansible (not just a shell-role)
   - added ``RequestHeader set X-Forwarded-Proto "https"``to ssl-vhost on master to make youtrack fully run under ssl 
 - generate icinga2 monitoring conf-files for easy integration
-- maybe put iptables into its own role?
+- ~~maybe put iptables into its own role?~~ nope...
 
 ## IPv6
 
