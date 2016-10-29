@@ -37,3 +37,19 @@
   file: src=/etc/icinga2/features-available/ido-mysql.conf dest=/etc/icinga2/features-enabled/ido-mysql.conf state=link
   notify:
     - restart icinga
+
+- name: apache vhost
+  template: dest=/etc/apache2/sites-enabled/icingaweb2.conf src=apache.conf.j2
+  notify:
+    - restart apache
+
+- name: enable vhost
+  file: dest=/etc/apache2/sites-available/icingaweb2.conf src=/etc/apache2/sites-enabled/icingaweb2.conf state=link
+  notify:
+    - restart apache
+
+- name: prepare icingaweb2
+  command: icingacli setup config directory --group icingaweb2
+
+- name: prepare icingaweb2 setup token
+  command: icingacli setup token create
