@@ -10,6 +10,9 @@
          - port: 3306
            proto: tcp
            source: "{{ container_bridge_subnet }}.0/24"
+         - port: 4949
+           proto: tcp
+           source: "{{ container_bridge_subnet }}.1/32"
      rotate:
        pattern: "{{ backup_dir }}*.log"
        interval: "daily"

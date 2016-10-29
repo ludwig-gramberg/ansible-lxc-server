@@ -22,7 +22,7 @@
 
 # separated install and upgrade so ansible only sets up the plugins-dir once
 
-- name: upgrade munin-node
+- name: install munin-node
   apt: name=munin-node state=present
   register: munin_node_installed
 
