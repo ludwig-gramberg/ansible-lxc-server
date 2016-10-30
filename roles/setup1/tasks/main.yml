@@ -14,4 +14,8 @@
   loop_control:
     loop_var: "container_item"
 
-- debug: msg="reboot now"
+- name: restart machine
+  shell: "shutdown -t 10 -r"
+  async: 0
+  poll: 0
+  ignore_errors: true
