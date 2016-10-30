@@ -1,11 +1,5 @@
 ---
 
-- name: apt/sources.list
-  template: dest=/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
-
-- name: upgrade system
-  apt: upgrade=dist update_cache=yes
-
 - name: include vars
   include_vars: "{{ item }}"
   with_first_found:

@@ -42,6 +42,7 @@
   with_items:
     - munin
     - python-passlib
+    - apache2
   register: munin_node_installed
 
 - name: create directory for basic auth files
@@ -49,11 +50,6 @@
 
 - name: create password file for basic auth
   htpasswd: path=/etc/apache2/basic-auth/munin name={{ munin_user }} password={{ munin_pass }} owner=root group=www-data mode=0640
-
-- name: enable cgi module
-  apache2_module: state=present name=cgi
-  notify:
-    - restart apache
 
 - name: disable default apache conf
   file: path=/etc/apache2/conf-enabled/munin.conf state=absent

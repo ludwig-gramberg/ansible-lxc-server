@@ -1,6 +1,6 @@
 ---
 
-- name: ensure ssmtp is at the latest version
+- name: install ssmtp
   apt: pkg=ssmtp state=present
 
 - name: ssmtp conf file

@@ -22,10 +22,10 @@
   roles:
     - role: munin
       tags: munin
+    - role: reverseproxy
     - role: apticron
       tags: apticron
     - role: ssmtp
       tags: ssmtp
-    - role: reverseproxy
     - role: timezone
       tags: timezone
