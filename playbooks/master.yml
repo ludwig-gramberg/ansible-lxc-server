@@ -27,3 +27,5 @@
     - role: ssmtp
       tags: ssmtp
     - role: reverseproxy
+    - role: timezone
+      tags: timezone

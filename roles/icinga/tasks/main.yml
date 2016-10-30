@@ -20,12 +20,16 @@
     - icinga2-ido-mysql
     - icingaweb2
 
-- name: check if database is tempy (no tables exist yet)
+- name: check if icinga database is empty (no tables exist yet)
   command: "mysql -h{{ icinga_mysql_host }} -u{{ icinga_mysql_user }} -p{{ icinga_mysql_pass }} {{ icinga_mysql_name }} -e 'show tables;'"
   register: icinga_tables
 
 - name: install icinga schema
   shell: "mysql -h{{ icinga_mysql_host }} -u{{ icinga_mysql_user }} -p{{ icinga_mysql_pass }} {{ icinga_mysql_name }} < /usr/share/icinga2-ido-mysql/schema/mysql.sql"
+  when: (icinga_tables.stdout_lines|length == 0)
+
+- name: install icingaweb schema
+  shell: "mysql -h{{ icinga_mysql_host }} -u{{ icinga_mysql_user }} -p{{ icinga_mysql_pass }} {{ icinga_mysql_name }} < /usr/share/icingaweb2/etc/schema/mysql.schema.sql"
   when: (icinga_tables.stdout_lines|length == 0)
 
 - name: configure mysql ido

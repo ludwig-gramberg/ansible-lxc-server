@@ -4,9 +4,15 @@
 mynode
 
 [all:vars]
+path_ansible_base= # ansolute path to base dir with trailing slash
+path_ansible_local= # ansolute path to local dir with trailing slash
 config_user_name=admin
 config_user_password_clear=somepass
 config_user_password=somepass_encrypted
+config_user_public_key_file= # absolute path to public key file
+config_user_private_key_file= # absolute path to private key file
+timezone=UTC
+
 container_bridge_subnet=10.11.0
 ansible_connection=ssh
 apt_server=ftp.cz.debian.org
@@ -21,14 +27,17 @@ ssmtp_port=""
 setup_ansible_user=root
 setup_ansible_ssh_pass=root
 
-config_user_public_key_file=~/.ssh/id_rsa.pub
-config_user_private_key_file=~/.ssh/id_rsa
+public_ip=node_ip_address
+public_eth=eth0
 
 container_user=runlxc
 container_bridge_uuid=a147a941-2b48-e94c-2fea-a0ccbe9454bb
 container_bridge_mac=52:54:00:6A:F0:80
 
-public_ip=0.0.0.0
+munin_user=munin
+munin_pass=munin
+munin_vhost_domain=
+munin_vhost_admin=
 
 # === containers definition ===
 
@@ -39,9 +48,11 @@ public_ip=0.0.0.0
 
 [c0:vars]
 hostname=c0
+userns_offset=100000
 
 [c1:vars]
 hostname=c1
+userns_offset=200000
 
 # === containers in scope ===
 
