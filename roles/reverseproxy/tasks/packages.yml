@@ -16,8 +16,8 @@
   with_items:
     - mpm_event.conf
     - mpm_event.load
-    - mpm_perfork.conf
-    - mpm_perfork.load
+    - mpm_prefork.conf
+    - mpm_prefork.load
     - mpm_worker.conf
     - mpm_worker.load
   notify:

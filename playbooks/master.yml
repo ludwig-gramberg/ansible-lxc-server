@@ -23,6 +23,7 @@
     - role: munin
       tags: munin
     - role: reverseproxy
+      tags: reverseproxy
     - role: apticron
       tags: apticron
     - role: ssmtp
