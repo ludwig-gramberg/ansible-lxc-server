@@ -12,6 +12,26 @@
     - openssl
     - ca-certificates
 
+- name: unlink all mpm modules
+  file: path=/etc/apache2/mods-enabled/{{ item }} state=absent
+  with_items:
+    - mpm_event.conf
+    - mpm_event.load
+    - mpm_perfork.conf
+    - mpm_perfork.load
+    - mpm_worker.conf
+    - mpm_worker.load
+  notify:
+    - restart apache
+
+- name: link preferred mpm module
+  file: src=/etc/apache2/mods-available/{{ item }} dest=/etc/apache2/mods-enabled/{{ item }} state=link
+  with_items:
+    - "mpm_{{ mpm_module }}.conf"
+    - "mpm_{{ mpm_module }}.load"
+  notify:
+    - restart apache
+
 - name: apache modules
   apache2_module: state=present name={{ item }}
   with_items:
@@ -20,3 +40,5 @@
     - rewrite
     - expires
     - rpaf
+  notify:
+    - restart apache

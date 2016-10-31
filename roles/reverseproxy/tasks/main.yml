@@ -1,6 +1,7 @@
 ---
 - name: set munin vars
   set_fact:
+    mpm_module: worker
     munin:
       plugins:
         - plugin: apache_accesses
