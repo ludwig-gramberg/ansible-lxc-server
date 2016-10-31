@@ -7,7 +7,7 @@
     - "{{ path_ansible_base }}vars/admins.yml"
 
 - name: create admin
-  user: name="{{ item.name }}" password="{{ item.password }}" shell=/bin/bash groups=sudo append=yes
+  user: name="{{ item.name }}" password="{{ item.password_encrypted }}" shell=/bin/bash groups=sudo append=yes
   with_items: "{{ admins }}"
 
 - name: admin authorized key

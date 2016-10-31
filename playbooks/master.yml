@@ -5,7 +5,7 @@
 - hosts: container
   vars:
     ansible_user: "{{ config_user_name }}"
-    ansible_become_pass: "{{ config_user_password_clear }}"
+    ansible_become_pass: "{{ config_user_password }}"
   become: true
   become_user: root
   become_method: sudo
@@ -15,7 +15,7 @@
 - hosts: master
   vars:
     ansible_user: "{{ config_user_name }}"
-    ansible_become_pass: "{{ config_user_password_clear }}"
+    ansible_become_pass: "{{ config_user_password }}"
   become: true
   become_user: root
   become_method: sudo

@@ -7,8 +7,8 @@ mynode
 path_ansible_base= # ansolute path to base dir with trailing slash
 path_ansible_local= # ansolute path to local dir with trailing slash
 config_user_name=admin
-config_user_password_clear=somepass
-config_user_password=somepass_encrypted
+config_user_password=somepass
+config_user_password_encrypted=somepass_encrypted
 config_user_public_key_file= # absolute path to public key file
 config_user_private_key_file= # absolute path to private key file
 timezone=UTC

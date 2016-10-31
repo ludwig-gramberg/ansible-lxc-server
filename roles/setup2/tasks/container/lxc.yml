@@ -89,7 +89,7 @@
 # add admin users to each container and set public key
 
 - name: add config user to container
-  command: lxc-attach -n {{ container.hostname }} -- useradd -p {{ config_user_password }} -s /bin/bash -m {{ config_user_name }}
+  command: lxc-attach -n {{ container.hostname }} -- useradd -p {{ config_user_password_encrypted }} -s /bin/bash -m {{ config_user_name }}
   args:
     chdir: ~/
     creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}

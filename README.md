@@ -46,4 +46,4 @@ use at your own risk. you found this somewhere on the internet ;-)
 ## misc
 
 ### generate password for user module:
-    openssl passwd -salt MySalt -1 MyPassword
+    openssl passwd -1 MyPassword
