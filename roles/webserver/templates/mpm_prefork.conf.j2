@@ -1,0 +1,7 @@
+<IfModule mpm_prefork_module>
+	StartServers			 {{ mpm.start_servers }}
+	MinSpareServers		     {{ mpm.min_spare_servers }}
+	MaxSpareServers		     {{ mpm.max_spare_servers }}
+	MaxRequestWorkers	     {{ mpm.max_request_workers }}
+	MaxConnectionsPerChild   {{ mpm.max_connections_per_child }}
+</IfModule>

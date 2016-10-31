@@ -1,0 +1,9 @@
+---
+
+mpm:
+  module: prefork
+  start_servers: 1
+  min_spare_servers: 0
+  max_spare_servers: 1
+  max_request_workers: 8
+  max_connections_per_child: 0

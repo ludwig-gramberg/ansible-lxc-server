@@ -11,6 +11,9 @@
     - openssl
     - ca-certificates
 
+- name: deploy mpm conf
+  template: src="mpm_{{ mpm_module }}.conf.j2" dest=/etc/apache2/mods-available/mpm_{{ mpm_module }}.conf
+
 - name: unlink all mpm modules
   file: path=/etc/apache2/mods-enabled/{{ item }} state=absent
   with_items:
@@ -40,6 +43,6 @@
     - expires
     - proxy
     - proxy_http
-    - cgi
+    - cgid
   notify:
     - restart apache

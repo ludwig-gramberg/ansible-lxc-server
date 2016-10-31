@@ -2,7 +2,6 @@
 
 - name: set vars
   set_fact:
-    mpm_module: prefork
     public_ip: "{{ ansible_default_ipv4.address }}"
     iptables:
       inbound:

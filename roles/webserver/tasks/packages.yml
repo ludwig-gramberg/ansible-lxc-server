@@ -12,6 +12,9 @@
     - openssl
     - ca-certificates
 
+- name: deploy mpm conf
+  template: src="mpm_{{ mpm.module }}.conf.j2" dest=/etc/apache2/mods-available/mpm_{{ mpm.module }}.conf
+
 - name: unlink all mpm modules
   file: path=/etc/apache2/mods-enabled/{{ item }} state=absent
   with_items:
@@ -27,8 +30,8 @@
 - name: link preferred mpm module
   file: src=/etc/apache2/mods-available/{{ item }} dest=/etc/apache2/mods-enabled/{{ item }} state=link
   with_items:
-    - "mpm_{{ mpm_module }}.conf"
-    - "mpm_{{ mpm_module }}.load"
+    - "mpm_{{ mpm.module }}.conf"
+    - "mpm_{{ mpm.module }}.load"
   notify:
     - restart apache
 

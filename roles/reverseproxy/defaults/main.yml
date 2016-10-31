@@ -1,0 +1,11 @@
+---
+
+mpm:
+  module: worker
+  start_servers: 2
+  min_spare_threads: 25
+  max_spare_threads: 75
+  thread_limit: 64
+  threads_per_child: 25
+  max_request_workers: 150
+  max_connections_per_child: 0
