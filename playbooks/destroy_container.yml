@@ -1,0 +1,54 @@
+---
+
+- hosts: container
+  vars:
+    ansible_user: "{{ config_user_name }}"
+    ansible_become_pass: "{{ config_user_password }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - debug: msg=""
+
+- hosts: master
+  vars:
+    ansible_user: "{{ config_user_name }}"
+    ansible_become_pass: "{{ config_user_password }}"
+  become: true
+  become_user: root
+  become_method: sudo
+
+  vars_prompt:
+    - name: "confirm_destroy"
+      prompt: "are you sure? if so please type 'yes'"
+      private: no
+    - name: "destroy_container"
+      prompt: "which container should be removed?"
+      private: no
+
+  tasks:
+    - name: check confirm
+      fail: msg="you did not confirm, aborting"
+      when: (confirm_destroy != "yes")
+
+    - name: check that container exists
+      stat: path="/home/runlxc-{{ destroy_container }}"
+      register: runlxc_homedir_exists
+
+    - name: fail if not
+      fail: msg="container {{ destroy_container }} does not exist"
+      when: runlxc_homedir_exists.stat.exists == False
+
+    - name: prep vars
+      set_fact:
+        destroy_nodename: "{{ groups[destroy_container][0] }}"
+
+    - name: prep vars
+      set_fact:
+        destroy_node: "{{ hostvars[destroy_nodename] }}"
+
+    - name: force shutdown container from host 1/2
+      shell: "kill -9 `ps -u {{ destroy_node.userns_offset }} -o pid=`"
+
+    - name: force shutdown container from host 2/2
+      shell: "kill -9 `ps -u runlxc-{{ destroy_container }} -o pid=`"

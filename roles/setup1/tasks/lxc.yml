@@ -3,7 +3,7 @@
 # source: https://myles.sh/configuring-lxc-unprivileged-containers-in-debian-jessie/
 
 - name: install lxc from backports
-  apt: name={{ item }} update_cache=yes state=present default_release=jessie-backports
+  apt: name={{ item }} state=present default_release=jessie-backports
   with_items:
    - lxc
 
