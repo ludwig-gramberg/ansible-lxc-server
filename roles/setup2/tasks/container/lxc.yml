@@ -6,6 +6,52 @@
     uid_begin: "{{ container.userns_offset }}"
     uid_end: "{{ (container.userns_offset+65536)|int }}"
 
+# user and file layout for lxc
+
+- name: include vars
+  include_vars: "{{ item }}"
+  with_first_found:
+  - "{{ path_ansible_local }}vars/admins.yml"
+  - "{{ path_ansible_base }}vars/admins.yml"
+
+- name: container user ssh keys
+  authorized_key: user="{{ container_run_user }}" key="{{ item[1].key }}"
+  with_subelements:
+    - "{{ admins }}"
+    - ssh_keys
+  become: yes
+  become_user: root
+
+# file layout lxc user homefolder
+
+- name: homefolder create dir layout 1/2
+  file: path=/home/{{ container_run_user }}/{{ item }} owner={{ container_run_user }} group={{ container_run_user }} mode=0755 state=directory
+  with_items:
+    - .local/share/lxc
+    - .local/share/lxcsnaps
+    - .cache/lxc
+  become: yes
+  become_user: root
+
+- name: homefolder create dir layout 2/2
+  file: path=/home/{{ container_run_user }}/{{ item }} owner=root group=root mode=0755 state=directory
+  with_items:
+    - .config/lxc
+  become: yes
+  become_user: root
+
+- name: homefolder create cfg files
+  file: path=/home/{{ container_run_user }}/{{ item }} owner=root group=root mode=0644 state=touch
+  with_items:
+    - .config/lxc/lxc.conf
+  become: yes
+  become_user: root
+
+- name: homefolder cfg file uid/gid mapping
+  template: dest=/home/{{ container_run_user }}/.config/lxc/default.conf src=lxc.default.conf.j2 owner=root group=root mode=0644
+  become: yes
+  become_user: root
+
 # get container ready to be used directly via ssh bastion by ansible
 
 - name: create barebone container

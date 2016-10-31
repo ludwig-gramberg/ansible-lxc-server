@@ -2,6 +2,9 @@
 
 ## Roles
 
+- move file-layout for lxc into setup2: done
+  - find way to limit loop over container to single container or learn how to detect if their setup is finished
+
 - certbot installation and configuration on master and optional cert-deployment to containers
   - exposing directory on master via alias and proxypassmatch:
     ``` 

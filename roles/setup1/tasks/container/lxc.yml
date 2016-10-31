@@ -11,37 +11,6 @@
 - name: create container users
   user: name="{{ container_run_user }}" shell=/bin/bash append=yes
 
-- name: include vars
-  include_vars: "{{ item }}"
-  with_first_found:
-  - "{{ path_ansible_local }}vars/admins.yml"
-  - "{{ path_ansible_base }}vars/admins.yml"
-
-- name: container user ssh keys
-  authorized_key: user="{{ container_run_user }}" key="{{ item[1].key }}"
-  with_subelements:
-    - "{{ admins }}"
-    - ssh_keys
-
-# file layout lxc user homefolder
-
-- name: homefolder create dir layout 1/2
-  file: path=/home/{{ container_run_user }}/{{ item }} owner={{ container_run_user }} group={{ container_run_user }} mode=0755 state=directory
-  with_items:
-    - .local/share/lxc
-    - .local/share/lxcsnaps
-    - .cache/lxc
-- name: homefolder create dir layout 2/2
-  file: path=/home/{{ container_run_user }}/{{ item }} owner=root group=root mode=0755 state=directory
-  with_items:
-    - .config/lxc
-- name: homefolder create cfg files
-  file: path=/home/{{ container_run_user }}/{{ item }} owner=root group=root mode=0644 state=touch
-  with_items:
-    - .config/lxc/lxc.conf
-- name: homefolder cfg file uid/gid mapping
-  template: dest=/home/{{ container_run_user }}/.config/lxc/default.conf src=lxc/user/default.conf.j2 owner=root group=root mode=0644
-
 # sub uid/gid
 
 - name: uid for container user
