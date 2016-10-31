@@ -73,8 +73,9 @@
     - config.ini
     - groups.ini
     - resources.ini
-    - modules/monitoring/commandtransports.ini
     - modules/monitoring/config.ini
+    - modules/monitoring/backends.ini
+    - modules/monitoring/commandtransports.ini
 
 - name: deploy config files (webserver writeable)
   template: dest=/etc/icingaweb2/{{ item }} src="web/{{ item }}.j2" owner=www-data group=www-data mode=0750
