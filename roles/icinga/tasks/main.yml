@@ -52,8 +52,43 @@
   notify:
     - restart apache
 
-- name: prepare icingaweb2
-  command: icingacli setup config directory --group icingaweb2
+# configure icingaweb2
 
-- name: prepare icingaweb2 setup token
-  command: icingacli setup token create
+- name: create config dirs
+  file: path={{ item }} state=directory owner=root group=www-data mode=0750
+  with_items:
+    - /etc/icingaweb2
+    - /etc/icingaweb2/modules
+    - /etc/icingaweb2/modules/monitoring
+    - /etc/icingaweb2/enabledModules
+- name: create preference dir
+  file: path={{ item }} state=directory owner=www-data group=www-data mode=0750
+  with_items:
+    - /etc/icingaweb2/preferences
+
+- name: deploy config files
+  template: dest=/etc/icingaweb2/{{ item }} src="web/{{ item }}.j2" owner=root group=www-data mode=0750
+  with_items:
+    - authentication.ini
+    - config.ini
+    - groups.ini
+    - resources.ini
+    - modules/monitoring/commandtransports.ini
+    - modules/monitoring/config.ini
+
+- name: deploy config files (webserver writeable)
+  template: dest=/etc/icingaweb2/{{ item }} src="web/{{ item }}.j2" owner=www-data group=www-data mode=0750
+  with_items:
+    - roles.ini
+
+- name: enable monitoring module
+  file: dest=/etc/icingaweb2/enabledModules/monitoring src=/usr/share/icingaweb2/modules/monitoring state=link
+
+- name: create admin user: deploy sql-file
+  template: src=create_admin.sql.j2 dest=/tmp/icinga_create_admin.sql owner=root group=root mode=0600
+
+- name: create admin user: run sql-file
+  shell: "mysql -h{{ icinga_mysql_host }} -u{{ icinga_mysql_user }} -p{{ icinga_mysql_pass }} {{ icinga_mysql_name }} < /tmp/icinga_create_admin.sql"
+
+- name: create admin user: remove sql-file
+  file: path=/tmp/icinga_create_admin.sql

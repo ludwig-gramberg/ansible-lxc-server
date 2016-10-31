@@ -1,0 +1,8 @@
+
+DELETE FROM `icingaweb_group`;
+DELETE FROM `icingaweb_group_membership`;
+DELETE FROM `icingaweb_user`;
+
+INSERT INTO `icingaweb_group` VALUES (1,'Administrators',NULL,NOW(),NULL);
+INSERT INTO `icingaweb_group_membership` VALUES (1,'{{ icinga_admin_username }}',NOW(),NULL);
+INSERT INTO `icingaweb_user` VALUES ('{{ icinga_admin_username }}',1,'{{ icinga_admin_password_encrypted }}',NULL,NULL);
