@@ -84,11 +84,11 @@
 - name: enable monitoring module
   file: dest=/etc/icingaweb2/enabledModules/monitoring src=/usr/share/icingaweb2/modules/monitoring state=link
 
-- name: create admin user: deploy sql-file
+- name: create admin user deploy sql-file
   template: src=create_admin.sql.j2 dest=/tmp/icinga_create_admin.sql owner=root group=root mode=0600
 
-- name: create admin user: run sql-file
+- name: create admin user run sql-file
   shell: "mysql -h{{ icinga_mysql_host }} -u{{ icinga_mysql_user }} -p{{ icinga_mysql_pass }} {{ icinga_mysql_name }} < /tmp/icinga_create_admin.sql"
 
-- name: create admin user: remove sql-file
-  file: path=/tmp/icinga_create_admin.sql
+- name: create admin user remove sql-file
+  file: path=/tmp/icinga_create_admin.sql state=absent

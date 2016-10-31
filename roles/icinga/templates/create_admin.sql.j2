@@ -1,6 +1,6 @@
 
-DELETE FROM `icingaweb_group`;
 DELETE FROM `icingaweb_group_membership`;
+DELETE FROM `icingaweb_group`;
 DELETE FROM `icingaweb_user`;
 
 INSERT INTO `icingaweb_group` VALUES (1,'Administrators',NULL,NOW(),NULL);
