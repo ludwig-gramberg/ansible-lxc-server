@@ -2,32 +2,62 @@
 
 - name: set vars
   set_fact:
-     public_ip: "{{ ansible_default_ipv4.address }}"
-     iptables:
-       inbound:
-         - port: 22
-           proto: tcp
-         - port: 80
-           proto: tcp
-           source: "{{ container_bridge_subnet }}.1/32"
-         - port: 443
-           proto: tcp
-           source: "{{ container_bridge_subnet }}.0/24"
+    public_ip: "{{ ansible_default_ipv4.address }}"
+    iptables:
+      inbound:
+        - port: 22
+          proto: tcp
+        - port: 80
+          proto: tcp
+          source: "{{ container_bridge_subnet }}.1/32"
+        - port: 443
+          proto: tcp
+          source: "{{ container_bridge_subnet }}.1/32"
+        - port: 4949
+          proto: tcp
+          source: "{{ container_bridge_subnet }}.1/32"
 
+- name: set vars
+  set_fact:
+    munin:
+      plugins:
+        - plugin: apache_accesses # machine specific
+        - plugin: apache_processes
+        - plugin: apache_volume
+        - plugin: http_loadtime
+  tags: munin
+
+- include: ../../../tasks/iptables.yml
+- include: ../../../tasks/munin-plugins.yml
+  tags: munin
 - include: tasks/packages.yml
-- include: tasks/iptables.yml
 - include: tasks/apache.yml
 
-- include_vars: vars/sites.yml
+- name: include sites
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/sites.yml"
+    - "{{ path_ansible_base }}vars/sites.yml"
 
-- name: build deploy_certs list 1/2
+- name: build deploy_certs list 1/3
   set_fact:
-    deploy_certs_tmp: "{{ deploy_certs_tmp|default([]) | union( [  item.ssl.cert_file|default(false), item.ssl.cert_key_file|default(false), item.ssl.cert_chain_file|default(false), item.ssl.cert_sign_file|default(false)  ] ) }}"
-  with_items: "{{ sites }}"
-  when: item.target_ip == "{{ ansible_default_ipv4.address }}"
+    deploy_certs_tmp: []
 
-- name: build deploy_certs list 2/2
+- name: build deploy_certs list 1/3
+  set_fact:
+    deploy_certs_tmp: "{{ deploy_certs_tmp | union( [  item.ssl.cert_file|default(false), item.ssl.cert_key_file|default(false), item.ssl.cert_chain_file|default(false), item.ssl.cert_sign_file|default(false)  ] ) }}"
+  with_items: "{{ sites }}"
+  when: (item.target_ip == "{{ ansible_default_ipv4.address }}") and (item.ssl is defined)
+
+- name: build deploy_certs list 2/3
   set_fact:
     deploy_certs: "{{ deploy_certs_tmp|select()|list }}"
 
-- include: tasks/ssl.certs.yml
+- name: cert dir
+  file: path=/etc/ssl-site-certs/ owner=root group=root mode=0755 state=directory
+
+- name: deploy certs
+  copy: dest=/etc/ssl-site-certs/{{ item }} src=../../../../local/certs/{{ item }} owner=root group=root mode=0400
+  with_items: "{{ deploy_certs }}"
+  notify:
+    - restart apache

@@ -1,0 +1,4 @@
+---
+
+- name: restart munin
+  service: name=munin-node state=restarted

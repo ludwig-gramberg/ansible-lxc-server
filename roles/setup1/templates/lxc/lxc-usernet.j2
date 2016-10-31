@@ -1,1 +1,3 @@
-{{ container_user }} veth lxc 100
+{% for container_name in groups['container'] %}
+{{ container_user }}-{{ hostvars[container_name].hostname }} veth lxc 1
+{% endfor %}

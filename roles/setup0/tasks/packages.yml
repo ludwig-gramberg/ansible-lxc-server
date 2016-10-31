@@ -1,13 +1,13 @@
 ---
 
 - name: apt/sources.list
-  template: dest=/etc/apt/sources.list src=apt.sources.list.j2
+  template: dest=/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
 
 - name: upgrade system
   apt: upgrade=dist update_cache=yes
 
 - name: install basics
-  apt: name={{ item }} update_cache=yes state=latest
+  apt: name={{ item }} update_cache=yes state=present
   with_items:
   - sudo
   - iptables-persistent

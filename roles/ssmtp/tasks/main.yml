@@ -1,7 +1,7 @@
 ---
 
-- name: ensure ssmtp is at the latest version
-  apt: pkg=ssmtp state=latest
+- name: install ssmtp
+  apt: pkg=ssmtp state=present
 
 - name: ssmtp conf file
   template: src=templates/ssmtp.conf.j2 dest=/etc/ssmtp/ssmtp.conf backup=yes owner=root group=root mode=0644

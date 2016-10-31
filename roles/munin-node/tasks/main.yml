@@ -1,0 +1,38 @@
+---
+
+# default container munin plugins
+
+- name: set vars
+  set_fact:
+    munin:
+      plugins:
+        - plugin: fw_conntrack
+        - plugin: fw_forwarded_local
+        - plugin: fw_packets
+        - plugin: netstat
+        - plugin: open_files
+        - plugin: if_eth0
+          source: if_
+        - plugin: if_err_eth0
+          source: if_err_
+        - plugin: threads
+        - plugin: uptime
+        - plugin: users
+        - plugin: vmstat
+
+# separated install and upgrade so ansible only sets up the plugins-dir once
+
+- name: install munin-node
+  apt: name=munin-node state=present
+  register: munin_node_installed
+
+- name: remove all (default) plugins
+  shell: rm -f /etc/munin/plugins/*
+  when: munin_node_installed.changed
+
+- include: ../../../tasks/munin-plugins.yml
+
+- name: munin-node.conf
+  template: src=munin-node.conf.j2 dest=/etc/munin/munin-node.conf owner=root group=root
+  notify:
+    - restart munin

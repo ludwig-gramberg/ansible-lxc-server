@@ -1,0 +1,62 @@
+---
+
+- name: set vars
+  set_fact:
+    munin:
+      plugins:
+        - plugin: mysql_bin_relay_log
+          source: mysql_
+        - plugin: mysql_commands
+          source: mysql_
+        - plugin: mysql_connections
+          source: mysql_
+        - plugin: mysql_files_tables
+          source: mysql_
+        - plugin: mysql_innodb_bpool
+          source: mysql_
+        - plugin: mysql_innodb_bpool_act
+          source: mysql_
+        - plugin: mysql_innodb_insert_buf
+          source: mysql_
+        - plugin: mysql_innodb_io
+          source: mysql_
+        - plugin: mysql_innodb_io_pend
+          source: mysql_
+        - plugin: mysql_innodb_log
+          source: mysql_
+        - plugin: mysql_innodb_rows
+          source: mysql_
+        - plugin: mysql_innodb_semaphores
+          source: mysql_
+        - plugin: mysql_innodb_tnx
+          source: mysql_
+        - plugin: mysql_myisam_indexes
+          source: mysql_
+        - plugin: mysql_network_traffic
+          source: mysql_
+        - plugin: mysql_qcache
+          source: mysql_
+        - plugin: mysql_qcache_mem
+          source: mysql_
+        - plugin: mysql_replication
+          source: mysql_
+        - plugin: mysql_select_types
+          source: mysql_
+        - plugin: mysql_slow
+          source: mysql_
+        - plugin: mysql_sorts
+          source: mysql_
+        - plugin: mysql_table_locks
+          source: mysql_
+        - plugin: mysql_tmp_tables
+          source: mysql_
+        - plugin: mysql_bytes
+        - plugin: mysql_queries
+
+- name: install munin plugins dependencies
+  apt: name={{ item }} state=present
+  with_items:
+  - libcache-perl
+  - libcache-cache-perl
+
+- include: "{{ path_ansible_base }}tasks/munin-plugins.yml"

@@ -1,0 +1,12 @@
+includedir /etc/munin/munin-conf.d
+
+[localhost]
+    address 127.0.0.1
+    use_node_name yes
+
+[container;]
+{% for host in groups['container'] %}
+[container;{{ hostvars[host].hostname }}]
+	address {{ hostvars[host].ansible_default_ipv4.address }}
+	use_node_name yes
+{% endfor %}

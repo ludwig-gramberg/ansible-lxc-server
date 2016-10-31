@@ -1,12 +1,13 @@
-group {{container_user}} {
+{% for container_name in groups['container'] %}
+group {{ container_user }}-{{ hostvars[container_name].hostname }} {
   perm {
     task {
-      uid = {{container_user}};
-      gid = {{container_user}};
+      uid = {{container_user}}-{{ hostvars[container_name].hostname }};
+      gid = {{container_user}}-{{ hostvars[container_name].hostname }};
     }
     admin {
-      uid = {{container_user}};
-      gid = {{container_user}};
+      uid = {{container_user}}-{{ hostvars[container_name].hostname }};
+      gid = {{container_user}}-{{ hostvars[container_name].hostname }};
     }
   }
   cpu {}
@@ -23,3 +24,4 @@ group {{container_user}} {
   net_cls {}
   net_prio {}
 }
+{% endfor %}

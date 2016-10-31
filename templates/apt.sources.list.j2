@@ -8,9 +8,3 @@ deb http://{{ apt_server }}/debian/ jessie-updates main
 deb-src http://{{ apt_server }}/debian/ jessie-updates main
 
 deb http://{{ apt_server }}/debian jessie-backports main
-
-{% if aptsources is defined %}
-{% for entry in aptsources %}
-{{ entry }}
-{% endfor %}
-{% endif %}

@@ -1,18 +1,23 @@
 ---
 
 - name: include vars
-  include_vars: "vars/admins.yml"
+  include_vars: "{{ item }}"
+  with_first_found:
+  - "{{ path_ansible_local }}vars/admins.yml"
+  - "{{ path_ansible_base }}vars/admins.yml"
 
-- name: create admin
+- name: create admins
   user: name="{{ item.name }}" password="{{ item.password }}" shell=/bin/bash groups=sudo append=yes
   with_items: "{{ admins }}"
 
 - name: admin authorized key
-  authorized_key: user="{{ item.name }}" key="{{ item.ssh_key }}"
-  with_items: "{{ admins }}"
+  authorized_key: user="{{ item[0].name }}" key="{{ item[1].key }}"
+  with_subelements:
+    - "{{ admins }}"
+    - ssh_keys
 
 - name: allow users in ssh
-  template: dest=/etc/ssh/sshd_config src=sshd_config.j2 owner=root group=root mode=0644
+  template: dest=/etc/ssh/sshd_config src=../../../templates/sshd_config.j2 owner=root group=root mode=0644
 
 - name: reload ssh
   command: systemctl reload ssh.service

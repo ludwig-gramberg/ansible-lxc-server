@@ -3,7 +3,7 @@
 # source: https://myles.sh/configuring-lxc-unprivileged-containers-in-debian-jessie/
 
 - name: install lxc from backports
-  apt: name={{ item }} update_cache=yes state=latest default_release=jessie-backports
+  apt: name={{ item }} update_cache=yes state=present default_release=jessie-backports
   with_items:
    - lxc
 
@@ -11,44 +11,6 @@
 
 - name: set DOWNLOAD_COMPAT_LEVEL to allow download unprivileged container templates
   lineinfile: dest=/usr/share/lxc/templates/lxc-download regexp=^DOWNLOAD_COMPAT_LEVEL= line=DOWNLOAD_COMPAT_LEVEL=3
-
-# create container user
-
-- name: create container user
-  user: name="{{ container_user }}" password="{{ container_user }}" shell=/bin/bash append=yes
-
-- name: include vars
-  include_vars: "vars/admins.yml"
-
-- name: container user ssh keys
-  authorized_key: user="{{ container_user }}" key="{{ item.ssh_key }}"
-  with_items: "{{ admins }}"
-
-# file layout lxc user homefolder
-
-- name: homefolder create dir layout 1/2
-  file: path=/home/{{ container_user }}/{{ item }} owner={{ container_user }} group={{ container_user }} mode=0755 state=directory
-  with_items:
-    - .local/share/lxc
-    - .local/share/lxcsnaps
-    - .cache/lxc
-- name: homefolder create dir layout 2/2
-  file: path=/home/{{ container_user }}/{{ item }} owner=root group=root mode=0755 state=directory
-  with_items:
-    - .config/lxc
-- name: homefolder create cfg files
-  file: path=/home/{{ container_user }}/{{ item }} owner=root group=root mode=0644 state=touch
-  with_items:
-    - .config/lxc/lxc.conf
-- name: homefolder cfg file uid/gid mapping
-  template: dest=/home/{{ container_user }}/.config/lxc/default.conf src=lxc/user/default.conf.j2 owner=root group=root mode=0644
-
-# sub uid/gid
-
-- name: uid for container user
-  raw: usermod --add-subuids 100000-165536 {{ container_user }}
-- name: gid for container user
-  raw: usermod --add-subgids 100000-165536 {{ container_user }}
 
 # kernel flag
 
@@ -76,10 +38,12 @@
 - name: cgred.service
   template: dest=/lib/systemd/system/cgred.service src=lxc/cgred.service.j2 owner=root group=root mode=0644
 
-- service: name=cgconfig enabled=yes state=started
-- service: name=cgred enabled=yes state=started
-
-# allow container user access to lxc bridge
+## allow container user access to lxc bridge
 
 - name: lxc bridge access
   template: dest=/etc/lxc/lxc-usernet src=lxc/lxc-usernet.j2 owner=root group=root mode=0644
+
+## start cgred services
+
+#- service: name=cgconfig enabled=yes state=started
+#- service: name=cgred enabled=yes state=started

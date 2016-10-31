@@ -1,1 +1,3 @@
-{{container_user}} * {{container_user}}
+{% for container_name in groups['container'] %}
+{{container_user}}-{{ hostvars[container_name].hostname }} * {{container_user}}-{{ hostvars[container_name].hostname }}
+{% endfor %}

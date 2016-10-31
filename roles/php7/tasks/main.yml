@@ -1,14 +1,16 @@
 ---
 
-- name: set vars
-  set_fact:
-     aptsources:
-       - "deb http://packages.dotdeb.org jessie all"
-       - "deb-src http://packages.dotdeb.org jessie all"
-     aptkeys:
-       - "https://www.dotdeb.org/dotdeb.gpg"
+- name: deploy dotdeb sources.list
+  template: dest=/etc/apt/sources.list.d/dotdeb.list src=apt.dotdeb.list.j2
 
-- include: tasks/apt.sources.yml
+- name: install keys
+  apt_key: url={{ item }} state=present
+  with_items:
+    - "https://www.dotdeb.org/dotdeb.gpg"
+
+- name: apt update
+  apt: update_cache=yes
+
 - include: tasks/packages.yml
 - name: php-logdir
   file: path=/var/log/php state=directory owner=www-data group=www-data mode=0755

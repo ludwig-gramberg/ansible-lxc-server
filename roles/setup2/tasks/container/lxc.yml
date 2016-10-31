@@ -1,5 +1,11 @@
 ---
 
+- name: container run user name and uids
+  set_fact:
+    container_run_user: "{{ container_user }}-{{ container.hostname }}"
+    uid_begin: "{{ container.userns_offset }}"
+    uid_end: "{{ (container.userns_offset+65536)|int }}"
+
 # get container ready to be used directly via ssh bastion by ansible
 
 - name: create barebone container
@@ -16,37 +22,37 @@
 # mostly getting container network ready
 
 - name: ipv4 precedence over ipv6
-  lineinfile: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
+  lineinfile: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
   become: yes
   become_user: root
 
 - name: network interfaces
-  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
+  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
   become: yes
   become_user: root
 
 - name: iptables dir
-  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables state=directory owner=100000 group=100000 mode=0644
+  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables state=directory owner={{ uid_begin }} group={{ uid_begin }} mode=0644
   become: yes
   become_user: root
 
 - name: empty iptables rules v4
   become: yes
   become_user: root
-  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v4.source state=touch owner=100000 group=100000
+  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v4.source state=touch owner={{ uid_begin }} group={{ uid_begin }}
 
 - name: empty iptables rules v6
   become: yes
   become_user: root
-  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v6.source state=touch owner=100000 group=100000
+  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v6.source state=touch owner={{ uid_begin }} group={{ uid_begin }}
 
 - name: resolve.conf
-  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
+  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
   become: yes
   become_user: root
 
 - name: apt/sources.list
-  template: dest=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=apt.sources.list.j2
+  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
   become: yes
   become_user: root
 
@@ -94,11 +100,14 @@
     chdir: ~/
 
 - name: add admin users public keys to container
-  authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
+  authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
   become: yes
   become_user: root
 
 - name: ownership of .ssh/authorized_keys
-  file: path=/home/{{ container_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner=100000 group=100000 mode=0755 recurse=yes
+  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner={{ uid_begin }} group={{ uid_begin }} mode=0755 recurse=yes
   become: yes
   become_user: root
+
+- name: container autostart
+  cron: name="lxc-autostart" special_time=reboot job="sleep 30 ; lxc-autostart" user={{ container_run_user }}

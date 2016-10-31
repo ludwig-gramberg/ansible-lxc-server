@@ -1,13 +1,17 @@
 ---
 
-- include_vars: vars/ports.yml
+- name: include ports
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/ports.yml"
+    - "{{ path_ansible_base }}vars/ports.yml"
 
 - set_fact:
     iptables:
       inbound: "{{ ports.inbound }}"
 
 - name: iptables
-  include: tasks/iptables.yml
+  include: ../../../tasks/iptables.yml
 
 # iptables rules dont include udp/tcp set by libvirt to allow dns for containers
 # thus a restart of the lxc-network is necessary
@@ -19,13 +23,12 @@
   virt_net: command=start name=lxc
 
 - name: spawn containers
-  include: tasks/lxc.yml
+  include: tasks/container/lxc.yml
   vars:
-     container: "{{ hostvars[item] }}"
-     container_ip: "{{ hostvars[item]['inventory_hostname'] }}"
+     container: "{{ hostvars[container_item] }}"
+     container_ip: "{{ hostvars[container_item]['inventory_hostname'] }}"
   with_items: "{{ groups['container'] }}"
   become: true
-  become_user: "{{ container_user }}"
-
-- name: container autostart
-  cron: name="lxc-autostart" special_time=reboot job="sleep 30 ; lxc-autostart" user={{ container_user }}
+  become_user: "{{ container_user }}-{{ hostvars[container_item].hostname }}"
+  loop_control:
+    loop_var: "container_item"

@@ -1,28 +1,43 @@
 ---
 
 - name: install mysql-server
-  apt: name={{ item }} state=latest default_release=jessie-backports
+  apt: name={{ item }} state=present default_release=jessie-backports
   with_items:
   - python
   - python-mysqldb
   - mysql-server-5.6
 
 - name: my.cnf
-  template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src=my.cnf.j2 backup=yes
+  template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src={{ item }} backup=yes
+  with_first_found:
+   - "{{ path_ansible_local }}templates/my.cnf.j2"
+   - "{{ path_ansible_base }}roles/mysql/templates/my.cnf.j2"
   notify:
    - restart mysql
 
 - name: enable mysql
   service: name=mysql enabled=yes
 
-- include_vars: vars/databases.yml
+- name: include databases
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/databases.yml"
+    - "{{ path_ansible_base }}vars/databases.yml"
 
 - name: create databases
-  mysql_db: name={{ item.name }} encoding={{ item.encoding }} collation={{ item.collation }} login_user=root
+  mysql_db: name={{ item.name }}
+            encoding={{ item.encoding }}
+            collation={{ item.collation }}
+            login_user=root
   with_items: "{{ databases.mysql }}"
 
 - name: create database users
-  mysql_user: host={{ item.1.host }} name={{ item.1.name }} password={{ item.1.password }} priv="{{ item.0.name }}.*:ALL" login_user=root
+  mysql_user: host={{ item.1.host }}
+              name={{ item.1.name }}
+              password={{ item.1.password }}
+              priv="{{ item.0.name }}.*:ALL"
+              login_user=root
+              append_privs=yes
   with_subelements:
     - "{{ databases.mysql }}"
     - users

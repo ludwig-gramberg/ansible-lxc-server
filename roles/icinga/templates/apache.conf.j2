@@ -1,0 +1,36 @@
+<VirtualHost *:80>
+
+	ServerName {{ domain_name }}
+
+	DocumentRoot /usr/share/icingaweb2/public
+
+	<Directory "/usr/share/icingaweb2/public">
+
+		Options SymLinksIfOwnerMatch
+		AllowOverride None
+
+		<RequireAll>
+			Require all granted
+		</RequireAll>
+
+		SetEnv ICINGAWEB_CONFIGDIR "/etc/icingaweb2"
+
+		EnableSendfile Off
+
+		<IfModule mod_rewrite.c>
+			RewriteEngine on
+			RewriteBase /
+			RewriteCond %{REQUEST_FILENAME} -s [OR]
+			RewriteCond %{REQUEST_FILENAME} -l [OR]
+			RewriteCond %{REQUEST_FILENAME} -d
+			RewriteRule ^.*$ - [NC,L]
+			RewriteRule ^.*$ index.php [NC,L]
+		</IfModule>
+
+		<IfModule !mod_rewrite.c>
+			DirectoryIndex error_norewrite.html
+			ErrorDocument 404 /error_norewrite.html
+		</IfModule>
+	</Directory>
+
+</VirtualHost>

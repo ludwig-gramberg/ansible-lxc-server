@@ -3,7 +3,7 @@
 - name: install requirements
   environment:
       DEBIAN_FRONTEND: noninteractive
-  apt: name={{ item }} state=latest
+  apt: name={{ item }} state=present
   with_items:
     - apache2
     - apache2-mpm-prefork
@@ -11,7 +11,15 @@
     - openssl
     - ca-certificates
 
-- name: apache modules
+- name: link mpm prefork
+  file: src=/etc/apache2/mods-available/{{ item }} dest=/etc/apache2/mods-enabled/{{ item }} state=link
+  with_items:
+    - mpm_prefork.conf
+    - mpm_prefork.load
+  notify:
+    - restart apache
+
+- name: enable apache modules
   apache2_module: state=present name={{ item }}
   with_items:
     - ssl
@@ -20,3 +28,6 @@
     - expires
     - proxy
     - proxy_http
+    - cgi
+  notify:
+    - restart apache

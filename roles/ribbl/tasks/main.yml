@@ -109,7 +109,11 @@
 - name: ribbl cfg
   template: dest=/var/www/project/config.php src=templates/config.php.j2 owner=root group=root mode=0755
 
-- include_vars: vars/sites.yml
+- name: include sites
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/sites.yml"
+    - "{{ path_ansible_base }}vars/sites.yml"
 
 - name: populate site
   set_fact:

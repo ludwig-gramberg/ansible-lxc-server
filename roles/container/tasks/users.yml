@@ -1,7 +1,10 @@
 ---
 
 - name: include vars
-  include_vars: "vars/admins.yml"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/admins.yml"
+    - "{{ path_ansible_base }}vars/admins.yml"
 
 - name: create admin
   user: name="{{ item.name }}" password="{{ item.password }}" shell=/bin/bash groups=sudo append=yes
@@ -22,6 +25,6 @@
   when: deploy_user is defined
 
 - name: ssh config
-  template: dest=/etc/ssh/sshd_config src=sshd_config.j2
+  template: dest=/etc/ssh/sshd_config src=../../../templates/sshd_config.j2
   notify:
     - reload sshd

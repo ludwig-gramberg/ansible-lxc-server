@@ -2,3 +2,5 @@
 
 - name: restart mysql
   service: name=mysql state=restarted
+- name: restart munin
+  service: name=munin-node state=restarted
