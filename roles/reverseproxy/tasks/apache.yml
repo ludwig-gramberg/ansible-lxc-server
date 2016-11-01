@@ -11,6 +11,21 @@
     - "{{ path_ansible_local }}vars/sites.yml"
     - "{{ path_ansible_base }}vars/sites.yml"
 
+- name: check for each site cert_bot_cert_exists if necessary
+  stat: path=/etc/letsencrypt/live/{{ item.domain }}/cert.pem
+  with_items: "{{ sites }}"
+  register: cert_bot_stats
+
+- name: prep exists list
+  set_fact:
+    cert_bot_cert_exists: []
+
+- name: populate exists list
+  set_fact:
+    cert_bot_cert_exists: "{{ cert_bot_cert_exists | union( [ item.item.domain ] ) }}"
+  with_items: "{{ cert_bot_stats.results }}"
+  when: item.stat.exists
+
 - name: reverse proxy vhosts
   template: dest=/etc/apache2/sites-available/reverse-{{ item.domain }}.conf src=templates/vhost.conf.j2
   with_items: "{{ sites }}"
@@ -22,3 +37,8 @@
   with_items: "{{ sites }}"
   notify:
     - restart apache
+
+# prep for certbot
+
+- name: create well-known dir
+  file: path=/var/www/html/certbot state=directory owner=root group=root

@@ -1,0 +1,19 @@
+---
+
+# install from backports, normal has dependecy problems with python
+
+- name: install certbot
+  apt: name=certbot state=present default_release=jessie-backports
+
+- name: create well-known dir
+  file: path=/var/www/html/certbot state=directory owner=root group=root
+
+- name: include sites
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ path_ansible_local }}vars/sites.yml"
+    - "{{ path_ansible_base }}vars/sites.yml"
+
+- name: install certs
+  shell: "certbot certonly --webroot --webroot-path=/var/www/html/certbot/ -m {{ certbot_auth_email }} --agree-tos -d {{ item.domain }}"
+  with_items: "{{ sites }}"

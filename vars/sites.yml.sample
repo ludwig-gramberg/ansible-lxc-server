@@ -9,8 +9,11 @@ sites:
     target_ip: someip
     target_request: http://someip/
     ssl:
-      target_request: https://someip/
 	  cert_file: domain.crt
 	  cert_key_file: domain.key
 	  cert_chain_file: domain.ca
 	  cert_sign_file: domain.csr
+  	# or with certbot:
+    ssl:
+	  cert_bot: True
+

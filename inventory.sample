@@ -11,8 +11,11 @@ config_user_password=somepass
 config_user_password_encrypted=somepass_encrypted
 config_user_public_key_file= # absolute path to public key file
 config_user_private_key_file= # absolute path to private key file
-timezone=UTC
 
+apticron_recipient=email@domain.com
+certbot_auth_email=email@domain.com
+
+timezone=UTC
 container_bridge_subnet=10.11.0
 ansible_connection=ssh
 apt_server=ftp.cz.debian.org

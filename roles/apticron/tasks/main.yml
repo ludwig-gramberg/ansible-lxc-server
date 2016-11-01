@@ -1,3 +1,5 @@
+---
+
 - name: install apticron
   apt: name=apticron state=present
 

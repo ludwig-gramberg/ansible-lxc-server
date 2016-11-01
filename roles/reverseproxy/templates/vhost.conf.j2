@@ -10,6 +10,12 @@
 
     ProxyRequests Off
     ProxyPreserveHost On
+
+    {% if item.ssl.cert_bot %}
+    Alias /.well-known/ /var/www/html/certbot/.well-known/
+	ProxyPassMatch ^/\.well-known/ !
+    {% endif %}
+
 	ProxyPass {{ item.source_request|default('/') }} {{ item.target_request }} disableReuse=On retry=5
     ProxyPassReverse {{ item.source_request|default('/') }} {{ item.target_request }}
     ProxyVia On
@@ -32,18 +38,39 @@
 
     ProxyRequests Off
 	ProxyPreserveHost On
-	ProxyPass {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request }} disableReuse=On retry=5
-	ProxyPassReverse {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request }}
+	ProxyPass {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request|default(item.target_request) }} disableReuse=On retry=5
+	ProxyPassReverse {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request|default(item.target_request) }}
 	ProxyVia On
 
-    SSLProxyEngine On
-    SSLProxyCheckPeerCN Off
-    SSLProxyCheckPeerExpire Off
+    {% if (item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists) %}
 
-    SSLEngine ON
-    SSLCertificateFile /etc/ssl-site-certs/{{ item.ssl.cert_file }}
-    SSLCertificateKeyFile /etc/ssl-site-certs/{{ item.ssl.cert_key_file }}
-    SSLCertificateChainFile /etc/ssl-site-certs/{{ item.ssl.cert_chain_file }}
+	RequestHeader set X-Forwarded-Proto "https"
+
+	SSLProxyEngine On
+	SSLProxyCheckPeerCN Off
+	SSLProxyCheckPeerExpire Off
+
+	SSLEngine ON
+	SSLCertificateFile /etc/letsencrypt/live/{{ item.domain }}/cert.pem
+	SSLCertificateKeyFile /etc/letsencrypt/live/{{ item.domain }}/privkey.pem
+	SSLCertificateChainFile /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem
+
+    {% endif %}
+
+    {% if item.ssl.cert_file is defined %}
+
+	RequestHeader set X-Forwarded-Proto "https"
+
+	SSLProxyEngine On
+	SSLProxyCheckPeerCN Off
+	SSLProxyCheckPeerExpire Off
+
+	SSLEngine ON
+	SSLCertificateFile /etc/ssl-site-certs/{{ item.ssl.cert_file|default('nofile') }}
+	SSLCertificateKeyFile /etc/ssl-site-certs/{{ item.ssl.cert_key_file|default('nofile') }}
+	SSLCertificateChainFile /etc/ssl-site-certs/{{ item.ssl.cert_chain_file|default('nofile') }}
+
+    {% endif %}
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
     LogLevel warn

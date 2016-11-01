@@ -34,7 +34,7 @@
   set_fact:
     deploy_certs_tmp: "{{ deploy_certs_tmp | union( [  item.ssl.cert_file|default(false), item.ssl.cert_key_file|default(false), item.ssl.cert_chain_file|default(false), item.ssl.cert_sign_file|default(false)  ] ) }}"
   with_items: "{{ sites }}"
-  when: (item.ssl is defined)
+  when: (item.ssl is defined) and (item.ssl.cert_file is defined)
   tags: reverseproxy
 
 - name: build deploy_certs list 2/3
