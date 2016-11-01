@@ -15,7 +15,7 @@
           source: "{{ container_bridge_subnet }}.1/32"
         - port: 4949
           proto: tcp
-          source: "{{ container_bridge_subnet }}.1/32"
+          source: "{{ munin_master }}/32"
 
 - name: set vars
   set_fact:

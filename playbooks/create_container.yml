@@ -1,0 +1,16 @@
+---
+- hosts: master
+  vars:
+    ansible_user: "{{ config_user_name }}"
+    ansible_become_pass: "{{ config_user_password }}"
+  become: true
+  become_user: root
+  become_method: sudo
+
+  vars_prompt:
+    - name: "limit_container"
+      prompt: "limit playbook to one container? if so enter container-name, otherwise all are reconfigured and restarted"
+      private: no
+
+  roles:
+   - create_container

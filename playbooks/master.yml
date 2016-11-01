@@ -20,7 +20,7 @@
   become_user: root
   become_method: sudo
   roles:
-    - role: munin
+    - role: munin-node
       tags: munin
     - role: reverseproxy
       tags: reverseproxy

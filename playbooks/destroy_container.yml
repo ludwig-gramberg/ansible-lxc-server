@@ -52,6 +52,7 @@
 
     - name: force shutdown container from host 2/2
       shell: "kill -9 `ps -u runlxc-{{ destroy_container }} -o pid=`"
+      ignore_errors: True
 
     - name: delete container files
       shell: "rm -rf /home/runlxc-{{ destroy_container }}/{{ item }}"

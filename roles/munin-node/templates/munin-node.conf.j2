@@ -16,9 +16,9 @@ ignore_file \.dpkg-(tmp|new|old|dist)$
 ignore_file \.rpm(save|new)$
 ignore_file \.pod$
 
-host_name {{ hostname }}
+host_name {{ hostname|default(ansible_nodename) }}
 
-allow ^{{ container_bridge_subnet | replace('.', '\.') }}\.1$
+allow ^{{ munin_master | replace('.', '\.') }}$
 
 host *
 port 4949

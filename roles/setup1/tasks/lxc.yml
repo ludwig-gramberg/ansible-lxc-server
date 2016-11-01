@@ -24,26 +24,9 @@
 - name: /etc/sysconfig/cgred.conf
   template: dest=/etc/sysconfig/cgred.conf src=lxc/cgred.conf.j2 owner=root group=root mode=0644
 
-# cgconfig
-
-- name: /etc/cgconfig.conf
-  template: dest=/etc/cgconfig.conf src=lxc/cgconfig.conf.j2 owner=root group=root mode=0644
-- name: /etc/cgrules.conf
-  template: dest=/etc/cgrules.conf src=lxc/cgrules.conf.j2 owner=root group=root mode=0644
-
 # install cgroup services
 
 - name: cgconfig.service
   template: dest=/lib/systemd/system/cgconfig.service src=lxc/cgconfig.service.j2 owner=root group=root mode=0644
 - name: cgred.service
   template: dest=/lib/systemd/system/cgred.service src=lxc/cgred.service.j2 owner=root group=root mode=0644
-
-## allow container user access to lxc bridge
-
-- name: lxc bridge access
-  template: dest=/etc/lxc/lxc-usernet src=lxc/lxc-usernet.j2 owner=root group=root mode=0644
-
-## start cgred services
-
-#- service: name=cgconfig enabled=yes state=started
-#- service: name=cgred enabled=yes state=started

@@ -6,6 +6,24 @@
     uid_begin: "{{ container.userns_offset }}"
     uid_end: "{{ (container.userns_offset+65536)|int }}"
 
+# create container user
+
+- name: create container users
+  user: name="{{ container_run_user }}" shell=/bin/bash append=yes
+  become: yes
+  become_user: root
+
+# sub uid/gid
+
+- name: uid for container user
+  raw: usermod --add-subuids {{ uid_begin }}-{{ uid_end }} {{ container_run_user }}
+  become: yes
+  become_user: root
+- name: gid for container user
+  raw: usermod --add-subgids {{ uid_begin }}-{{ uid_end }} {{ container_run_user }}
+  become: yes
+  become_user: root
+
 # user and file layout for lxc
 
 - name: include vars
@@ -102,15 +120,15 @@
   become: yes
   become_user: root
 
-# restart container
+# start container
 
-- name: restart container 1/2
+- name: stop container
   command: lxc-stop -k -n {{ container.hostname }}
   args:
     chdir: ~/
-  ignore_errors: yes
+  ignore_errors: True
 
-- name: restart container 2/2
+- name: start container
   command: lxc-start -d -n {{ container.hostname }}
   args:
     chdir: ~/

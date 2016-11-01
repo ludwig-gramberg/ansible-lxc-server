@@ -17,3 +17,5 @@
 - name: install certs
   shell: "certbot certonly --webroot --webroot-path=/var/www/html/certbot/ -m {{ certbot_auth_email }} --agree-tos -d {{ item.domain }}"
   with_items: "{{ sites }}"
+  args:
+    creates: "/etc/letsencrypt/live/{{ item.domain }}/cert.pem"

@@ -1,48 +1,10 @@
 ---
 
-- name: set vars
-  set_fact:
-    munin:
-      plugins:
-        - plugin: netstat
-        - plugin: fw_forwarded_local
-        - plugin: fw_packets
-        - plugin: fw_conntrack
-        - plugin: "if_{{ public_eth }}"
-          source: if_
-        - plugin: "if_err_{{ public_eth }}"
-          source: if_err_
-        - plugin: ntp_kernel_pll_freq
-        - plugin: ntp_kernel_pll_off
-        - plugin: ntp_kernel_err
-        - plugin: ntp_offset
-        - plugin: entropy
-        - plugin: interrupts
-        - plugin: irqstats
-        - plugin: open_files
-        - plugin: df
-        - plugin: df_inode
-        - plugin: diskstats
-        - plugin: open_inodes
-        - plugin: cpu
-        - plugin: forks
-        - plugin: swap
-        - plugin: memory
-        - plugin: munin_stats
-        - plugin: load
-        - plugin: threads
-        - plugin: proc_pri
-        - plugin: processes
-        - plugin: users
-        - plugin: uptime
-        - plugin: vmstat
-
 - name: install packages
   apt: name={{ item }} state=present
   with_items:
     - munin
     - python-passlib
-    - apache2
   register: munin_node_installed
 
 - name: create directory for basic auth files
@@ -68,12 +30,6 @@
   file: src=/etc/apache2/sites-available/munin.conf dest=/etc/apache2/sites-enabled/munin.conf state=link
   notify:
     - reload apache
-
-- name: remove all (default) plugins
-  shell: rm -f /etc/munin/plugins/*
-  when: munin_node_installed.changed
-
-- include: ../../../tasks/munin-plugins.yml
 
 - name: munin-node.conf
   template: src=munin.conf.j2 dest=/etc/munin/munin.conf owner=root group=root
