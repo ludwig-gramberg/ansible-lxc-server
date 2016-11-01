@@ -1,7 +1,7 @@
 [defaults]
 retry_files_enabled = False
 roles_path = ./roles:../local/roles
+hostfile = ../local/inventory
 
 [ssh_connection]
 ssh_args = -F ./ssh.cfg
-control_path = ~/.ssh/mux-%r@%h:%p
