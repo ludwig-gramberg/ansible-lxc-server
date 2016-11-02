@@ -60,8 +60,11 @@
 # separated install and upgrade so ansible only sets up the plugins-dir once
 
 - name: install munin-node
-  apt: name=munin-node state=present
+  apt: name={{ item }} state=present
   register: munin_node_installed
+  with_items:
+   - munin-node
+   - libwww-perl
 
 - name: remove all (default) plugins
   shell: rm -f /etc/munin/plugins/*

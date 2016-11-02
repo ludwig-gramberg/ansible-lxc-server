@@ -36,3 +36,6 @@
   template: src=munin.conf.j2 dest=/etc/munin/munin.conf owner=root group=root
   notify:
     - restart munin
+
+- name: disable loginsuid in pam for cron or munin-cron wont run
+  lineinfile: dest=/etc/pam.d/cron regexp="session[\s]+required[\s]+pam_loginuid\.so" line="#session required pam_loginuid.so"
