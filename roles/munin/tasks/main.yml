@@ -5,6 +5,7 @@
   with_items:
     - munin
     - python-passlib
+    - libwww-perl
   register: munin_node_installed
 
 - name: create directory for basic auth files

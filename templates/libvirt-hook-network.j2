@@ -1,20 +1,38 @@
 #!/bin/bash
 
 if [ "${1}" = "lxc" ]; then
-if [ "${2}" = "stopped" ] || [ "${2}" = "reconnect" ]; then
-{% for p in ports.forward %}
 
-iptables -t nat -D PREROUTING {% if p.source_net is defined %}-s {{ p.source_net }} {% endif %}-d {{ public_ip }} -p tcp --dport {{ p.source_port }} -j DNAT --to {{ p.container_ip }}:{{ p.target_port }}
-iptables -D FORWARD -d {{ p.container_ip }}/32 -p tcp -m state --state NEW -m tcp --dport {{ p.target_port }} -j ACCEPT
+if [ "${2}" = "stopped" ] || [ "${2}" = "reconnect" ]; then
+# add rules
+:
+{% if iptables.forward is defined %}
+{% for p in iptables.forward %}
+
+iptables -t nat -D PREROUTING {% if p.source_net is defined %}-s {{ p.source_net }} {% endif %}-d {{ public_ip }} -p tcp --dport {{ p.source_port }} -j DNAT --to {{ p.container_ip }}:{{ p.target_port }} > /dev/null 2>&1
+while [ $? -eq 0 ]; do
+	iptables -t nat -D PREROUTING {% if p.source_net is defined %}-s {{ p.source_net }} {% endif %}-d {{ public_ip }} -p tcp --dport {{ p.source_port }} -j DNAT --to {{ p.container_ip }}:{{ p.target_port }} > /dev/null 2>&1
+done
+
+iptables -D FORWARD -d {{ p.container_ip }}/32 -p tcp -m state --state NEW -m tcp --dport {{ p.target_port }} -j ACCEPT > /dev/null 2>&1
+while [ $? -eq 0 ]; do
+	iptables -D FORWARD -d {{ p.container_ip }}/32 -p tcp -m state --state NEW -m tcp --dport {{ p.target_port }} -j ACCEPT > /dev/null 2>&1
+done
 
 {% endfor %}
+{% endif %}
 fi
+
 if [ "${2}" = "started" ] || [ "${2}" = "reconnect" ]; then
-{% for p in ports.forward %}
+# remove rules
+:
+{% if iptables.forward is defined %}
+{% for p in iptables.forward %}
 
 iptables -t nat -I PREROUTING 1 {% if p.source_net is defined %}-s {{ p.source_net }} {% endif %}-d {{ public_ip }} -p tcp --dport {{ p.source_port }} -j DNAT --to {{ p.container_ip }}:{{ p.target_port }}
 iptables -I FORWARD 1 -d {{ p.container_ip }}/32 -p tcp -m state --state NEW -m tcp --dport {{ p.target_port }} -j ACCEPT
 
 {% endfor %}
+{% endif %}
 fi
+
 fi

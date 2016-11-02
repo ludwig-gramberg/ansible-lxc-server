@@ -12,8 +12,8 @@
 
 # Inbound TCP ports
 {% if iptables is defined %}
-{% for entry in iptables.inbound %}
--A INPUT -p {{ entry.proto }} -m state --state NEW {% if entry.source is defined %}-s {{ entry.source }}{% endif %} --dport {{ entry.port }} -d {{ public_ip }} -j ACCEPT
+{% for entry in iptables.allow %}
+-A INPUT -p {{ entry.proto }} -m state --state NEW {% if entry.source is defined %}-s {{ entry.source }}{% endif %} --dport {{ entry.port }} -d {{ entry.target|default( public_ip ) }} -j ACCEPT
 {% endfor %}
 {% endif %}
 

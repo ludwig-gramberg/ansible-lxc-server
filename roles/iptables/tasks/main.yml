@@ -1,0 +1,60 @@
+---
+
+# v4
+
+- name: iptables v4 rules template
+  template: dest=/etc/iptables/rules.v4.source src="iptables.v4.rules.j2" owner=root group=root mode=0644
+  register: iptables_v4_rules
+  notify:
+  - restart libvirt
+  - restart fail2ban
+
+- name: flush iptables v4
+  command: iptables -F
+  when: iptables_v4_rules.changed
+- name: iptables v4 load rules
+  command: bash -c "iptables-restore < /etc/iptables/rules.v4.source"
+  when: iptables_v4_rules.changed
+- name: iptables v4 write back rules
+  command: bash -c "iptables-save > /etc/iptables/rules.v4"
+  when: iptables_v4_rules.changed
+
+# network hook for port forwarding
+
+- name: create tmp copy of existing hook
+  copy: dest=/tmp/libvirt-network-hook src=/etc/libvirt/hooks/network mode=0755 remote_src=True
+  register: libvirt_existing_hook
+  when: "'master' in group_names"
+  ignore_errors: True
+
+- name: udpate libvirt network hook
+  template: dest=/etc/libvirt/hooks/network src="{{ path_ansible_base }}templates/libvirt-hook-network.j2" mode=0755
+  when: "'master' in group_names"
+  register: libvirt_hook_changed
+
+- name: remove rules for old hook
+  shell: "/tmp/libvirt-network-hook 'lxc' 'stopped'"
+  when: (libvirt_hook_changed.changed) and (libvirt_existing_hook.changed) and ("'master' in group_names")
+
+- name: add rules for updated hook
+  shell: "/etc/libvirt/hooks/network 'lxc' 'started'"
+  when: "'master' in group_names"
+
+# v6
+
+- name: iptables v6 rules template
+  template: dest=/etc/iptables/rules.v6.source src="iptables.v6.rules.j2" owner=root group=root mode=0644
+  register: iptables_v6_rules
+  notify:
+  - restart libvirt
+  - restart fail2ban
+
+- name: flush iptables v6
+  command: ip6tables -F
+  when: iptables_v6_rules.changed
+- name: iptables v6 load rules
+  command: bash -c "ip6tables-restore < /etc/iptables/rules.v6.source"
+  when: iptables_v6_rules.changed
+- name: iptables v6 write back rules
+  command: bash -c "ip6tables-save > /etc/iptables/rules.v6"
+  when: iptables_v6_rules.changed

@@ -1,21 +1,5 @@
 ---
 
-- name: include ports
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ path_ansible_local }}vars/ports.yml"
-    - "{{ path_ansible_base }}vars/ports.yml"
-
-- set_fact:
-    iptables:
-      inbound: "{{ ports.inbound }}"
-
-- name: iptables
-  include: ../../../tasks/iptables.yml
-
-# iptables rules dont include udp/tcp set by libvirt to allow dns for containers
-# thus a restart of the lxc-network is necessary
-
 # cgconfig
 
 - name: /etc/cgconfig.conf

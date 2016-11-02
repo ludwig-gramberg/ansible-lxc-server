@@ -1,0 +1,31 @@
+---
+
+mpm:
+  module: worker
+  start_servers: 1
+  min_spare_threads: 1
+  max_spare_threads: 5
+  thread_limit: 64
+  threads_per_child: 25
+  max_request_workers: 150
+  max_connections_per_child: 0
+
+public_ip: some-ip
+public_eth: eth0
+
+iptables:
+  allow:
+    - port: 22
+      proto: tcp
+    - port: 80
+      proto: tcp
+    - port: 443
+      proto: tcp
+    - port: 4949
+      proto: tcp
+      source: "{{ munin_master }}/32"
+      target: "{{ container_bridge_subnet }}.1/32"
+  forward:
+    - container_ip: some-ip
+      source_port: 2222
+      target_port: 22

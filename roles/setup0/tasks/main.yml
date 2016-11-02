@@ -1,12 +1,6 @@
 ---
-- set_fact:
-    iptables:
-       inbound:
-         - port: 22
-           proto: tcp
 
 - include: tasks/packages.yml
-- include: ../../../tasks/iptables.yml
 - include: tasks/fail2ban.yml
 - include: tasks/systemd.yml
 - include: tasks/network.yml

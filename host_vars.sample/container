@@ -1,0 +1,14 @@
+---
+
+public_ip: some-ip
+
+iptables:
+  allow:
+    - port: 22
+      proto: tcp
+    - port: 3306
+      proto: tcp
+      source: "{{ container_bridge_subnet }}.0/24"
+    - port: 4949
+      proto: tcp
+      source: "{{ munin_master }}/32"

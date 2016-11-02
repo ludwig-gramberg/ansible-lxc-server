@@ -2,6 +2,10 @@
 
 ## Roles
 
+- iptables/network reset roundup -> own rule after all
+  - libvirt service restart
+  - rewrite iptables in master and container
+
 ## IPv6
 
 - allow incoming ipv6 for websites

@@ -1,0 +1,8 @@
+---
+
+- name: restart libvirt
+  service: name=libvirtd state=restarted
+  when: "'master' in group_names"
+- name: restart fail2ban
+  service: name=fail2ban state=restarted
+  when: "'master' in group_names"

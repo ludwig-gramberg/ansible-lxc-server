@@ -6,8 +6,6 @@
   set_fact:
     munin:
       plugins:
-        - plugin: fw_conntrack
-        - plugin: fw_forwarded_local
         - plugin: fw_packets
         - plugin: netstat
         - plugin: open_files
