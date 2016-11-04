@@ -20,6 +20,8 @@
   become_user: root
   become_method: sudo
   roles:
+    - role: users
+      tags: users
     - role: iptables
       tags: iptables
     - role: munin-node
