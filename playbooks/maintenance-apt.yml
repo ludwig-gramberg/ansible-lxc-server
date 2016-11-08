@@ -8,7 +8,7 @@
   become_user: root
   become_method: sudo
   tasks:
-    - name: upgrade apckages
+    - name: upgrade packages
       apt:
         upgrade: dist
         update_cache: yes
