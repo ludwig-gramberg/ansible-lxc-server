@@ -14,3 +14,6 @@
        DEBIAN_FRONTEND: noninteractive
   apt: name={{ item }} state=present
   with_items: "{{ essentials }}"
+
+- name: disable loginsuid in pam for cron or crons wont run
+  lineinfile: dest=/etc/pam.d/cron regexp="session[\s]+required[\s]+pam_loginuid\.so" line="#session required pam_loginuid.so"
