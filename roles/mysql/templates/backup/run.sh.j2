@@ -3,15 +3,17 @@
 # cfg
 KEEP_DAY_HOUR="12" # keep the backup from this hour as the daily backup
 KEEP_MONTH_DAY="01" # keep the backup from this day as the monthly backup
-KEEP_DAYS="{{ backups_days|default(30) }}" # keep as many daily backups
-KEEP_HOURS="{{ backups_hour|default(48) }}" # keep as many hourly backups
-KEEP_MONTHS="{{ backup_months|default(24) }}" # keep as many monthly backups
-BACKUP_DIR="{{ backup_dir }}"
-LOG="{{ backup_log }}"
+KEEP_DAYS="30" # keep as many daily backups
+KEEP_HOURS="48" # keep as many hourly backups
+KEEP_MONTHS="24" # keep as many monthly backups
+BACKUP_DIR="/home/admin/backup/mysql/files/"
+LOG="/home/admin/backup/mysql/run/backup.log"
+DBA="-uroot" # host/auth params
 
 # vars
 HOSTNAME=$(hostname)
-DBS=$(mysql -uroot -N -e 'show databases')
+CMD_DATABASES="mysql ${DBA} -N -e 'show databases'"
+DBS=$(eval $CMD_DATABASES)
 DATE=$(date +"%Y-%m-%d")
 TIME=$(date +"%Y-%m-%d-%H")
 DAY=$(date +"%d")
@@ -47,20 +49,19 @@ do
       mkdir -p $DB/monthly
    fi
 
-   # build mysql command
-   dump_cmd="mysqldump --no-create-info -uroot -q --single-transaction"
+   # dump structure
+   dump_cmd="mysqldump -d ${DBA} -q --single-transaction $DB > $DB/dump.sql"
+   eval $dump_cmd
 
+   # dump data
+   dump_cmd="mysqldump --no-create-info ${DBA} -q --single-transaction"
    if [ -f $DB/ignore.cfg ]
    then
       while read table; do
          dump_cmd="$dump_cmd --ignore-table=${DB}.${table}"
       done <$DB/ignore.cfg
    fi
-
    dump_cmd="$dump_cmd $DB >> $DB/dump.sql"
-
-   # dump structure
-   mysqldump -d -uroot -q --single-transaction $DB > $DB/dump.sql
    eval $dump_cmd
 
    # check if backup is complete
