@@ -3,11 +3,11 @@
 # cfg
 KEEP_DAY_HOUR="12" # keep the backup from this hour as the daily backup
 KEEP_MONTH_DAY="01" # keep the backup from this day as the monthly backup
-KEEP_DAYS="30" # keep as many daily backups
-KEEP_HOURS="48" # keep as many hourly backups
-KEEP_MONTHS="24" # keep as many monthly backups
-BACKUP_DIR="/home/admin/backup/mysql/files/"
-LOG="/home/admin/backup/mysql/run/backup.log"
+KEEP_DAYS="{{ backups_days|default(30) }}" # keep as many daily backups
+KEEP_HOURS="{{ backups_hour|default(48) }}" # keep as many hourly backups
+KEEP_MONTHS="{{ backup_months|default(24) }}" # keep as many monthly backups
+BACKUP_DIR="{{ backup_dir }}"
+LOG="{{ backup_log }}"
 DBA="-uroot" # host/auth params
 
 # vars
