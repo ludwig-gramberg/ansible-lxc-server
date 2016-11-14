@@ -8,7 +8,7 @@
     {% endfor %}
     {% endif %}
 
-    {% if item.ssl.cert_bot %}
+    {% if (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
     Alias /.well-known/ /var/www/html/certbot/.well-known/
     {% endif %}
 
@@ -27,7 +27,7 @@
 
     ProxyRequests Off
     ProxyPreserveHost On
-    {% if item.ssl.cert_bot %}
+    {% if (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
 	ProxyPassMatch ^/\.well-known/ !
     {% endif %}
 	ProxyPass {{ item.source_request|default('/') }} {{ item.target_request }} disableReuse=On retry=5
@@ -59,7 +59,7 @@
 	ProxyPassReverse {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request|default(item.target_request) }}
 	ProxyVia On
 
-    {% if (item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists) %}
+    {% if (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists) %}
 
 	RequestHeader set X-Forwarded-Proto "https"
 

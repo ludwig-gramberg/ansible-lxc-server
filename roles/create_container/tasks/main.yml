@@ -1,5 +1,19 @@
 ---
 
+# create container user and ns
+
+- name: spawn containers
+  include: tasks/container/user.yml
+  vars:
+     container: "{{ hostvars[container_item] }}"
+     container_ip: "{{ hostvars[container_item].public_ip }}"
+  with_items: "{{ groups['container'] }}"
+  become: true
+  become_user: root
+  loop_control:
+    loop_var: "container_item"
+  when: ("{{ limit_container }}" == "") or ("{{ limit_container }}" == "{{ hostvars[container_item].hostname }}" )
+
 # cgconfig
 
 - name: /etc/cgconfig.conf
@@ -8,7 +22,7 @@
 
 - name: /etc/cgrules.conf
   template: dest=/etc/cgrules.conf src=cgrules.conf.j2 owner=root group=root mode=0644
-  register: chrules_changed
+  register: cgrules_changed
 
 - name: restart cgconfig
   service: name=cgconfig state=restarted
@@ -27,7 +41,7 @@
   include: tasks/container/lxc.yml
   vars:
      container: "{{ hostvars[container_item] }}"
-     container_ip: "{{ hostvars[container_item]['inventory_hostname'] }}"
+     container_ip: "{{ hostvars[container_item].public_ip }}"
   with_items: "{{ groups['container'] }}"
   become: true
   become_user: "{{ container_user }}-{{ hostvars[container_item].hostname }}"
