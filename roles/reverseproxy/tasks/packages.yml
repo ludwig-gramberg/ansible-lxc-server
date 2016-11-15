@@ -43,3 +43,6 @@
     - cgid
   notify:
     - restart apache
+
+- name: enable apache2
+  service: name=apache2 enabled=yes

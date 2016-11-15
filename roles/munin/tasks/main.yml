@@ -19,6 +19,11 @@
   notify:
     - reload apache
 
+- name: enable cgid module
+  apache2_module: state=present name=cgid
+  notify:
+    - restart apache
+
 - name: deploy apache munin site .conf
   template: src={{ item }} dest=/etc/apache2/sites-available/munin.conf
   with_first_found:
