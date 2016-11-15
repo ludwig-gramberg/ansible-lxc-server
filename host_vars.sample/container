@@ -1,7 +1,8 @@
 ---
 
 public_ip: some-ip
-
+hostname: container-name
+userns_offset: 100000
 iptables:
   allow:
     - port: 22

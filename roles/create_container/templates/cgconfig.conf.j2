@@ -16,7 +16,7 @@ group {{ container_user }}-{{ hostvars[container_name].hostname }} {
   cpuset {
     cgroup.clone_children = 1;
     cpuset.mems = 0;
-    cpuset.cpus = 0;
+    cpuset.cpus = "0{% if cpus > 0 %}-{{ (cpus-1|int) }}{% endif %}";
   }
   devices {}
   freezer {}

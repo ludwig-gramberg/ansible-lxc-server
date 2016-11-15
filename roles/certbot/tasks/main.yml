@@ -19,3 +19,4 @@
   with_items: "{{ sites }}"
   args:
     creates: "/etc/letsencrypt/live/{{ item.domain }}/cert.pem"
+  when: (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot)
