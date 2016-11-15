@@ -49,6 +49,12 @@ AllowUsers {{ a.name }}
 {% endfor %}
 {% endif %}
 
+{% if users is defined %}
+{% for u in users %}
+AllowUsers {{ u.name }}
+{% endfor %}
+{% endif %}
+
 {% if deploy_user is defined %}
 AllowUsers {{ deploy_user }}
 Match User {{ deploy_user }}
