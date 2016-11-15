@@ -6,21 +6,21 @@
   user: name={{ backup_user }} append=yes
 
 - name: create backup_dir
-  file: path={{ backup_dir }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
+  file: path={{ backup_dir }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0750
 
 - name: create run dir
-  file: path=/home/{{ backup_user }}/bin/ state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
+  file: path=/home/{{ backup_user }}/bin/ state=directory owner={{ backup_user }} group={{ backup_user }} mode=0750
 
 - name: symlink backup dir into home of backup_user
   file: src={{ backup_dir }} dest=/home/{{ backup_user }}/backups state=link
 
 - name: deploy backup-script into home of backup_user
-  template: dest=/home/{{ backup_user }}/bin/run-backup.sh src=backup/run.sh.j2 owner={{ backup_user }} group={{ backup_user }} mode=0700
+  template: dest=/home/{{ backup_user }}/bin/run-backup.sh src=backup/run.sh.j2 owner={{ backup_user }} group={{ backup_user }} mode=0750
 
 # logs
 
 - name: create log-dir
-  file: path={{ backup_log | dirname }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0700
+  file: path={{ backup_log | dirname }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0750
 
 - name: logrotate for logs
   template: dest=/etc/logrotate.d/{{ backup_user }}-backup-cron src=../../../templates/logrotate.simple.j2 owner=root group=root
