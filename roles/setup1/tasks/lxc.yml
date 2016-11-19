@@ -1,7 +1,5 @@
 ---
 
-# source: https://myles.sh/configuring-lxc-unprivileged-containers-in-debian-jessie/
-
 - name: install lxc from backports
   apt: name={{ item }} state=present default_release=jessie-backports
   with_items:
@@ -11,22 +9,3 @@
 
 - name: set DOWNLOAD_COMPAT_LEVEL to allow download unprivileged container templates
   lineinfile: dest=/usr/share/lxc/templates/lxc-download regexp=^DOWNLOAD_COMPAT_LEVEL= line=DOWNLOAD_COMPAT_LEVEL=3
-
-# kernel flag
-
-- name: kernel allow unprivileged user to create namespace
-  sysctl: name=kernel.unprivileged_userns_clone value=1 state=present
-
-# cgred.conf
-
-- name: mkdir /etc/sysconfig
-  file: path=/etc/sysconfig state=directory mode=0755
-- name: /etc/sysconfig/cgred.conf
-  template: dest=/etc/sysconfig/cgred.conf src=lxc/cgred.conf.j2 owner=root group=root mode=0644
-
-# install cgroup services
-
-- name: cgconfig.service
-  template: dest=/lib/systemd/system/cgconfig.service src=lxc/cgconfig.service.j2 owner=root group=root mode=0644
-- name: cgred.service
-  template: dest=/lib/systemd/system/cgred.service src=lxc/cgred.service.j2 owner=root group=root mode=0644

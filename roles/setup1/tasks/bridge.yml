@@ -9,7 +9,7 @@
   - libvirt-bin
 
 - name: create libvirt network hook
-  template: dest=/etc/libvirt/hooks/network src=templates/libvirt-hook-network.j2 mode=0755
+  template: dest=/etc/libvirt/hooks/network src="{{ path_ansible_base }}templates/libvirt-hook-network.j2" mode=0755
   when: iptables.forward is defined
 
 - name: define network

@@ -16,7 +16,7 @@
   - ntp
 
 - name: linux kernel upgrade
-  apt: name=linux-image-amd64 state=present default_release=jessie-backports
+  apt: name=linux-image-amd64 state=latest default_release=jessie-backports
 
 - name: restart ntp
   service: name=ntp state=restarted enabled=yes
