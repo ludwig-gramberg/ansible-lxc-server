@@ -7,14 +7,16 @@
   apt: upgrade=dist update_cache=yes
 
 - name: install basics
-  apt: name={{ item }} update_cache=yes state=present
+  apt: name={{ item }} state=present
   with_items:
   - sudo
   - iptables-persistent
   - fail2ban
-  - cgroup-tools
   - uidmap
   - ntp
+
+- name: linux kernel upgrade
+  apt: name=linux-image-amd64 state=present default_release=jessie-backports
 
 - name: restart ntp
   service: name=ntp state=restarted enabled=yes
