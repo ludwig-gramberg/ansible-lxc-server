@@ -1,5 +1,11 @@
 ---
 
+- name: create config user
+  user: name="{{ config_user_name }}" password="{{ config_user_password_encrypted }}" shell=/bin/bash groups=sudo append=yes
+
+- name: config user authorized key
+  authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}"
+
 - name: include vars
   include_vars: "{{ item }}"
   with_first_found:
@@ -16,8 +22,5 @@
     - "{{ admins }}"
     - ssh_keys
 
-- name: allow users in ssh
+- name: sshd config
   template: dest=/etc/ssh/sshd_config src=../../../templates/sshd_config.j2 owner=root group=root mode=0644
-
-- name: reload ssh
-  command: systemctl reload ssh.service

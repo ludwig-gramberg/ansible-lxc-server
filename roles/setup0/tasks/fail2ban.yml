@@ -1,4 +1,0 @@
----
-
-- name: restart fail2ban
-  command: systemctl restart fail2ban

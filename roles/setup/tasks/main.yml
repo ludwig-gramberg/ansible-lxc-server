@@ -1,9 +1,14 @@
 ---
 
 - include: tasks/packages.yml
-- include: tasks/admins.yml
+- include: tasks/systemd.yml
+- include: tasks/network.yml
 - include: tasks/bridge.yml
 - include: tasks/lxc.yml
+- include: tasks/users.yml
+
+- name: restart ntp
+  service: name=ntp enabled=yes
 
 - name: restart machine
   shell: "shutdown -t 10 -r"

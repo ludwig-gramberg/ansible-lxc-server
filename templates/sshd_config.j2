@@ -37,12 +37,6 @@ X11Forwarding no
 
 AllowUsers {{ config_user_name }}
 
-{% if (container_user is defined) and (groups['container'] is defined) %}
-{% for container_name in groups['container'] %}
-AllowUsers {{ container_user }}-{{ hostvars[container_name].hostname }}
-{% endfor %}
-{% endif %}
-
 {% if admins is defined %}
 {% for a in admins %}
 AllowUsers {{ a.name }}
