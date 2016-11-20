@@ -24,9 +24,15 @@
   authorized_key: user="{{ deploy_user }}" key="{{ deploy_user_key }}"
   when: deploy_user is defined
 
-- name: create users
-  include: users.yml
-  when: users is defined
+- name: create user
+  user: name="{{ item.name }}" shell=/bin/bash append=yes
+  with_items: "{{ users | default([]) }}"
+
+- name: user authorized key
+  authorized_key: user="{{ item.0.name }}" key="{{ item.1.key }}"
+  with_subelements:
+    - "{{ users | default([]) }}"
+    - ssh_keys
 
 - name: ssh config
   template: dest=/etc/ssh/sshd_config src=../../../templates/sshd_config.j2

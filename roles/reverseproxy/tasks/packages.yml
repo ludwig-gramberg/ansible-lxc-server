@@ -15,10 +15,10 @@
   template: src="mpm_{{ mpm.module }}.conf.j2" dest=/etc/apache2/mods-available/mpm_{{ mpm.module }}.conf
 
 - name: unlink all mpm modules
-  file: path=/etc/apache2/mods-enabled/{{ item[0] }}.{{ item[1] }} state=absent
+  file: path=/etc/apache2/mods-enabled/mpm_{{ item[0] }}.{{ item[1] }} state=absent
   with_nested:
     - [ "event", "prefork", "worker" ]
-    - [ ".conf", ".load" ]
+    - [ "conf", "load" ]
   when: ("{{ mpm.module }}" != item[0])
   notify:
     - restart apache
