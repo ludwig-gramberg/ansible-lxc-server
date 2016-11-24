@@ -8,11 +8,11 @@
     {% endfor %}
     {% endif %}
 
-    {% if (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
+    {% if (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
     Alias /.well-known/ /var/www/html/certbot/.well-known/
     {% endif %}
 
-	{% if (item.ssl.cert_file is defined) or ((item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists)) %}
+	{% if (item.ssl is defined) and ((item.ssl.cert_file is defined) or ((item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists))) %}
 
 	# ssl is enabled: enforce redirect to https
 
@@ -27,7 +27,7 @@
 
     ProxyRequests Off
     ProxyPreserveHost On
-    {% if (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
+    {% if (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
 	ProxyPassMatch ^/\.well-known/ !
     {% endif %}
 	ProxyPass {{ item.source_request|default('/') }} {{ item.target_request }} disableReuse=On retry=5
@@ -35,7 +35,6 @@
     ProxyVia On
 
 	{% endif %}
-
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
 	LogLevel warn
