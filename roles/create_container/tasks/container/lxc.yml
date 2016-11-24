@@ -2,9 +2,13 @@
 
 - name: container run user name and uids
   set_fact:
-    container_run_user: "{{ container_user }}-{{ container.hostname }}"
     uid_begin: "{{ container.userns_offset }}"
     uid_end: "{{ (container.userns_offset+65536)|int }}"
+
+- name: uid for container
+  raw: usermod --add-subuids {{ uid_begin }}-{{ uid_end }} root
+- name: gid for container
+  raw: usermod --add-subgids {{ uid_begin }}-{{ uid_end }} root
 
 # user and file layout for lxc
 
@@ -14,146 +18,74 @@
   - "{{ path_ansible_local }}vars/admins.yml"
   - "{{ path_ansible_base }}vars/admins.yml"
 
-- name: container user ssh keys
-  authorized_key: user="{{ container_run_user }}" key="{{ item[1].key }}"
-  with_subelements:
-    - "{{ admins }}"
-    - ssh_keys
-  become: yes
-  become_user: root
-
-# file layout lxc user homefolder
-
-- name: homefolder create dir layout 1/2
-  file: path=/home/{{ container_run_user }}/{{ item }} owner={{ container_run_user }} group={{ container_run_user }} mode=0755 state=directory
-  with_items:
-    - .local/share/lxc
-    - .local/share/lxcsnaps
-    - .cache/lxc
-  become: yes
-  become_user: root
-
-- name: homefolder create dir layout 2/2
-  file: path=/home/{{ container_run_user }}/{{ item }} owner=root group=root mode=0755 state=directory
-  with_items:
-    - .config/lxc
-  become: yes
-  become_user: root
-
-- name: homefolder create cfg files
-  file: path=/home/{{ container_run_user }}/{{ item }} owner=root group=root mode=0644 state=touch
-  with_items:
-    - .config/lxc/lxc.conf
-  become: yes
-  become_user: root
-
-- name: homefolder cfg file uid/gid mapping
-  template: dest=/home/{{ container_run_user }}/.config/lxc/default.conf src=lxc.default.conf.j2 owner=root group=root mode=0644
-  become: yes
-  become_user: root
+- name: spawn-container cfg file
+  template: dest=/etc/lxc/{{ container.hostname }}.conf src=lxc.default.conf.j2
 
 # get container ready to be used directly via ssh bastion by ansible
 
 - name: create barebone container
-  command: lxc-create --name {{ container.hostname }} --template download -- --release jessie --arch amd64 --dist debian
+  command: lxc-create -f /etc/lxc/{{ container.hostname }}.conf --name {{ container.hostname }} --template download -- --release jessie --arch amd64 --dist debian
   args:
-    chdir: ~/
-    creates: "~/.local/share/lxc/{{ container.hostname }}/config"
+    creates: "/var/lib/lxc/{{ container.hostname }}/config"
   register: container_created
 
 - name: container config
-  template: dest=~/.local/share/lxc/{{ container.hostname }}/config src=lxc.config.j2
+  template: dest=/var/lib/lxc/{{ container.hostname }}/config src=lxc.config.j2
 
 # preparing some container files from outside container as root
 # mostly getting container network ready
 
 - name: ipv4 precedence over ipv6
-  lineinfile: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
-  become: yes
-  become_user: root
+  lineinfile: dest=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/gai.conf line="precedence ::ffff:0:0/96  100"
 
 - name: network interfaces
-  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
-  become: yes
-  become_user: root
+  template: dest=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/network/interfaces src=network.interfaces.j2
 
 - name: iptables dir
-  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables state=directory owner={{ uid_begin }} group={{ uid_begin }} mode=0644
-  become: yes
-  become_user: root
+  file: path=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/iptables state=directory owner={{ uid_begin }} group={{ uid_begin }} mode=0644
 
 - name: empty iptables rules v4
-  become: yes
-  become_user: root
-  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v4.source state=touch owner={{ uid_begin }} group={{ uid_begin }}
+  file: path=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v4.source state=touch owner={{ uid_begin }} group={{ uid_begin }}
 
 - name: empty iptables rules v6
-  become: yes
-  become_user: root
-  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v6.source state=touch owner={{ uid_begin }} group={{ uid_begin }}
+  file: path=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/iptables/rules.v6.source state=touch owner={{ uid_begin }} group={{ uid_begin }}
 
 - name: resolve.conf
-  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
-  become: yes
-  become_user: root
+  template: dest=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
 
 - name: apt/sources.list
-  template: dest=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
-  become: yes
-  become_user: root
+  template: dest=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
 
-# start container
+# restart container
 
 - name: stop container
   command: lxc-stop -k -n {{ container.hostname }}
-  args:
-    chdir: ~/
   ignore_errors: True
 
 - name: start container
   command: lxc-start -d -n {{ container.hostname }}
-  args:
-    chdir: ~/
 
-# attach and run commands
+#
+## attach and run commands
 
-- name: apt-get update via lxc-attach
-  command: lxc-attach -n {{ container.hostname }} -- apt-get update
-  args:
-    chdir: ~/
+- name: prepare container via lxc-attach
+  command: lxc-attach -n {{ container.hostname }} -- {{ item }}
+  with_items:
+    - "apt-get update"
+    - "apt-get install -y openssh-server python sudo"
+    - "apt-get install -y systemd -t jessie-backports"
+    - "useradd -p {{ config_user_password_encrypted }} -s /bin/bash -m {{ config_user_name }}"
+    - "usermod -a -G sudo {{ config_user_name }}"
 
-- name: install ssh server and ansible requirements
-  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y openssh-server python sudo
-  args:
-    chdir: ~/
-
-- name: update systemd from backports
-  command: lxc-attach -n {{ container.hostname }} -- apt-get install -y systemd -t jessie-backports
-  args:
-    chdir: ~/
-
-# add admin users to each container and set public key
-
-- name: add config user to container
-  command: lxc-attach -n {{ container.hostname }} -- useradd -p {{ config_user_password_encrypted }} -s /bin/bash -m {{ config_user_name }}
-  args:
-    chdir: ~/
-    creates: ~/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}
-
-- name: sudo for config user
-  command: lxc-attach -n {{ container.hostname }} -- usermod -a -G sudo {{ config_user_name }}
-  args:
-    chdir: ~/
-
-- name: add admin users public keys to container
-  authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
-  become: yes
-  become_user: root
-
-- name: ownership of .ssh/authorized_keys
-  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner={{ uid_begin }} group={{ uid_begin }} mode=0755 recurse=yes
-  become: yes
-  become_user: root
-
-- name: container autostart
-  cron: name="lxc-autostart" special_time=reboot job="sleep 30 ; lxc-autostart" user={{ container_run_user }}
+#- name: add admin users public keys to container
+#  authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
+#  become: yes
+#  become_user: root
+#
+#- name: ownership of .ssh/authorized_keys
+#  file: path=/home/{{ container_run_user }}/.local/share/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner={{ uid_begin }} group={{ uid_begin }} mode=0755 recurse=yes
+#  become: yes
+#  become_user: root
+#
+#- name: container autostart
+#  cron: name="lxc-autostart" special_time=reboot job="sleep 30 ; lxc-autostart" user={{ container_run_user }}

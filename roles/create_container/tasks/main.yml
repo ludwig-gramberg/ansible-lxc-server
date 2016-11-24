@@ -3,49 +3,11 @@
 # create container user and ns
 
 - name: spawn containers
-  include: tasks/container/user.yml
-  vars:
-     container: "{{ hostvars[container_item] }}"
-     container_ip: "{{ hostvars[container_item].public_ip }}"
-  with_items: "{{ groups['container'] }}"
-  become: true
-  become_user: root
-  loop_control:
-    loop_var: "container_item"
-  when: ("{{ limit_container }}" == "") or ("{{ limit_container }}" == "{{ hostvars[container_item].hostname }}" )
-
-# cgconfig
-
-- name: /etc/cgconfig.conf
-  template: dest=/etc/cgconfig.conf src=cgconfig.conf.j2 owner=root group=root mode=0644
-  register: cgconfig_changed
-
-- name: /etc/cgrules.conf
-  template: dest=/etc/cgrules.conf src=cgrules.conf.j2 owner=root group=root mode=0644
-  register: cgrules_changed
-
-- name: restart cgconfig
-  service: name=cgconfig state=restarted
-  when: cgconfig_changed.changed
-
-- name: restart cgred
-  service: name=cgred state=restarted
-  when: cgrules_changed.changed
-
-# allow container user access to lxc bridge
-
-- name: lxc bridge access
-  template: dest=/etc/lxc/lxc-usernet src=lxc-usernet.j2 owner=root group=root mode=0644
-
-- name: spawn containers
   include: tasks/container/lxc.yml
   vars:
      container: "{{ hostvars[container_item] }}"
      container_ip: "{{ hostvars[container_item].public_ip }}"
   with_items: "{{ groups['container'] }}"
-  become: true
-  become_user: "{{ container_user }}-{{ hostvars[container_item].hostname }}"
   loop_control:
     loop_var: "container_item"
   when: ("{{ limit_container }}" == "") or ("{{ limit_container }}" == "{{ hostvars[container_item].hostname }}" )
-
