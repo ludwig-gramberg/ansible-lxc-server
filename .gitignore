@@ -7,7 +7,6 @@
 # files
 /keys
 /ansible.cfg
-/ssh.cfg
 /inventory
 /inventory.*
 !/inventory.sample
