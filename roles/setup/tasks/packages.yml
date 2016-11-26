@@ -1,7 +1,7 @@
 ---
 
 - name: apt/sources.list
-  template: dest=/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
+  template: dest=/etc/apt/sources.list src=apt.sources.list.j2
 
 - name: upgrade system
   apt: upgrade=dist update_cache=yes
@@ -22,10 +22,7 @@
   apt: name=linux-image-amd64 state=latest default_release=jessie-backports
 
 - name: include vars
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ path_ansible_local }}vars/packages.yml"
-    - "{{ path_ansible_base }}vars/packages.yml"
+  include_vars: "../../../../vars/packages.yml"
 
 - name: install basics 1/2
   apt: name={{ item }} state=present

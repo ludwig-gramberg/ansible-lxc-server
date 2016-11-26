@@ -28,7 +28,7 @@
   ignore_errors: True
 
 - name: udpate libvirt network hook
-  template: dest=/etc/libvirt/hooks/network src="{{ path_ansible_base }}templates/libvirt-hook-network.j2" mode=0755
+  template: dest=/etc/libvirt/hooks/network src="../../../templates/libvirt-hook-network.j2" mode=0755
   when: "'master' in group_names"
   register: libvirt_hook_changed
 

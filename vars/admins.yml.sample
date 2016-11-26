@@ -1,7 +1,0 @@
----
-
-admins:
-  - name: "admin"
-    password: "openssl encrypted pass"
-    ssh_keys:
-      - key: "pubkey file contents"

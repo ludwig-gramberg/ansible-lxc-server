@@ -54,7 +54,7 @@
   template: dest=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/resolv.conf src=resolv.conf.j2
 
 - name: apt/sources.list
-  template: dest=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=../../../templates/apt.sources.list.j2
+  template: dest=/var/lib/lxc/{{ container.hostname }}/rootfs/etc/apt/sources.list src=apt.sources.list.j2
 
 # restart container
 

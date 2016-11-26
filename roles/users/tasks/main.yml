@@ -1,10 +1,7 @@
 ---
 
 - name: include vars
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ path_ansible_local }}vars/admins.yml"
-    - "{{ path_ansible_base }}vars/admins.yml"
+  include_vars: "../../../../vars/admins.yml"
 
 - name: create admin
   user: name="{{ item.name }}" password="{{ item.password_encrypted }}" shell=/bin/bash groups=sudo append=yes

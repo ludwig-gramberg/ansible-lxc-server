@@ -10,7 +10,7 @@
         - plugin: http_loadtime
   tags: munin
 
-- include: ../../../tasks/munin-plugins.yml
+- include: munin-plugins.yml
   tags: munin
 - include: tasks/packages.yml
 - include: tasks/apache.yml
