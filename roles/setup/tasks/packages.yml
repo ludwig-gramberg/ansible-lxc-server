@@ -21,13 +21,23 @@
 - name: linux kernel upgrade
   apt: name=linux-image-amd64 state=latest default_release=jessie-backports
 
-- name: include vars
-  include_vars: "../../../../vars/packages.yml"
-
-- name: install basics 1/2
+- name: install essentials
+  environment:
+    DEBIAN_FRONTEND: noninteractive
   apt: name={{ item }} state=present
-  with_items: "{{ essentials }}"
-
-- name: install basics 2/2
-  apt: name={{ item }} state=present
-  with_items: "{{ essentials_master }}"
+  with_items:
+    - iptables-persistent
+    - inetutils-syslogd
+    - iputils-ping
+    - logrotate
+    - iptables
+    - dnsutils
+    - telnet
+    - cron
+    - htop
+    - curl
+    - wget
+    - less
+    - nano
+    - vim
+    - man

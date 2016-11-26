@@ -10,16 +10,18 @@
         - plugin: http_loadtime
   tags: munin
 
-- include: munin-plugins.yml
+- name: activate plugins
+  file: src=/usr/share/munin/plugins/{{ item.source|default(item.plugin) }} dest=/etc/munin/plugins/{{ item.plugin }} state=link owner=root group=root
+  with_items: "{{ munin.plugins }}"
+  notify:
+    - restart munin
   tags: munin
+
 - include: tasks/packages.yml
 - include: tasks/apache.yml
 
 - name: include sites
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ path_ansible_local }}vars/sites.yml"
-    - "{{ path_ansible_base }}vars/sites.yml"
+  include_vars: "../../../../vars/sites.yml"
 
 - name: build deploy_certs list 1/3
   set_fact:

@@ -59,4 +59,8 @@
   - libcache-perl
   - libcache-cache-perl
 
-- include: "{{ path_ansible_base }}tasks/munin-plugins.yml"
+- name: activate plugins
+  file: src=/usr/share/munin/plugins/{{ item.source|default(item.plugin) }} dest=/etc/munin/plugins/{{ item.plugin }} state=link owner=root group=root
+  with_items: "{{ munin.plugins }}"
+  notify:
+    - restart munin

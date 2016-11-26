@@ -25,10 +25,7 @@
     - restart apache
 
 - name: deploy apache munin site .conf
-  template: src={{ item }} dest=/etc/apache2/sites-available/munin.conf
-  with_first_found:
-    - "{{ path_ansible_local }}templates/apache.conf.j2"
-    - "{{ path_ansible_base }}roles/munin/templates/apache.conf.j2"
+  template: src=templates/apache.conf.j2 dest=/etc/apache2/sites-available/munin.conf
   notify:
     - reload apache
 

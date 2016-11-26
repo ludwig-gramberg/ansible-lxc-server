@@ -3,17 +3,26 @@
 - name: hosts file
   template: dest=/etc/hosts src=hosts.j2
 
-- name: include vars
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ path_ansible_local }}vars/packages.yml"
-    - "{{ path_ansible_base }}vars/packages.yml"
-
 - name: install essentials
   environment:
-       DEBIAN_FRONTEND: noninteractive
+    DEBIAN_FRONTEND: noninteractive
   apt: name={{ item }} state=present
-  with_items: "{{ essentials }}"
+  with_items:
+    - iptables-persistent
+    - inetutils-syslogd
+    - iputils-ping
+    - logrotate
+    - iptables
+    - dnsutils
+    - telnet
+    - cron
+    - htop
+    - curl
+    - wget
+    - less
+    - nano
+    - vim
+    - man
 
 - name: disable loginsuid in pam for cron or crons wont run
   lineinfile: dest=/etc/pam.d/cron regexp="session[\s]+required[\s]+pam_loginuid\.so" line="#session required pam_loginuid.so"

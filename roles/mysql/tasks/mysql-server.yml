@@ -10,8 +10,8 @@
 - name: my.cnf
   template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src={{ item }} backup=yes
   with_first_found:
-   - "{{ path_ansible_local }}templates/my.cnf.j2"
-   - "{{ path_ansible_base }}roles/mysql/templates/my.cnf.j2"
+   - "../../../../templates/my.cnf.j2"
+   - "templates/my.cnf.j2"
   notify:
    - restart mysql
 
@@ -19,10 +19,7 @@
   service: name=mysql enabled=yes
 
 - name: include databases
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ path_ansible_local }}vars/databases.yml"
-    - "{{ path_ansible_base }}vars/databases.yml"
+  include_vars: "../../../../vars/databases.yml"
 
 - name: create databases
   mysql_db: name={{ item.name }}
