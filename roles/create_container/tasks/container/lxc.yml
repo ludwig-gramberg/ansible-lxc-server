@@ -81,7 +81,7 @@
   command: lxc-attach -n {{ container.hostname }} -- usermod -a -G sudo {{ config_user_name }}
 
 - name: add admin users public keys to container
-  authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}" path="/var/lib/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
+  authorized_key: user="{{ config_user_name }}" key="{{ config_user_public_key }}" path="/var/lib/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh/authorized_keys"
 
 - name: ownership of .ssh/authorized_keys
   file: path=/var/lib/lxc/{{ container.hostname }}/rootfs/home/{{ config_user_name }}/.ssh owner={{ uid_begin }} group={{ uid_begin }} mode=0755 recurse=yes

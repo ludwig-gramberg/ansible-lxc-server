@@ -4,7 +4,7 @@
   user: name="{{ config_user_name }}" password="{{ config_user_password_encrypted }}" shell=/bin/bash groups=sudo append=yes
 
 - name: config user authorized key
-  authorized_key: user="{{ config_user_name }}" key="{{ lookup('file', config_user_public_key_file) }}"
+  authorized_key: user="{{ config_user_name }}" key="{{ config_user_public_key }}"
 
 - name: include vars
   include_vars: "../../../../vars/admins.yml"
