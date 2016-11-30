@@ -47,6 +47,7 @@
         - plugin: forks
         - plugin: swap
         - plugin: memory
+        - plugin: meminfo
         - plugin: munin_stats
         - plugin: load
         - plugin: threads

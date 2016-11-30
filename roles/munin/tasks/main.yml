@@ -1,12 +1,14 @@
 ---
 
+- name: install munin
+  apt: name=munin state=present default_release=jessie-backports
+  register: munin_node_installed
+
 - name: install packages
   apt: name={{ item }} state=present
   with_items:
-    - munin
     - python-passlib
     - libwww-perl
-  register: munin_node_installed
 
 - name: create directory for basic auth files
   file: path=/etc/apache2/basic-auth state=directory

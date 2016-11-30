@@ -69,6 +69,7 @@
   command: lxc-attach -n {{ container.hostname }} -- {{ item }}
   with_items:
     - "apt-get update"
+    - "apt-get install -y libterm-ui-perl"
     - "apt-get install -y openssh-server python sudo"
     - "apt-get install -y systemd -t jessie-backports"
 
