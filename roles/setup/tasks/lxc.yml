@@ -9,3 +9,8 @@
 
 - name: set DOWNLOAD_COMPAT_LEVEL to allow download unprivileged container templates
   lineinfile: dest=/usr/share/lxc/templates/lxc-download regexp=^DOWNLOAD_COMPAT_LEVEL= line=DOWNLOAD_COMPAT_LEVEL=3
+
+# cron to autostart lxc 60s after boot
+
+- name: container autostart fix
+  cron: name="lxc-autostart" special_time=reboot job="sleep 60 ; lxc-autostart" user=root
