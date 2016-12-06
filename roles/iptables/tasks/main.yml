@@ -1,5 +1,15 @@
 ---
 
+# install
+
+- name: install
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  apt: name={{ item }} state=present
+  with_items:
+    - iptables-persistent
+    - iptables
+
 # v4
 
 - name: iptables v4 rules template
