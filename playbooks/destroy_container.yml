@@ -32,12 +32,12 @@
       when: (confirm_destroy != "yes")
 
     - name: check that container exists
-      stat: path="/home/runlxc-{{ destroy_container }}"
-      register: runlxc_homedir_exists
+      stat: path="/var/lib/lxc/{{ destroy_container }}"
+      register: container_exists
 
     - name: fail if not
       fail: msg="container {{ destroy_container }} does not exist"
-      when: runlxc_homedir_exists.stat.exists == False
+      when: container_exists.stat.exists == False
 
     - name: prep vars
       set_fact:
@@ -47,16 +47,8 @@
       set_fact:
         destroy_node: "{{ hostvars[destroy_nodename] }}"
 
-    - name: force shutdown container from host 1/2
-      shell: "kill -9 `ps -u {{ destroy_node.userns_offset }} -o pid=`"
+    - name: force shutdown container
+      shell: "lxc-stop -k -n {{ destroy_container }}"
 
-    - name: force shutdown container from host 2/2
-      shell: "kill -9 `ps -u runlxc-{{ destroy_container }} -o pid=`"
-      ignore_errors: True
-
-    - name: delete container files
-      shell: "rm -rf /home/runlxc-{{ destroy_container }}/{{ item }}"
-      with_items:
-        - ".cache"
-        - ".local"
-        - ".config"
+    - name: destroy container
+      shell: "lxc-destroy -n {{ destroy_container }}"
