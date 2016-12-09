@@ -134,13 +134,10 @@ do
 
    # cleanup rotation
 
-   let max_h=KEEP_HOURS+1
-   let max_d=KEEP_DAYS+1
-   let max_m=KEEP_MONTHS+1
-
-   ls -tp $DB/hourly/ | grep -v '/$' | tail -n +$max_h | xargs -I {} rm -- {}
-   ls -tp $DB/daily/ | grep -v '/$' | tail -n +$max_d | xargs -I {} rm -- {}
-   ls -tp $DB/monthly/ | grep -v '/$' | tail -n +$max_m | xargs -I {} rm -- {}
+   cd $BACKUP_DIR/$DB/hourly/ && ls | head -n -$KEEP_HOURS | xargs -r rm
+   cd $BACKUP_DIR/$DB/monthly/ && ls | head -n -$KEEP_DAYS | xargs -r rm
+   cd $BACKUP_DIR/$DB/daily/ && ls | head -n -$KEEP_MONTHS | xargs -r rm
+   cd $BACKUP_DIR
 done
 
 echo "completed backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $LOG
