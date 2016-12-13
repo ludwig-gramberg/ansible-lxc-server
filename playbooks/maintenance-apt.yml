@@ -9,6 +9,8 @@
   become_method: sudo
   tasks:
     - name: upgrade packages
+      environment:
+        DEBIAN_FRONTEND: noninteractive
       apt:
         upgrade: dist
         update_cache: yes
