@@ -22,11 +22,23 @@
 		RewriteBase /
 
 {% if site.ssl is defined %}
+{% if site.aliases is defined %}
+{% for alias in site.aliases %}
+		RewriteCond %{HTTPS} off
+		RewriteCond %{HTTP_HOST} ^{{ alias | replace('.', '\.') }}$
+		RewriteRule .* https://{{ alias }}%{REQUEST_URI} [R=301,L]
+{% endfor %}
+{% endif %}
 		RewriteCond %{HTTPS} off
 		RewriteRule .* https://{{ site.domain }}%{REQUEST_URI} [R=301,L]
 {% endif %}
 
 		RewriteCond %{HTTP_HOST} !^{{ site.domain | replace('.', '\.') }}$
+{% if site.aliases is defined %}
+{% for alias in site.aliases %}
+		RewriteCond %{HTTP_HOST} !^{{ alias | replace('.', '\.') }}$
+{% endfor %}
+{% endif %}
 		RewriteRule .* http{% if site.ssl is defined %}s{% endif %}://{{ site.domain }}%{REQUEST_URI} [R=301,L]
 
 {% if application.mod_rewrite is defined %}

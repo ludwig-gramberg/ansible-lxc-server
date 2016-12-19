@@ -1,39 +1,21 @@
-{% if site.ssl is defined %}
-
 <VirtualHost *:80>
 
-{% include "./vhost.docroot.j2" ignore missing %}
+{% include "./vhost.docroot.j2" %}
+{% include "./vhost.directories.j2" %}
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	LogLevel warn
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 
+{% if site.ssl is defined %}
 <VirtualHost *:443>
 
-{% include "./vhost.docroot.j2" ignore missing %}
-{% include "./vhost.directories.j2" ignore missing %}
-
-	ErrorLog ${APACHE_LOG_DIR}/error.log
-	LogLevel warn
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-	SSLEngine ON
-	SSLCertificateFile /etc/ssl-site-certs/{{ site.ssl.cert_file }}
-	SSLCertificateKeyFile /etc/ssl-site-certs/{{ site.ssl.cert_key_file }}
-	SSLCertificateChainFile /etc/ssl-site-certs/{{ site.ssl.cert_chain_file }}
-</VirtualHost>
-
-{% else %}
-
-<VirtualHost *:80>
-
-{% include "./vhost.docroot.j2" ignore missing %}
-{% include "./vhost.directories.j2" ignore missing %}
+{% include "./vhost.docroot.j2" %}
+{% include "./vhost.directories.j2" %}
 
 	ErrorLog ${APACHE_LOG_DIR}/error.log
 	LogLevel warn
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
-
 {% endif %}
