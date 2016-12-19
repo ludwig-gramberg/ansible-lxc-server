@@ -1,0 +1,18 @@
+---
+
+- include: tasks/packages.yml
+- name: php-logdir
+  file: path=/var/log/php state=directory owner=www-data group=www-data mode=0755
+
+- name: php ini
+  template: dest=/etc/php5/{{ item }}/php.ini src=templates/php.{{ item }}.ini.j2 backup=yes
+  with_items:
+    - "apache2"
+    - "cli"
+  notify:
+   - restart apache
+
+- name: enable php
+  apache2_module: state=present name=php5
+  notify:
+   - restart apache
