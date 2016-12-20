@@ -103,8 +103,6 @@
 
 {% if item.ssl.cert_file is defined %}
 
-    RequestHeader set X-Forwarded-Proto "https"
-
     SSLProxyEngine On
     SSLProxyCheckPeerCN Off
     SSLProxyCheckPeerExpire Off

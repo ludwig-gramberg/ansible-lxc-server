@@ -30,7 +30,7 @@
     - restart apache
 
 - name: enable vhost
-  file: src=/etc/apache2/sites-available/reverse-{{ item.domain }}.conf dest=/etc/apache2/sites-enabled/reverse-{{ item.domain }}.conf owner=root group=root state=link
+  file: src=/etc/apache2/sites-available/reverse-{{ item.domain }}.conf dest=/etc/apache2/sites-enabled/reverse-{{ item.domain }}.conf owner=root group=root state=link backup=yes
   with_items: "{{ sites }}"
   notify:
     - restart apache
