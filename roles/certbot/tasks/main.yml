@@ -12,8 +12,8 @@
   include_vars: "../../../../vars/sites.yml"
 
 - name: install certs
-  shell: "certbot certonly --webroot --webroot-path=/var/www/html/certbot/ -m {{ certbot_auth_email }} --agree-tos -d {{ item.domain }}"
+  include: cert.yml
   with_items: "{{ sites }}"
-  args:
-    creates: "/etc/letsencrypt/live/{{ item.domain }}/cert.pem"
-  when: (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot)
+  when: (site.ssl is defined) and (site.ssl.cert_bot is defined) and (site.ssl.cert_bot)
+  loop_control:
+    loop_var: site

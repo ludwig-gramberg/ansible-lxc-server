@@ -1,0 +1,15 @@
+---
+
+- name: build install certs command
+  set_fact:
+    certbot_command: "certbot certonly -q --webroot --webroot-path=/var/www/html/certbot/ -m {{ certbot_auth_email }} --agree-tos -d {{ site.domain }}"
+
+- name: build install certs command
+  set_fact:
+    certbot_command: "{{ certbot_command }} -d {{ item }}"
+  with_items: "{{ site.aliases | default([]) }}"
+
+- name: install certs
+  shell: "{{ certbot_command }}"
+  args:
+    creates: "/etc/letsencrypt/live/{{ site.domain }}/cert.pem"
