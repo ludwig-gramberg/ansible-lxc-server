@@ -1,43 +1,59 @@
 <VirtualHost {{ item.public_ip }}:80>
 
-	ServerAdmin {{ item.admin }}
-	ServerName {{ item.domain }}
-	{% if item.aliases is defined %}
-	{% for alias in item.aliases %}
+    ServerAdmin {{ item.admin }}
+    ServerName {{ item.domain }}
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
     ServerAlias {{ alias }}
-    {% endfor %}
-    {% endif %}
+{% endfor %}
+{% endif %}
 
-    {% if (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
+    RewriteEngine on
+
+{% if (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
     Alias /.well-known/ /var/www/html/certbot/.well-known/
-    {% endif %}
+{% endif %}
 
-	{% if (item.ssl is defined) and ((item.ssl.cert_file is defined) or ((item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists))) %}
+{% if (item.ssl is defined) and ((item.ssl.cert_file is defined) or ((item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists))) %}
 
-	# ssl is enabled: enforce redirect to https
+    # ssl is enabled: enforce redirect to https
 
-	RewriteEngine on
-	RewriteCond %{REQUEST_URI} !^/\.well-known
-	RewriteCond ${HTTPS} !^on$
-	RewriteRule (.*) https://{{ item.domain }}$1 [NC,R=301]
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
+    RewriteCond %{HTTP_HOST} ^{{ alias | replace('.', '\.') }}$
+    RewriteRule .* https://{{ alias }}%{REQUEST_URI} [R=301,L]
+{% endfor %}
+{% endif %}
+    RewriteCond %{REQUEST_URI} !^/\.well-known
+    RewriteRule .* https://{{ item.domain }}%{REQUEST_URI} [NC,R=301]
 
-	{% else %}
+{% else %}
 
-	# no ssl: reverse proxy
+    # hostname redirect
+
+    RewriteCond %{HTTP_HOST} !^{{ item.domain | replace('.', '\.') }}$
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
+    RewriteCond %{HTTP_HOST} !^{{ alias | replace('.', '\.') }}$
+{% endfor %}
+{% endif %}
+    RewriteRule .* http://{{ item.domain }}%{REQUEST_URI} [R=301,L]
+
+    # no ssl: reverse proxy
 
     ProxyRequests Off
     ProxyPreserveHost On
-    {% if (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
-	ProxyPassMatch ^/\.well-known/ !
-    {% endif %}
-	ProxyPass {{ item.source_request|default('/') }} {{ item.target_request }} disableReuse=On retry=5
+{% if (item.ssl is defined) and (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) %}
+    ProxyPassMatch ^/\.well-known/ !
+{% endif %}
+    ProxyPass {{ item.source_request|default('/') }} {{ item.target_request }} disableReuse=On retry=5
     ProxyPassReverse {{ item.source_request|default('/') }} {{ item.target_request }}
     ProxyVia On
 
-	{% endif %}
+{% endif %}
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
-	LogLevel warn
+    LogLevel warn
 
 </VirtualHost>
 
@@ -45,48 +61,60 @@
 <VirtualHost {{ item.public_ip }}:443>
 
     ServerAdmin {{ item.admin }}
-	ServerName {{ item.domain }}
-	{% if item.aliases is defined %}
-	{% for alias in item.aliases %}
-	ServerAlias {{ alias }}
-	{% endfor %}
-	{% endif %}
+    ServerName {{ item.domain }}
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
+    ServerAlias {{ alias }}
+{% endfor %}
+{% endif %}
+
+    RewriteEngine on
+
+    RewriteCond %{HTTP_HOST} !^{{ item.domain | replace('.', '\.') }}$
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
+    RewriteCond %{HTTP_HOST} !^{{ alias | replace('.', '\.') }}$
+{% endfor %}
+{% endif %}
+    RewriteRule .* https://{{ item.domain }}%{REQUEST_URI} [R=301,L]
+
+    RequestHeader set X-Forwarded-Proto "https"
+    RequestHeader set X-Forwarded-Https "on"
+    RequestHeader set X-Forwarded-Port "443"
 
     ProxyRequests Off
-	ProxyPreserveHost On
-	ProxyPass {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request|default(item.target_request) }} disableReuse=On retry=5
-	ProxyPassReverse {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request|default(item.target_request) }}
-	ProxyVia On
+    ProxyPreserveHost On
+    ProxyPass {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request|default(item.target_request) }} disableReuse=On retry=5
+    ProxyPassReverse {{ item.ssl.source_request|default('/') }} {{ item.ssl.target_request|default(item.target_request) }}
+    ProxyVia On
 
-    {% if (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists) %}
+{% if (item.ssl.cert_bot is defined) and (item.ssl.cert_bot) and (item.domain in cert_bot_cert_exists) %}
 
-	RequestHeader set X-Forwarded-Proto "https"
+    SSLProxyEngine On
+    SSLProxyCheckPeerCN Off
+    SSLProxyCheckPeerExpire Off
 
-	SSLProxyEngine On
-	SSLProxyCheckPeerCN Off
-	SSLProxyCheckPeerExpire Off
+    SSLEngine ON
+    SSLCertificateFile /etc/letsencrypt/live/{{ item.domain }}/cert.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/{{ item.domain }}/privkey.pem
+    SSLCertificateChainFile /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem
 
-	SSLEngine ON
-	SSLCertificateFile /etc/letsencrypt/live/{{ item.domain }}/cert.pem
-	SSLCertificateKeyFile /etc/letsencrypt/live/{{ item.domain }}/privkey.pem
-	SSLCertificateChainFile /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem
+{% endif %}
 
-    {% endif %}
+{% if item.ssl.cert_file is defined %}
 
-    {% if item.ssl.cert_file is defined %}
+    RequestHeader set X-Forwarded-Proto "https"
 
-	RequestHeader set X-Forwarded-Proto "https"
+    SSLProxyEngine On
+    SSLProxyCheckPeerCN Off
+    SSLProxyCheckPeerExpire Off
 
-	SSLProxyEngine On
-	SSLProxyCheckPeerCN Off
-	SSLProxyCheckPeerExpire Off
+    SSLEngine ON
+    SSLCertificateFile /etc/ssl-site-certs/{{ item.ssl.cert_file|default('nofile') }}
+    SSLCertificateKeyFile /etc/ssl-site-certs/{{ item.ssl.cert_key_file|default('nofile') }}
+    SSLCertificateChainFile /etc/ssl-site-certs/{{ item.ssl.cert_chain_file|default('nofile') }}
 
-	SSLEngine ON
-	SSLCertificateFile /etc/ssl-site-certs/{{ item.ssl.cert_file|default('nofile') }}
-	SSLCertificateKeyFile /etc/ssl-site-certs/{{ item.ssl.cert_key_file|default('nofile') }}
-	SSLCertificateChainFile /etc/ssl-site-certs/{{ item.ssl.cert_chain_file|default('nofile') }}
-
-    {% endif %}
+{% endif %}
 
     ErrorLog ${APACHE_LOG_DIR}/error.log
     LogLevel warn

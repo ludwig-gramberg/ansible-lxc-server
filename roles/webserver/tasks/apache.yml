@@ -7,8 +7,3 @@
   template: dest=/etc/apache2/conf-enabled/server-name.conf src=templates/server-name.conf.j2
   notify:
     - restart apache
-
-- name: rpaf.conf
-  template: dest=/etc/apache2/mods-available/rpaf.conf src=templates/rpaf.conf.j2
-  notify:
-    - restart apache

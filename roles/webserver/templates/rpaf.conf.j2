@@ -1,5 +1,8 @@
 <IfModule rpaf_module>
-    RPAFenable On
-    RPAFsethostname On
-    RPAFproxy_ips {{ container_bridge_subnet }}.1 ::1
+    RPAF_Enable             On
+    RPAF_ProxyIPs           {{ container_bridge_subnet }}.1 ::1
+    RPAF_SetHostName        On
+    RPAF_SetHTTPS           On
+    RPAF_SetPort            On
+    RPAF_ForbidIfNotProxy   Off
 </IfModule>

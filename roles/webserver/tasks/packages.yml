@@ -8,7 +8,6 @@
     - mysql-client
     - apache2
     - apache2-mpm-prefork
-    - libapache2-mod-rpaf
     - openssl
     - ca-certificates
 
@@ -35,14 +34,36 @@
   notify:
     - restart apache
 
+- name: install precompiled mod_rpaf 0.8.4 from https://github.com/gnif/mod_rpaf
+  copy:
+    src: files/mod_rpaf.so
+    dest: /usr/lib/apache2/modules/mod_rpaf.so
+    owner: root
+    group: root
+    mode: 0644
+
+- name: rpaf configs
+  template: src=templates/rpaf.{{ item }}.j2 dest=/etc/apache2/mods-available/mod_rpaf.{{ item }}
+  with_items:
+    - "load"
+    - "conf"
+  notify:
+    - restart apache
+
+- name: enable module rpaf
+  file: src=/etc/apache2/mods-available/mod_rpaf.{{ item }} dest=/etc/apache2/mods-enabled/mod_rpaf.{{ item }} state=link
+  with_items:
+    - "load"
+    - "conf"
+  notify:
+    - restart apache
+
 - name: apache modules
   apache2_module: state=present name={{ item }}
   with_items:
-    - ssl
     - headers
     - rewrite
     - expires
-    - rpaf
   notify:
     - restart apache
 
