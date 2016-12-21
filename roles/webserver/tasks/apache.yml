@@ -7,3 +7,8 @@
   template: dest=/etc/apache2/conf-enabled/server-name.conf src=templates/server-name.conf.j2
   notify:
     - restart apache
+
+- name: listen on 8000 for server-status / munin
+  lineinfile: dest=/etc/apache2/ports.conf line="Listen 8000" state="present"
+  notify:
+    - restart apache
