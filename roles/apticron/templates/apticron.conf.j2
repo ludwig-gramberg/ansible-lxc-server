@@ -1,5 +1,5 @@
 EMAIL="{{ apticron_recipient }}"
 DIFF_ONLY="1"
-SYSTEM="{{ ansible_hostname }}"
+SYSTEM="{{ ansible_hostname }}.{{ apticron_name }}"
 CUSTOM_SUBJECT="apticron"
-CUSTOM_FROM="apticron@{{ ansible_hostname }}"
+CUSTOM_FROM="apticron@{{ ansible_hostname }}.{{ apticron_name }}"

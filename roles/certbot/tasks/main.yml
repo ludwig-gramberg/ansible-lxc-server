@@ -13,7 +13,7 @@
 
 - name: install certs
   include: cert.yml
-  with_items: "{{ sites }}"
+  with_items: "{{ sites | default([]) }}"
   when: (site.ssl is defined) and (site.ssl.cert_bot is defined) and (site.ssl.cert_bot)
   loop_control:
     loop_var: site
