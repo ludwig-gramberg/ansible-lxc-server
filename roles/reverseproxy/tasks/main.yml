@@ -8,13 +8,13 @@
         - plugin: apache_volume
   tags: munin
 
-#- name: activate plugins
-#  file: src=/usr/share/munin/plugins/{{ item.source|default(item.plugin) }} dest=/etc/munin/plugins/{{ item.plugin }} state=link owner=root group=root
-#  with_items: "{{ munin.plugins }}"
-#  notify:
-#    - restart munin
-#  tags: munin
+- name: activate plugins
+  file: src=/usr/share/munin/plugins/{{ item.source|default(item.plugin) }} dest=/etc/munin/plugins/{{ item.plugin }} state=link owner=root group=root
+  with_items: "{{ munin.plugins }}"
+  notify:
+    - restart munin
+  tags: munin
 
-#- include: packages.yml
+- include: packages.yml
 - include: apache.yml
-#- include: certs.yml
+- include: certs.yml
