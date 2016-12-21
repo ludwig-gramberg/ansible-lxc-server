@@ -15,14 +15,11 @@
   template: src="mpm_{{ mpm.module }}.conf.j2" dest=/etc/apache2/mods-available/mpm_{{ mpm.module }}.conf
 
 - name: unlink all mpm modules
-  file: path=/etc/apache2/mods-enabled/{{ item }} state=absent
-  with_items:
-    - mpm_event.conf
-    - mpm_event.load
-    - mpm_prefork.conf
-    - mpm_prefork.load
-    - mpm_worker.conf
-    - mpm_worker.load
+  file: path=/etc/apache2/mods-enabled/mpm_{{ item[0] }}.{{ item[1] }} state=absent
+  with_nested:
+    - ["event","worker","prefork"]
+    - ["conf","load"]
+  when: ("{{ mpm.module }}" != item[0])
   notify:
     - restart apache
 
