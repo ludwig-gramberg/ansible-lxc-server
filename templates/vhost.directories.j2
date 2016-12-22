@@ -6,6 +6,11 @@
 {% if directory.vhost.php is defined %}
 		php_admin_flag engine {{ directory.vhost.php }}
 {% endif %}
+{% if directory.vhost.extras is defined %}
+{% for extra in directory.vhost.extras %}
+		{{ extra }}
+{% endfor %}
+{% endif %}
 {% if directory.vhost.access is defined %}
 {% for access in directory.vhost.access %}
 {% if access.require is defined %}
@@ -19,11 +24,11 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-{% if directory.cache is defined %}
-{% for cache in directory.cache %}
+{% if directory.vhost.cache is defined %}
+{% for cache in directory.vhost.cache %}
 {% if cache.files_match is defined %}
 		<FilesMatch "{{ cache.files_match }}">
-			Header set Cache-Control "max-age={{ cache.max_age }}, public"
+			Header set Cache-Control "max-age={{ cache.max_age|default(86400) }}, public"
 		</FilesMatch>
 {% endif %}
 {% endfor %}
