@@ -7,6 +7,11 @@
     ServerAlias {{ alias }}
 {% endfor %}
 {% endif %}
+{% if item.alternatives is defined %}
+{% for alt in item.alternatives %}
+    ServerAlias {{ alt }}
+{% endfor %}
+{% endif %}
 
     RewriteEngine on
 
