@@ -10,3 +10,15 @@ includedir /etc/munin/munin-conf.d
 	address {{ hostvars[host].public_ip }}
 	use_node_name yes
 {% endfor %}
+
+{% if munin_external is defined %}
+{% for g in munin_external %}
+[{{ g.group }};]
+{% for n in g.nodes %}
+[{{ g.group }};{{ n.node }}]
+    address {{ n.address }}
+    port {{ n.port }}
+	use_node_name yes
+{% endfor %}
+{% endfor %}
+{% endif %}
