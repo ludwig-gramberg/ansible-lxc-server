@@ -103,7 +103,7 @@
     SSLEngine ON
     SSLCertificateFile /etc/letsencrypt/live/{{ item.domain }}/cert.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/{{ item.domain }}/privkey.pem
-    SSLCertificateChainFile /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem
+    SSLCertificateChainFile /etc/letsencrypt/live/{{ item.domain }}/chain.pem
 
 {% endif %}
 
