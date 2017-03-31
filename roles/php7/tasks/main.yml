@@ -23,6 +23,9 @@
   notify:
    - restart apache
 
+- name: logrotate for php logs
+  template: dest=/etc/logrotate.d/php src=templates/php.logrotate.j2
+
 - name: enable php7.0
   apache2_module: state=present name=php7.0
   notify:
