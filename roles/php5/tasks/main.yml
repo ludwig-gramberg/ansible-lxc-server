@@ -20,4 +20,17 @@
   notify:
    - restart apache
 
+- name: place vhost
+  template: src=vhost.conf.j2 dest=/etc/apache2/sites-available/localhost.conf owner="root" group="root"
+  notify:
+    - restart apache
+
+- name: enable vhost
+  file: state=link src=/etc/apache2/sites-available/localhost.conf dest=/etc/apache2/sites-enabled/localhost.conf
+  notify:
+    - restart apache
+
+- name: opcache_reset script
+  copy: src=files/opcache/opcache_reset.php dest=/var/www/html/opcache_reset.php mode=0644 owner="root" group="root"
+
 - include: tasks/munin.yml

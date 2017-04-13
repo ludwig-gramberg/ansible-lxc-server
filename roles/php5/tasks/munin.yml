@@ -1,10 +1,12 @@
 ---
 
-- name: deploy munin opcache plugin
-  copy: src=files/munin/{{ item }} dest=/usr/share/munin/plugins/{{ item }} mode=0755 owner="root" group="root"
-  with_items:
-    - "php_opcache.php"
-    - "php_opcache"
+- name: deploy munin opcache plugin 1/2
+  copy: src=files/munin/php_opcache dest=/usr/share/munin/plugins/php_opcache mode=0755 owner="root" group="root"
+  notify:
+    - restart munin
+
+- name: deploy munin opcache plugin 2/2
+  copy: src=files/munin/php_opcache.php dest=/var/www/html/php_opcache.php mode=0644 owner="root" group="root"
   notify:
     - restart munin
 
