@@ -77,6 +77,13 @@
   notify:
     - restart munin
 
+- name: activate host-based additional plugins
+  file: src=/usr/share/munin/plugins/{{ item.source|default(item.plugin) }} dest=/etc/munin/plugins/{{ item.plugin }} state=link owner=root group=root
+  with_items: "{{ munin_additional_plugins }}"
+  when: (munin_additional_plugins is defined)
+  notify:
+    - restart munin
+
 - name: munin-node.conf
   template: src=munin-node.conf.j2 dest=/etc/munin/munin-node.conf owner=root group=root
   notify:

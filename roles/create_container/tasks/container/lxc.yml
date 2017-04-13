@@ -26,6 +26,26 @@
     creates: "/var/lib/lxc/{{ container.hostname }}/config"
   register: container_created
 
+- name: create mount source directories
+  file:
+    state: directory
+    dest: "{{ item.source_path }}"
+    mode: 0755
+    owner: "{{ uid_begin }}"
+    group: "{{ uid_begin }}"
+  with_items: "{{ container.master_mount }}"
+  when: (container.master_mount) is defined
+
+- name: create mount target directories
+  file:
+    state: directory
+    dest: "{{ item.target_path }}"
+    mode: 0755
+    owner: "{{ uid_begin }}"
+    group: "{{ uid_begin }}"
+  with_items: "{{ container.master_mount }}"
+  when: (container.master_mount) is defined
+
 - name: container config
   template: dest=/var/lib/lxc/{{ container.hostname }}/config src=lxc.config.j2
 

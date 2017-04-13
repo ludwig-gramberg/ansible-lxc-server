@@ -17,6 +17,12 @@ lxc.network.flags = up
 lxc.network.ipv4 = {{ container_ip }}/24
 lxc.network.ipv4.gateway = {{ container_bridge_subnet }}.1
 
+{% if (container.master_mount is defined) %}
+{% for mount in container.master_mount %}
+lxc.mount.entry = {{ mount.source_path }} {{ mount.target_path }} none bind 0 0
+{% endfor %}
+{% endif %}
+
 # Autostart
 lxc.start.auto = 1
 lxc.start.delay = 5

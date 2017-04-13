@@ -1,0 +1,14 @@
+---
+
+- name: deploy munin opcache plugin
+  copy: src=files/munin/{{ item }} dest=/usr/share/munin/plugins/{{ item }} mode=0755 owner="root" group="root"
+  with_items:
+    - "php_opcache.php"
+    - "php_opcache"
+  notify:
+    - restart munin
+
+- name: link opcache plugin
+  file: src=/usr/share/munin/plugins/php_opcache dest=/etc/munin/plugins/php_opcache state=link owner=root group=root
+  notify:
+    - restart munin
