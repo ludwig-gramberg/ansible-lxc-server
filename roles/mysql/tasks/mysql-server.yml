@@ -1,11 +1,20 @@
 ---
 
+- name: add mysql repo sources.list
+  template:
+     dest: /etc/apt/sources.list.d/mysql.list
+     src: mysql.list.j2
+
+- name: update apt
+  apt:
+    update_cache: yes
+
 - name: install mysql-server
   apt: name={{ item }} state=present default_release=jessie-backports
   with_items:
   - python
   - python-mysqldb
-  - mysql-server-5.6
+  - mysql-server
 
 - name: my.cnf
   template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src={{ item }} backup=yes
