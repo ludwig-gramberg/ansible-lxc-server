@@ -1,8 +1,8 @@
 [mysqladmin]
-socket                         = /var/lib/mysql/mysql.sock
+socket                         = /var/run/mysqld/mysqld.sock
 
 [mysqld_safe]
-socket                         = /var/lib/mysql/mysql.sock
+socket                         = /var/run/mysqld/mysqld.sock
 nice		= 0
 
 [mysqld]
@@ -10,7 +10,7 @@ nice		= 0
 # GENERAL #
 user                           = mysql
 default-storage-engine         = InnoDB
-socket                         = /var/lib/mysql/mysql.sock
+socket                         = /var/run/mysqld/mysqld.sock
 pid-file                       = /var/lib/mysql/mysql.pid
 bind-address 				   = {{ public_ip }}
 

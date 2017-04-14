@@ -12,9 +12,11 @@
 - name: install mysql-server
   apt: name={{ item }} state=present default_release=jessie-backports
   with_items:
-  - python
-  - python-mysqldb
-  - mysql-server
+   - libdbi-perl
+   - libdbd-mysql-perl
+   - python
+   - python-mysqldb
+   - mysql-server
 
 - name: my.cnf
   template: dest=/etc/mysql/mysql.conf.d/mysqld.cnf src={{ item }} backup=yes
