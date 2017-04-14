@@ -21,6 +21,7 @@
   with_first_found:
    - "../../../../templates/my.cnf.j2"
    - "templates/my.cnf.j2"
+  tags: mysql-config
   notify:
    - restart mysql
 
