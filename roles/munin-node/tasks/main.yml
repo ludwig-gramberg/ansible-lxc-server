@@ -79,8 +79,7 @@
 
 - name: activate host-based additional plugins
   file: src=/usr/share/munin/plugins/{{ item.source|default(item.plugin) }} dest=/etc/munin/plugins/{{ item.plugin }} state=link owner=root group=root
-  with_items: "{{ munin_additional_plugins }}"
-  when: (munin_additional_plugins is defined)
+  with_items: "{{ munin_additional_plugins|default([]) }}"
   notify:
     - restart munin
 

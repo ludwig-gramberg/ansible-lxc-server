@@ -12,8 +12,6 @@
 - name: install mysql-server
   apt: name={{ item }} state=present default_release=jessie-backports
   with_items:
-   - libdbi-perl
-   - libdbd-mysql-perl
    - python
    - python-mysqldb
    - mysql-server
