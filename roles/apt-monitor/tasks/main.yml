@@ -1,0 +1,15 @@
+---
+
+- name: deploy apt-monitor bin
+  copy: src=files/apt-monitor dest=/usr/bin/apt-monitor owner=root group=root mode=0755
+
+- name: deploy apt-monitor config
+  template: src=apt-monitor.conf.j2 dest=/etc/apt-monitor.conf owner=root group=root mode=0600
+
+- name: cron for apt-monitor
+  cron:
+    name: apt-monitor
+    user: root
+    hour: 9
+    minute: 0
+    job: "/usr/bin/apt-monitor > /dev/null 2>&1"

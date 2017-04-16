@@ -18,6 +18,8 @@
       tags: reverseproxy
     - role: apticron
       tags: apticron
+    - role: apt-monitor
+      tags: apt-monitor
     - role: ssmtp
       tags: ssmtp
     - role: timezone
