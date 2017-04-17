@@ -1,5 +1,8 @@
 ---
 
+- name: ensure apt-listchanges is installed
+  apt: name=apt-listchanges state=present
+
 - name: deploy apt-monitor bin
   copy: src=files/apt-monitor dest=/usr/bin/apt-monitor owner=root group=root mode=0755
 
