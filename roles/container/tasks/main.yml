@@ -21,6 +21,7 @@
     - nano
     - vim
     - man
+    - rsync
     - apt-listchanges
 
 - name: disable loginsuid in pam for cron or crons wont run
