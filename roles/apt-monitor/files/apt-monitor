@@ -8,6 +8,7 @@ import datetime
 import socket
 import smtplib
 import ConfigParser
+import os.path
 from subprocess import call
 
 # extract updates from apt output
@@ -55,8 +56,13 @@ for key, upgrade in upgrades.iteritems():
   deb_file = '/var/cache/apt/archives/'+upgrade['name']+'_'+upgrade['version_new']+'_'+upgrade['suffix']+'.deb'
   if upgrade['is_lxc']:
     container = upgrade['hosts'][0]
+    host_deb_file = '/var/lib/lxc/'+container+'/rootfs'+deb_file
+    if not os.path.isfile(host_deb_file):
+      subprocess.check_output(['lxc-attach', '-n', container, '--', 'apt-get', '-y', '-d', 'install', upgrade['name']])
     apt_changes += subprocess.check_output(['lxc-attach', '-n', container, '--', 'apt-listchanges', '-f', 'text', deb_file])
   else:
+    if not os.path.isfile(deb_file):
+      subprocess.check_output(['apt-get', '-y', '-d', 'install', upgrade['name']])
     apt_changes += subprocess.check_output(['apt-listchanges', '-f', 'text', deb_file])
   text += '\n'
   text += upgrade['name']+'\n'
