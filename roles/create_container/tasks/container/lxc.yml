@@ -33,8 +33,7 @@
     mode: 0755
     owner: "{{ uid_begin }}"
     group: "{{ uid_begin }}"
-  with_items: "{{ container.master_mount }}"
-  when: (container.master_mount) is defined
+  with_items: "{{ container.master_mount | default([]) }}"
 
 - name: create mount target directories
   file:
@@ -43,8 +42,7 @@
     mode: 0755
     owner: "{{ uid_begin }}"
     group: "{{ uid_begin }}"
-  with_items: "{{ container.master_mount }}"
-  when: (container.master_mount) is defined
+  with_items: "{{ container.master_mount | default([]) }}"
 
 - name: container config
   template: dest=/var/lib/lxc/{{ container.hostname }}/config src=lxc.config.j2
