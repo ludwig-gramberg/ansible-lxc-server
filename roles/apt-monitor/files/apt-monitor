@@ -54,6 +54,7 @@ text += '----- packages -----\n'
 apt_changes = ''
 for key, upgrade in upgrades.iteritems():
   deb_file = '/var/cache/apt/archives/'+upgrade['name']+'_'+upgrade['version_new']+'_'+upgrade['suffix']+'.deb'
+  deb_file = deb_file.replace(':', '%3a')
   if upgrade['is_lxc']:
     container = upgrade['hosts'][0]
     host_deb_file = '/var/lib/lxc/'+container+'/rootfs'+deb_file
