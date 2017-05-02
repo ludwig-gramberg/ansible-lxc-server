@@ -2,12 +2,17 @@
 
 - name: build install certs command
   set_fact:
-    certbot_command: "certbot certonly -q --webroot --webroot-path=/var/www/html/certbot/ -m {{ certbot_auth_email }} --agree-tos -d {{ site.domain }}"
+    certbot_command: "certbot certonly -q --webroot --webroot-path=/var/www/html/certbot/ -m {{ certbot_auth_email }} --agree-tos --expand -d {{ site.domain }}"
 
-- name: build install certs command
+- name: build install certs command add aliases
   set_fact:
     certbot_command: "{{ certbot_command }} -d {{ item }}"
   with_items: "{{ site.aliases | default([]) }}"
+
+- name: build install certs command add alternatives
+  set_fact:
+    certbot_command: "{{ certbot_command }} -d {{ item }}"
+  with_items: "{{ site.alternatives | default([]) }}"
 
 - name: install certs
   shell: "{{ certbot_command }}"
