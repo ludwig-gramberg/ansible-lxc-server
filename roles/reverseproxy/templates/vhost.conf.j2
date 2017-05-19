@@ -4,12 +4,7 @@
     ServerName {{ item.domain }}
 {% if item.aliases is defined %}
 {% for alias in item.aliases %}
-    ServerAlias {{ alias }}
-{% endfor %}
-{% endif %}
-{% if item.alternatives is defined %}
-{% for alt in item.alternatives %}
-    ServerAlias {{ alt }}
+    ServerAlias {{ alias.name }}
 {% endfor %}
 {% endif %}
 
@@ -25,9 +20,11 @@
 
 {% if item.aliases is defined %}
 {% for alias in item.aliases %}
+{% if (alias.ssl is defined) and (alias.ssl == True) %}
 	RewriteCond %{REQUEST_URI} !^/\.well-known
-    RewriteCond %{HTTP_HOST} ^{{ alias | replace('.', '\.') }}$
-    RewriteRule .* https://{{ alias }}%{REQUEST_URI} [R=301,L]
+    RewriteCond %{HTTP_HOST} ^{{ alias.name | replace('.', '\.') }}$
+    RewriteRule .* https://{{ alias.name }}%{REQUEST_URI} [R=301,L]
+{% endif %}
 {% endfor %}
 {% endif %}
     RewriteCond %{REQUEST_URI} !^/\.well-known
@@ -40,7 +37,9 @@
     RewriteCond %{HTTP_HOST} !^{{ item.domain | replace('.', '\.') }}$
 {% if item.aliases is defined %}
 {% for alias in item.aliases %}
-    RewriteCond %{HTTP_HOST} !^{{ alias | replace('.', '\.') }}$
+{% if (alias.redirect is defined) and (alias.redirect == False) %}
+    RewriteCond %{HTTP_HOST} !^{{ alias.name | replace('.', '\.') }}$
+{% endif %}
 {% endfor %}
 {% endif %}
     RewriteRule .* http://{{ item.domain }}%{REQUEST_URI} [R=301,L]
@@ -70,7 +69,9 @@
     ServerName {{ item.domain }}
 {% if item.aliases is defined %}
 {% for alias in item.aliases %}
-    ServerAlias {{ alias }}
+{% if (alias.ssl is defined) and (alias.ssl == True) %}
+    ServerAlias {{ alias.name }}
+{% endif %}
 {% endfor %}
 {% endif %}
 
@@ -79,7 +80,9 @@
     RewriteCond %{HTTP_HOST} !^{{ item.domain | replace('.', '\.') }}$
 {% if item.aliases is defined %}
 {% for alias in item.aliases %}
-    RewriteCond %{HTTP_HOST} !^{{ alias | replace('.', '\.') }}$
+{% if (alias.ssl is defined) and (alias.ssl == True) and (alias.redirect is defined) and (alias.redirect == False) %}
+    RewriteCond %{HTTP_HOST} !^{{ alias.name | replace('.', '\.') }}$
+{% endif %}
 {% endfor %}
 {% endif %}
     RewriteRule .* https://{{ item.domain }}%{REQUEST_URI} [R=301,L]

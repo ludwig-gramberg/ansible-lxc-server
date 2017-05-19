@@ -3,7 +3,7 @@
 	ServerName {{ domain_name }}
 {% if site.aliases is defined %}
 {% for alias in site.aliases %}
-	ServerAlias {{ alias }}
+	ServerAlias {{ alias.name }}
 {% endfor %}
 {% endif %}
 

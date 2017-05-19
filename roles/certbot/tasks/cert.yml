@@ -6,13 +6,9 @@
 
 - name: build install certs command add aliases
   set_fact:
-    certbot_command: "{{ certbot_command }} -d {{ item }}"
-  with_items: "{{ site.aliases | default([]) }}"
-
-- name: build install certs command add alternatives
-  set_fact:
-    certbot_command: "{{ certbot_command }} -d {{ item }}"
-  with_items: "{{ site.alternatives | default([]) }}"
+    certbot_command: "{{ certbot_command }} -d {{ item.name }}"
+  when: "(item.ssl is defined) and (item.ssl == True)"
+  with_items: "{{ site.aliases | default([]) }}"
 
 - name: install certs
   shell: "{{ certbot_command }}"
