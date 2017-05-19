@@ -12,3 +12,12 @@
   lineinfile: dest=/etc/apache2/ports.conf line="Listen 8000" state="present"
   notify:
     - restart apache
+
+- name: combined logfileformat switch %h -> %a
+  lineinfile:
+    dest: /etc/apache2/apache2.conf
+    line: 'LogFormat "%a %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" combined'
+    regexp: "^LogFormat(.*)combined$"
+    state: "present"
+  notify:
+    - restart apache
