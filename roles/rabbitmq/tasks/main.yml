@@ -1,0 +1,85 @@
+---
+
+- name: install rabbitmq and requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - rabbitmq-server
+    - python-pip
+
+- name: install ansible requirements
+  pip: name={{ item }}
+  with_items:
+    - requests
+
+- name: install rabbitmq plugins
+  rabbitmq_plugin: names={{ item }} state=enabled
+  with_items:
+    - rabbitmq_management
+
+- name: enable rabbitmq service
+  service: name=rabbitmq-server state=restarted enabled=yes
+
+- name: create vhosts
+  rabbitmq_vhost:
+    name: "{{ item.name }}"
+    state: present
+    node: "rabbit@{{ hostname }}"
+  with_items: "{{ rabbitmq.vhosts|default([]) }}"
+  tags:
+    - rabbitmq-config
+
+- name: create admin on default vhost
+  rabbitmq_user:
+    user: "{{ rabbitmq.admin.username }}"
+    password: "{{ rabbitmq.admin.password }}"
+    vhost: "/"
+    configure_priv: ".*"
+    read_priv: ".*"
+    write_priv: ".*"
+    state: present
+    tags: "administrator,management"
+  with_items: "{{ rabbitmq.vhosts|default([]) }}"
+  tags:
+    - rabbitmq-config
+
+- name: create admin on configured vhosts
+  rabbitmq_user:
+    user: "{{ rabbitmq.admin.username }}"
+    password: "{{ rabbitmq.admin.password }}"
+    vhost: "{{ item.name }}"
+    configure_priv: ".*"
+    read_priv: ".*"
+    write_priv: ".*"
+    state: present
+    tags: "administrator,management"
+  with_items: "{{ rabbitmq.vhosts|default([]) }}"
+  tags:
+    - rabbitmq-config
+
+- name: create users
+  rabbitmq_user:
+    user: "{{ item.username }}"
+    password: "{{ item.password }}"
+    permissions:
+      - vhost: "{{ item.vhost }}"
+        configure_priv: ".*"
+        read_priv: ".*"
+        write_priv: ".*"
+    state: present
+  with_items: "{{ rabbitmq.users|default([]) }}"
+  tags:
+    - rabbitmq-config
+
+- name: create queues
+  rabbitmq_queue:
+    name: "{{ item.name }}"
+    vhost: "{{ item.vhost }}"
+    login_user: "{{ rabbitmq.admin.username }}"
+    login_password: "{{ rabbitmq.admin.password }}"
+    durable: yes
+    state: present
+  with_items: "{{ rabbitmq.queues|default([]) }}"
+  tags:
+    - rabbitmq-config
