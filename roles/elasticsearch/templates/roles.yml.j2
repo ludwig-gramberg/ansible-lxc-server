@@ -1,0 +1,11 @@
+{% for user in elastic.users %}
+{{ user.name }}:
+  cluster:
+    - all
+  indices:
+{% for indice in user.indices %}
+    - names: '{{ indice.name }}'
+      privileges:
+        - all
+{% endfor %}
+{% endfor %}

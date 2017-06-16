@@ -1,0 +1,99 @@
+---
+
+- name: apt-transport-https
+  apt: name=apt-transport-https state=present
+
+- name: install elastic apt key
+  apt_key: url=https://artifacts.elastic.co/GPG-KEY-elasticsearch state=present
+  register: apt_change_1
+
+- name: deploy elastic list file
+  template: src=elastic.list.j2 dest=/etc/apt/sources.list.d/elastic.list
+  register: apt_change_2
+
+- name: deploy java list file
+  template: src=java.list.j2 dest=/etc/apt/sources.list.d/java.list
+  register: apt_change_3
+
+- name: ubuntu pgp key
+  apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=EEA14886 state=present
+  register: apt_change_4
+
+- name: update apt
+  apt: update_cache=yes
+  when: (apt_change_1.changed or apt_change_2.changed or apt_change_3.changed or apt_change_4.changed)
+
+- name: prepare java8 installation
+  debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+
+- name: install packages
+  apt: name={{ item }} state=present
+  environment:
+    ES_SKIP_SET_KERNEL_PARAMETERS: "true"
+  with_items:
+    - oracle-java8-installer
+    - oracle-java8-set-default
+    - elasticsearch
+
+- name: install elastic search plugins
+  command: /usr/share/elasticsearch/bin/elasticsearch-plugin --batch install {{ item }}
+  args:
+    creates: /usr/share/elasticsearch/plugins/{{ item }}
+  with_items:
+   - x-pack
+   - analysis-icu
+   - analysis-phonetic
+
+- name: deploy config
+  template: src=elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml owner=root group=elasticsearch mode=0550
+  notify:
+    - restart elasticsearch
+  tags:
+    - elasticsearch-config
+
+- name: enable and start elasticsearch
+  service: name=elasticsearch enabled=yes state=started
+
+- name: check if users exist
+  command: /usr/share/elasticsearch/bin/x-pack/users list
+  register: command_output
+  tags:
+    - elasticsearch-config
+
+- name: process user list
+  set_fact:
+    elastic_existing_users: "{{ command_output.stdout.split('\n') | map('regex_replace', '^([\\S]+)(.*)$', '\\1') | list }}"
+  tags:
+    - elasticsearch-config
+
+- debug: var=elastic_existing_users
+  tags:
+    - elasticsearch-config
+
+- name: create users
+  command: /usr/share/elasticsearch/bin/x-pack/users useradd {{ item.name }} -p {{ item.password }} -r {{ item.name }}
+  with_items: "{{ elastic.users }}"
+  when: "not item.name in elastic_existing_users"
+  tags:
+    - elasticsearch-config
+
+- name: update users passwd
+  command: /usr/share/elasticsearch/bin/x-pack/users passwd {{ item.name }} -p {{ item.password }}
+  with_items: "{{ elastic.users }}"
+  when: "item.name in elastic_existing_users"
+  tags:
+    - elasticsearch-config
+
+- name: update users roles
+  command: /usr/share/elasticsearch/bin/x-pack/users roles {{ item.name }} -a {{ item.name }}
+  with_items: "{{ elastic.users }}"
+  when: "item.name in elastic_existing_users"
+  tags:
+    - elasticsearch-config
+
+- name: deploy roles
+  template: src=roles.yml.j2 dest=/etc/elasticsearch/x-pack/roles.yml owner=root group=elasticsearch mode=0550
+  notify:
+    - restart elasticsearch
+  tags:
+    - elasticsearch-config
