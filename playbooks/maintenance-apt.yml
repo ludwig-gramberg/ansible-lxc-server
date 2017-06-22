@@ -11,6 +11,7 @@
     - name: upgrade packages
       environment:
         DEBIAN_FRONTEND: noninteractive
+        ES_SKIP_SET_KERNEL_PARAMETERS: "true"
       apt:
         upgrade: dist
         update_cache: yes
