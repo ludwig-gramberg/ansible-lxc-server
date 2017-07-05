@@ -1,0 +1,18 @@
+---
+
+- name: set up recipients 1/2
+  set_fact:
+    recipients_flat: ""
+
+- name: set up recipients 2/2
+  set_fact:
+    recipients_flat: "{{ recipients_flat }} {{ item }}"
+  with_items: "{{ log.recipients }}"
+
+- name: setup cron
+  cron:
+    name: "log-mailer {{ log.file }}"
+    job: "/bin/bash /usr/bin/log-mailer {{ log.file }} {{ log_mailer_sender }} {{ recipients_flat }}"
+    user: "root"
+    minute: 0
+    hour: "{{ log.hour }}"

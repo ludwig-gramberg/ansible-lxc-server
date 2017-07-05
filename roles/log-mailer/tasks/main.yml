@@ -1,0 +1,14 @@
+---
+
+- name: deploy binary
+  copy: src=files/log-mailer.sh dest=/usr/bin/log-mailer owner=root group=root mode=0755
+
+- name: setup var
+  set_fact:
+    log_mailer: "{{ log_mailer|default([]) }}"
+
+- name: setup cron
+  include: tasks/cron.yml
+  with_items: "{{ log_mailer }}"
+  loop_control:
+    loop_var: "log"
