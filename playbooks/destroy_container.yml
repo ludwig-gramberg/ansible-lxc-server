@@ -39,14 +39,6 @@
       fail: msg="container {{ destroy_container }} does not exist"
       when: container_exists.stat.exists == False
 
-    - name: prep vars
-      set_fact:
-        destroy_nodename: "{{ groups[destroy_container][0] }}"
-
-    - name: prep vars
-      set_fact:
-        destroy_node: "{{ hostvars[destroy_nodename] }}"
-
     - name: force shutdown container
       shell: "lxc-stop -k -n {{ destroy_container }}"
 
