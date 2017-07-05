@@ -13,14 +13,6 @@
     - "{{ admins }}"
     - ssh_keys
 
-- name: create deploy user
-  user: name={{ deploy_user }} shell=/bin/bash append=yes
-  when: deploy_user is defined
-
-- name: deploy user authorized key
-  authorized_key: user="{{ deploy_user }}" key="{{ deploy_user_key }}"
-  when: deploy_user is defined
-
 - name: create user
   user: name="{{ item.name }}" shell=/bin/bash append=yes
   with_items: "{{ users | default([]) }}"

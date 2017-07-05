@@ -46,11 +46,9 @@ AllowUsers {{ a.name }}
 {% if users is defined %}
 {% for u in users %}
 AllowUsers {{ u.name }}
-{% endfor %}
+{% if (u.force_command is defined) %}
+Match User {{ u.name }}
+   ForceCommand {{ u.force_command }}
 {% endif %}
-
-{% if deploy_user is defined %}
-AllowUsers {{ deploy_user }}
-Match User {{ deploy_user }}
-   ForceCommand internal-sftp
+{% endfor %}
 {% endif %}
