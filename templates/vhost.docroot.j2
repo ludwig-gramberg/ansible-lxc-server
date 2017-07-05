@@ -1,6 +1,6 @@
-	ServerAdmin admin@{{ domain_name }}
+	ServerAdmin admin@{{ site.domain }}
 
-	ServerName {{ domain_name }}
+	ServerName {{ site.domain }}
 {% if site.aliases is defined %}
 {% for alias in site.aliases %}
 	ServerAlias {{ alias.name }}
