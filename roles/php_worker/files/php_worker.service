@@ -1,0 +1,13 @@
+[Unit]
+Description=php_worker
+
+[Service]
+User=www-data
+Restart=always
+RestartSec=5
+Type=simple
+ExecStart=/usr/bin/php /usr/bin/php_worker.php /etc/php_worker.conf
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

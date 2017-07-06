@@ -1,0 +1,12 @@
+---
+
+- name: deploy binary
+  copy: src=files/php_worker.php dest=/usr/bin/php_worker.php mode=0755 owner=root group=root
+
+- name: deploy service file
+  copy: src=files/php_worker.service dest=/etc/systemd/system/php_worker.service mode=0755 owner=root group=root
+  notify:
+    - daemon-reload
+
+- name: deploy cfg file
+  template: src=templates/php_worker.conf.j2 dest=/etc/php_worker.conf mode=0755 owner=root group=root
