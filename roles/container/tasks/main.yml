@@ -2,6 +2,8 @@
 
 - name: hosts file
   template: dest=/etc/hosts src=hosts.j2
+  tags:
+    - hosts
 
 - name: install essentials
   environment:
