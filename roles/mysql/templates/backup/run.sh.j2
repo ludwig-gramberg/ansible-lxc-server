@@ -54,7 +54,7 @@ do
    eval $dump_cmd
 
    # dump data
-   dump_cmd="mysqldump --no-create-info ${DBA} -q --single-transaction"
+   dump_cmd="mysqldump --complete-insert --no-create-info ${DBA} -q --single-transaction"
    if [ -f $DB/ignore.cfg ]
    then
       while read table; do
