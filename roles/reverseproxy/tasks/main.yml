@@ -20,6 +20,8 @@
   tags:
     - reverseproxy-config
 - include: certs.yml
+  tags:
+    - reverseproxy-certs
 
 - name: listen on 8000 for server-status / munin
   lineinfile: dest=/etc/apache2/ports.conf line="Listen 8000" state="present"
