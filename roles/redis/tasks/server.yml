@@ -1,0 +1,41 @@
+---
+
+- name: prepare variable
+  set_fact:
+    redis_suffix: "{{ ['-', redis.port ]|join('') if redis.port != 6379 else '' }}"
+
+- name: redis.conf
+  template:
+    dest: "/etc/redis/redis{{ redis_suffix }}.conf"
+    src: templates/redis.conf.j2
+    owner: root
+    group: root
+    mode: 0644
+
+- name: systemd redis.service
+  template:
+    dest: "/etc/systemd/system/redis-server{{ redis_suffix }}.service"
+    src: templates/redis.service.j2
+    owner: root
+    group: root
+    mode: 0644
+
+- name: systemd reload
+  command: systemctl daemon-reload
+
+- name: enable redis
+  service:
+    name: "redis-server{{ redis_suffix }}"
+    enabled: yes
+    state: started
+
+- name: activate plugin
+  file:
+    src: "/usr/share/munin/plugins/redis_"
+    dest: "/etc/munin/plugins/redis_127.0.0.1_{{ redis.port }}"
+    state: link
+    owner: root
+    group: root
+  notify:
+    - restart munin
+  tags: munin
