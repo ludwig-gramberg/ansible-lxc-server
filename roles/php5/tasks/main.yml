@@ -33,4 +33,10 @@
 - name: opcache_reset script
   copy: src=files/opcache/opcache_reset.php dest=/var/www/html/opcache_reset.php mode=0644 owner="root" group="root"
 
+- name: check if munin installation
+  stat:
+    path: /usr/share/munin/plugins/
+  register: munin_installed
+
 - include: tasks/munin.yml
+  when: munin_installed.stat.exists == True
