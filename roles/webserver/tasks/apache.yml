@@ -16,8 +16,10 @@
 - name: combined logfileformat switch %h -> %a
   lineinfile:
     dest: /etc/apache2/apache2.conf
-    line: 'LogFormat "%a %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" combined'
+    line: 'LogFormat "%a %{HTTP_HOST}e %l %u %t \"%r\" %>s %O \"%{Location}o\" \"%{Referer}i\" \"%{User-Agent}i\"" combined'
     regexp: "^LogFormat(.*)combined$"
     state: "present"
+  tags:
+    - webserver-log-config
   notify:
     - restart apache
