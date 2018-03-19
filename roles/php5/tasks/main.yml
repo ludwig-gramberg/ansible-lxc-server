@@ -15,11 +15,6 @@
 - name: logrotate for php logs
   template: dest=/etc/logrotate.d/php src=templates/php.logrotate.j2
 
-- name: enable php
-  apache2_module: state=present name=php5
-  notify:
-   - restart apache
-
 - name: place vhost
   template: src=vhost.conf.j2 dest=/etc/apache2/sites-available/localhost.conf owner="root" group="root"
   notify:
