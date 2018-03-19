@@ -1,5 +1,11 @@
 ---
 
+- name: mysql apt key
+  apt_key:
+    keyserver: pgp.mit.edu
+    state: present
+    id: 5072E1F5
+
 - name: add mysql repo sources.list
   template:
      dest: /etc/apt/sources.list.d/mysql.list
