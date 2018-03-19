@@ -13,7 +13,7 @@
 # user and file layout for lxc
 
 - name: include vars
-  include_vars: "../../../../vars/admins.yml"
+  include_vars: "../../../vars/admins.yml"
 
 - name: spawn-container cfg file
   template: dest=/etc/lxc/{{ container.hostname }}.conf src=lxc.default.conf.j2
