@@ -3,7 +3,7 @@
 # prepare list of ssl-certs to be deployed
 
 - name: include sites
-  include_vars: "../../../../vars/sites.yml"
+  include_vars: "../../vars/sites.yml"
   tags: reverseproxy
 
 - name: build deploy_certs list 1/3

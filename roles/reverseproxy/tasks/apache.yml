@@ -6,7 +6,7 @@
     - restart apache
 
 - name: include sites
-  include_vars: "../../../../vars/sites.yml"
+  include_vars: "../../vars/sites.yml"
 
 - name: check for each site cert_bot_cert_exists if necessary
   stat: path=/etc/letsencrypt/live/{{ item.domain }}/cert.pem
