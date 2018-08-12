@@ -35,7 +35,7 @@
   service: name=mysql enabled=yes
 
 - name: include databases
-  include_vars: "../../vars/databases.yml"
+  include_vars: "../vars/databases.yml"
   tags: mysql-accounts
 
 - name: create databases
