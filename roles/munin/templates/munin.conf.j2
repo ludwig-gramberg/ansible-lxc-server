@@ -1,18 +1,7 @@
 includedir /etc/munin/munin-conf.d
 
-[master]
-    address {{ container_bridge_subnet }}.1
-    use_node_name yes
-
-[container;]
-{% for host in groups['container'] %}
-[container;{{ hostvars[host].hostname }}]
-	address {{ hostvars[host].public_ip }}
-	use_node_name yes
-{% endfor %}
-
-{% if munin_external is defined %}
-{% for g in munin_external %}
+{% if munin_nodes is defined %}
+{% for g in munin_nodes %}
 [{{ g.group }};]
 {% for n in g.nodes %}
 [{{ g.group }};{{ n.node }}]

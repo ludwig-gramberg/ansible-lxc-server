@@ -37,7 +37,7 @@
   when: "'master' in group_names"
   ignore_errors: True
 
-- name: udpate libvirt network hook
+- name: update libvirt network hook
   template: dest=/etc/libvirt/hooks/network src="../../../templates/libvirt-hook-network.j2" mode=0755
   when: "'master' in group_names"
   register: libvirt_hook_changed
