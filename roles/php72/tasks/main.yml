@@ -1,0 +1,35 @@
+---
+
+- name: requirements
+  apt: name=apt-transport-https state=present
+
+- name: deploy dotdeb sources.list
+  template: dest=/etc/apt/sources.list.d/sury.org.list src=apt.sury.org.list.j2
+
+- name: install keys
+  apt_key: url={{ item }} state=present
+  with_items:
+    - "https://packages.sury.org/php/apt.gpg"
+
+- name: apt update
+  apt: update_cache=yes
+
+- include: tasks/packages.yml
+- name: php-logdir
+  file: path=/var/log/php state=directory owner=www-data group=www-data mode=0755
+
+- name: php ini
+  template: dest=/etc/php/7.2/{{ item }}/php.ini src=templates/php.{{ item }}.ini.j2 backup=yes
+  with_items:
+    - "apache2"
+    - "cli"
+  notify:
+   - restart apache
+
+- name: logrotate for php logs
+  template: dest=/etc/logrotate.d/php src=templates/php.logrotate.j2
+
+- name: enable php7.2
+  apache2_module: state=present name=php7.0
+  notify:
+   - restart apache
