@@ -6,6 +6,11 @@
     - redis-server
     - redis-tools
 
+- name: check if munin is installed
+  stat:
+    path: /usr/share/munin/plugins
+  register: munin_installed
+
 - name: deploy redis munin plugin
   copy:
     dest: /usr/share/munin/plugins/redis_
@@ -13,6 +18,7 @@
     owner: root
     group: root
     mode: 0755
+  when: munin_installed.stat.exists
 
 - name: configure redis servers
   include: tasks/server.yml
