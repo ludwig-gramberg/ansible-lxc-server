@@ -5,17 +5,18 @@
       DEBIAN_FRONTEND: noninteractive
   apt: name={{ item }} state=present
   with_items:
-    - libapache2-mod-php
-    - php7.0-curl
-    - php7.0-mcrypt
-    - php7.0-mysql
-    - php7.0-readline
-    - php7.0-imap
-    - php7.0-gd
-    - php7.0-imagick
-    - php7.0-json
-    - php7.0-xml
-    - php7.0-mbstring
-    - php7.0-intl
+    - "libapache2-mod-php{{ php_version }}"
+    - "php{{ php_version }}-cli"
+    - "php{{ php_version }}-curl"
+    - "php{{ php_version }}-mcrypt"
+    - "php{{ php_version }}-mysql"
+    - "php{{ php_version }}-readline"
+    - "php{{ php_version }}-imap"
+    - "php{{ php_version }}-gd"
+    - "php{{ php_version }}-imagick"
+    - "php{{ php_version }}-json"
+    - "php{{ php_version }}-xml"
+    - "php{{ php_version }}-mbstring"
+    - "php{{ php_version }}-intl"
   notify:
     - restart apache
