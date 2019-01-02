@@ -153,5 +153,15 @@ soap.wsdl_cache_limit = 5
 ldap.max_links = -1
 
 [opcache]
+{% if php_opcache_memory > 0 %}
+opcache.enable=1
+opcache.enable_cli=0
+opcache.memory_consumption={{ php_opcache_memory }}
+opcache.save_comments=1
+opcache.load_comments=1
+opcache.validate_timestamps=0
+opcache.max_accelerated_files=10000
+{% else %}
 opcache.enable=0
 opcache.enable_cli=0
+{% endif %}
