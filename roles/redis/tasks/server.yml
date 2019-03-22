@@ -1,5 +1,10 @@
 ---
 
+- name: check if munin is installed
+  stat:
+    path: /usr/share/munin/plugins
+  register: munin_installed
+
 - name: prepare variable
   set_fact:
     redis_suffix: "{{ ['-', redis.port ]|join('') if redis.port != 6379 else '' }}"
@@ -39,3 +44,4 @@
   notify:
     - restart munin
   tags: munin
+  when: munin_installed.stat.exists
