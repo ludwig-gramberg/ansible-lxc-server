@@ -10,6 +10,8 @@
   apt_key: url={{ item }} state=present
   with_items:
     - "https://packages.sury.org/php/apt.gpg"
+  tags:
+    - php-apt-key
 
 - name: apt update
   apt: update_cache=yes
