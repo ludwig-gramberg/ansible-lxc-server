@@ -2,8 +2,8 @@
 
 # install from backports, normal has dependecy problems with python
 
-- name: install certbot
-  apt: name=certbot state=present default_release=jessie-backports
+#- name: install certbot
+#  apt: name=certbot state=present default_release=jessie-backports
 
 - name: create well-known dir
   file: path=/var/www/html/certbot state=directory owner=root group=root
@@ -13,7 +13,7 @@
 
 - name: install certs
   include: cert.yml
-  with_items: "{{ sites | default([]) }}"
+  with_items: "{{ sites | default([]) }}"
   when: (site.ssl is defined) and (site.ssl.cert_bot is defined) and (site.ssl.cert_bot)
   loop_control:
     loop_var: site

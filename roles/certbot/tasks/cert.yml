@@ -8,7 +8,7 @@
   set_fact:
     certbot_command: "{{ certbot_command }} -d {{ item.name }}"
   when: "(item.ssl is defined) and (item.ssl == True)"
-  with_items: "{{ site.aliases | default([]) }}"
+  with_items: "{{ site.aliases | default([]) }}"
 
 - name: install certs
   shell: "{{ certbot_command }}"
