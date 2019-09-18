@@ -28,4 +28,4 @@
 # cron
 
 - name: install backup in backup_users crontab
-  cron: name="mysql-backup" user={{ backup_user }} minute="45" job="/home/{{ backup_user }}/bin/run-backup.sh >> {{ backup_log | dirname }}/cron.log 2>&1"
+  cron: name="mysql-backup" user={{ backup_user }} minute="45" job="/home/{{ backup_user }}/bin/run-backup.sh >> {{ backup_log | dirname }}/cron.log 2>&1"

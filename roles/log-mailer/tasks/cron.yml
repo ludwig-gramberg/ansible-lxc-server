@@ -15,4 +15,4 @@
     job: "/bin/bash /usr/bin/log-mailer {{ log.file }} {{ log_mailer_sender }} {{ recipients_flat }}"
     user: "root"
     minute: 0
-    hour: "{{ log.hour }}"
+    hour: "{{ log.hour }}"

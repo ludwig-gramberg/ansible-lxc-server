@@ -5,22 +5,22 @@
 
 - name: create admin
   user: name="{{ item.name }}" password="{{ item.password_encrypted }}" shell=/bin/bash groups=sudo append=yes
-  with_items: "{{ admins }}"
+  with_items: "{{ admins }}"
 
 - name: admin authorized key
   authorized_key: user="{{ item.0.name }}" key="{{ item.1.key }}"
   with_subelements:
-    - "{{ admins }}"
+    - "{{ admins }}"
     - ssh_keys
 
 - name: create user
   user: name="{{ item.name }}" shell=/bin/bash append=yes
-  with_items: "{{ users | default([]) }}"
+  with_items: "{{ users | default([]) }}"
 
 - name: user authorized key
   authorized_key: user="{{ item.0.name }}" key="{{ item.1.key }}"
   with_subelements:
-    - "{{ users | default([]) }}"
+    - "{{ users | default([]) }}"
     - ssh_keys
 
 - name: ssh config

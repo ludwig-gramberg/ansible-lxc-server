@@ -38,7 +38,7 @@ daemonize yes
 
 # When running daemonized, Redis writes a pid file in /var/run/redis.pid by
 # default. You can specify a custom pid file location here.
-pidfile /var/run/redis/redis-server{{ redis_suffix }}.pid
+pidfile /var/run/redis/redis-server{{ redis_suffix }}.pid
 
 # Accept connections on the specified port, default is 6379.
 # If port 0 is specified Redis will not listen on a TCP socket.
@@ -100,7 +100,7 @@ loglevel notice
 # Specify the log file name. Also the empty string can be used to force
 # Redis to log on the standard output. Note that if you use standard
 # output for logging but daemonize, logs will be sent to /dev/null
-logfile /var/log/redis/redis-server{{ redis_suffix }}.log
+logfile /var/log/redis/redis-server{{ redis_suffix }}.log
 
 # To enable logging to the system logger, just set 'syslog-enabled' to yes,
 # and optionally update the other syslog parameters to suit your needs.
@@ -174,7 +174,7 @@ rdbcompression yes
 rdbchecksum yes
 
 # The filename where to dump the DB
-dbfilename dump{{ redis_suffix }}.rdb
+dbfilename dump{{ redis_suffix }}.rdb
 
 # The working directory.
 #

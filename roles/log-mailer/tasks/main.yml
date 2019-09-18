@@ -9,6 +9,6 @@
 
 - name: setup cron
   include: tasks/cron.yml
-  with_items: "{{ log_mailer }}"
+  with_items: "{{ log_mailer }}"
   loop_control:
     loop_var: "log"

@@ -10,4 +10,4 @@
   with_items: "{{ groups['container'] }}"
   loop_control:
     loop_var: "container_item"
-  when: ("{{ limit_container }}" == "") or ("{{ limit_container }}" == "{{ hostvars[container_item].hostname }}" )
+  when: ("{{ limit_container }}" == "") or ("{{ limit_container }}" == "{{ hostvars[container_item].hostname }}" )

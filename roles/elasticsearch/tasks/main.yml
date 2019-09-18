@@ -36,7 +36,7 @@
     - elasticsearch
 
 - name: install elastic search plugins
-  command: /usr/share/elasticsearch/bin/elasticsearch-plugin -s install {{ item }}
+  command: /usr/share/elasticsearch/bin/elasticsearch-plugin -s install {{ item }}
   args:
     creates: /usr/share/elasticsearch/plugins/{{ item }}
   with_items:

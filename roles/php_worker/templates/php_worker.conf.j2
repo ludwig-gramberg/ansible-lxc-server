@@ -1,7 +1,7 @@
 {% if php_worker is defined %}
 {% for worker in php_worker %}
-[{{ worker.name }}]
-instances = {{ worker.instances }}
+[{{ worker.name }}]
+instances = {{ worker.instances }}
 path = {{ worker.path }}
 kill_signal = {{ worker.kill_signal|default(9) }}
 log = {{ worker.log }}
