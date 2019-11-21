@@ -11,28 +11,15 @@
   template: src=elastic.list.j2 dest=/etc/apt/sources.list.d/elastic.list
   register: apt_change_2
 
-- name: deploy java list file
-  template: src=java.list.j2 dest=/etc/apt/sources.list.d/java.list
-  register: apt_change_3
-
-- name: ubuntu pgp key
-  apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=EEA14886 state=present
-  register: apt_change_4
-
 - name: update apt
   apt: update_cache=yes
-  when: (apt_change_1.changed or apt_change_2.changed or apt_change_3.changed or apt_change_4.changed)
-
-- name: prepare java8 installation
-  debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+  when: (apt_change_1.changed or apt_change_2.changed)
 
 - name: install packages
   apt: name={{ item }} state=present
   environment:
     ES_SKIP_SET_KERNEL_PARAMETERS: "true"
   with_items:
-    - oracle-java8-installer
-    - oracle-java8-set-default
     - elasticsearch
 
 - name: install elastic search plugins
@@ -97,3 +84,8 @@
     - restart elasticsearch
   tags:
     - elasticsearch-config
+      
+# java install
+# download current java8 tar
+# unpack into /usr/java
+# update-alternatives --install /usr/bin/java java /usr/java/jre1.8.0_231/bin/java 100
