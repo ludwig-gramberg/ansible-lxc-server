@@ -89,7 +89,6 @@
     - "apt-get update"
     - "apt-get install -y libterm-ui-perl"
     - "apt-get install -y openssh-server python sudo"
-    - "apt-get install -y systemd -t jessie-backports"
 
 - name: prepare container user via lxc-attach
   command: lxc-attach -n {{ container.hostname }} -- useradd -p {{ config_user_password_encrypted }} -s /bin/bash -m {{ config_user_name }}
