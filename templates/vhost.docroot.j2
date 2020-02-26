@@ -7,6 +7,13 @@
 {% endfor %}
 {% endif %}
 
+{% if application.xsendfile_path %}
+	XSendFile on
+	XSendFileIgnoreEtag on
+	XSendFileIgnoreLastModified on
+	XSendFilePath {{ application.xsendfile_path }}
+{% endif %}
+
 	DocumentRoot {{ application.document_root }}
 
 	<Directory />
