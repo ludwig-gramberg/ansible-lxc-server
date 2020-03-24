@@ -64,4 +64,4 @@
     user: "{{ mysql_backup.user }}"
     hour: 13
     minute: 25
-    job: "bash /home/{{ mysql_backup.user }}/bin/status-mail.sh | mail -s 'Mysql Backup Report {{ server_name }}' -a 'From: {{ ssmtp_email }}' -a 'Content-Type:text/html' -a 'Mime-Version: 1.0' {{ ssmtp_email }}"
+    job: "bash /home/{{ mysql_backup.user }}/bin/status-mail.sh | mail -s 'Mysql Backup Report {{ server_name }}' -a 'From: {{ ssmtp_email }}' -a 'Content-Type:text/html' -a 'Mime-Version: 1.0' {{ mysql_backup.email }}"
