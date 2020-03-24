@@ -3,11 +3,12 @@
 - name: set vars
   set_fact:
     rotate:
-      pattern: "{{ backup_dir }}*.log"
+      pattern: "{{ mysql_backup.dir }}*.log"
       interval: "daily"
       files: 7
 
 - include: tasks/mysql-server.yml
 - include: tasks/backups.yml
+  tags: mysql-backup
 - include: tasks/munin.yml
   tags: munin

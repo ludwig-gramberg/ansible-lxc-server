@@ -1,0 +1,120 @@
+#!/bin/sh
+
+###########################
+
+hour=$(date +"%Y-%m-%d-%H")
+month=$(date +"%Y-%m")
+today=$(date +"%Y-%m-%d")
+
+dir="{{ backup_access_dir }}"
+cd $dir
+
+###########################
+
+echo "<html><head><style type=\"text/css\">";
+echo "h2 { font-size:14px; line-height:16px; padding:10px 0 10px 0; margin:10px 0 0 0; border-top:1px solid #ccc; }";
+echo "h3 { font-size:12px; line-height:14px; padding:0 0 5px 0; margin:0 0 0 0; }";
+echo "ul { margin:0; padding:0; list-style-type:none; }";
+echo "table { border-collapse:collapse; border:none; width:100%; }";
+echo "td { padding-right: 20px; vertical-align:top; width:33%; }";
+echo "</style></head><body>";
+
+###########################
+
+echo "<h1>Mysql Backup Report</h1>"
+echo "<p>"
+echo "Date: ${today}<br/>"
+echo "Host: {{ server_name }}</p>"
+echo "</p>"
+
+databases=$(ls)
+for database in $databases; do
+	
+	dir_db="$dir/$database"
+	
+	if [ -d $dir_db ]; then
+    
+		cd $dir_db
+    echo "<h2>${database}</h2>"
+    echo "<table><tr>"
+    
+    # ---- hourly ----
+    
+    echo "<td>"
+    echo "<h3>hourly</h3>"
+    dir_sub="$dir_db/hourly"
+    if [ -d $dir_sub ]; then
+      echo "<ul>"
+      cd $dir_sub
+      last=$(ls -r *.sql.gz | head -3)
+      for h in $last; do
+        if [[ $h =~ ^${today} ]]; then
+          if [[ $h =~ ^${hour} ]]; then
+            echo "<li style=\"color:green\">${h}</li>"
+          else
+            echo "<li>${h}</li>"
+          fi
+        else
+          echo "<li style=\"color:red\">${h} <strong>file outdated</strong></li>"
+        fi
+      done
+      echo "</ul>"
+    fi
+    echo "</td>"
+    
+    # ---- daily ----
+    
+    echo "<td>"
+    echo "<h3>daily</h3>"
+    dir_sub="$dir_db/daily"
+    if [ -d $dir_sub ]; then
+      echo "<ul>"
+      cd $dir_sub
+      last=$(ls -r *.sql.gz | head -3)
+      current_exists=0
+      for h in $last; do
+        if [[ $h =~ ^${today} ]]; then
+          current_exists=1
+          echo "<li style=\"color:green\">${h}</li>"
+        else
+          echo "<li>${h}</li>"
+        fi
+      done
+      if [ $current_exists -eq 0 ]; then
+        echo "<li style=\"color:red\">missing current day ${today}!</li>"
+      fi
+      echo "</ul>"
+    fi
+    echo "</td>"
+    
+    # ---- monthly ----
+    
+    echo "<td>"
+    echo "<h3>monthly</h3>"
+    dir_sub="$dir_db/monthly"
+    if [ -d $dir_sub ]; then
+      echo "<ul>"
+      cd $dir_sub
+      last=$(ls -r *.sql.gz | head -3)
+      current_exists=0
+      for h in $last; do
+        if [[ $h =~ ^${month} ]]; then
+          echo "<li style=\"color:green\">${h}</li>"
+          current_exists=1
+        else
+          echo "<li>${h}</li>"
+        fi
+      done
+      if [ $current_exists -eq 0 ]; then
+        echo "<li style=\"color:red\">missing current month ${month}!</li>"
+      fi
+      echo "</ul>"
+    fi
+    echo "</td>"
+	fi
+	echo "</tr></table>"
+done
+
+###########################
+
+echo "</body></html>";

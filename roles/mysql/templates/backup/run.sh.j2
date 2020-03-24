@@ -6,8 +6,8 @@ KEEP_MONTH_DAY="01" # keep the backup from this day as the monthly backup
 KEEP_DAYS="{{ backups_days|default(30) }}" # keep as many daily backups
 KEEP_HOURS="{{ backups_hour|default(48) }}" # keep as many hourly backups
 KEEP_MONTHS="{{ backup_months|default(24) }}" # keep as many monthly backups
-BACKUP_DIR="{{ backup_dir }}"
-LOG="{{ backup_log }}"
+BACKUP_DIR="{{ backup_access_dir }}"
+LOG="{{ mysql_backup.log }}"
 DBA="-uroot" # host/auth params
 
 # vars

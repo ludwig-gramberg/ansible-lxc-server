@@ -1,31 +1,67 @@
 ---
 
-# user and script, backup_dir
+# user and script, mysql_backup.dir
 
-- name: create backup_user if he doesnt exist yet
-  user: name={{ backup_user }} append=yes
+- name: prep var
+  set_fact:
+    backup_access_dir: "/home/{{ mysql_backup.user }}/backups"
 
-- name: create backup_dir
-  file: path={{ backup_dir }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0750
+- name: create mysql_backup.user if he doesnt exist yet
+  user: name={{ mysql_backup.user }} append=yes
+
+- name: check mysql_backup.dir
+  stat:
+    path: "{{ mysql_backup.dir }}"
+  register: backup_dir_exists
+
+- name: create mysql_backup.dir
+  file: path={{ mysql_backup.dir }} state=directory owner={{ mysql_backup.user }} group={{ mysql_backup.user }} mode=0750
+  when: backup_dir_exists.stat.exists == false
 
 - name: create run dir
-  file: path=/home/{{ backup_user }}/bin/ state=directory owner={{ backup_user }} group={{ backup_user }} mode=0750
+  file: path=/home/{{ mysql_backup.user }}/bin/ state=directory owner={{ mysql_backup.user }} group={{ mysql_backup.user }} mode=0750
 
-- name: symlink backup dir into home of backup_user
-  file: src={{ backup_dir }} dest=/home/{{ backup_user }}/backups state=link
+- name: symlink backup dir into home of mysql_backup.user
+  file: src={{ mysql_backup.dir }} dest={{ backup_access_dir }} state=link
+  when: mysql_backup.dir != backup_access_dir
 
-- name: deploy backup-script into home of backup_user
-  template: dest=/home/{{ backup_user }}/bin/run-backup.sh src=backup/run.sh.j2 owner={{ backup_user }} group={{ backup_user }} mode=0750
+- name: deploy backup-script into home of mysql_backup.user
+  template: dest=/home/{{ mysql_backup.user }}/bin/run-backup.sh src=backup/run.sh.j2 owner={{ mysql_backup.user }} group={{ mysql_backup.user }} mode=0750
 
 # logs
 
 - name: create log-dir
-  file: path={{ backup_log | dirname }} state=directory owner={{ backup_user }} group={{ backup_user }} mode=0750
+  file: path={{ mysql_backup.log | dirname }} state=directory owner={{ mysql_backup.user }} group={{ mysql_backup.user }} mode=0750
 
 - name: logrotate for logs
-  template: dest=/etc/logrotate.d/{{ backup_user }}-backup-cron src=../../../templates/logrotate.simple.j2 owner=root group=root
+  template: dest=/etc/logrotate.d/{{ mysql_backup.user }}-backup-cron src=../../../templates/logrotate.simple.j2 owner=root group=root
+  when: (rotate is defined)
 
 # cron
 
-- name: install backup in backup_users crontab
-  cron: name="mysql-backup" user={{ backup_user }} minute="45" job="/home/{{ backup_user }}/bin/run-backup.sh >> {{ backup_log | dirname }}/cron.log 2>&1"
+- name: install backup in mysql_backup.users crontab
+  cron: name="mysql-backup" user={{ mysql_backup.user }} minute="45" job="bash /home/{{ mysql_backup.user }}/bin/run-backup.sh >> {{ mysql_backup.log }} 2>&1"
+
+# status-mail
+
+- name: deploy status-mail.sh
+  template:
+    src: backup/status-mail.sh.j2
+    dest: "/home/{{ mysql_backup.user }}/bin/status-mail.sh"
+    mode: 0750
+    owner: "{{ mysql_backup.user }}"
+    group: "{{ mysql_backup.user }}"
+    backup: yes
+
+# cron
+
+- name: install backup in mysql_backup.users crontab
+  cron: name="mysql-backup" user={{ mysql_backup.user }} minute="5" job="/home/{{ mysql_backup.user }}/bin/run-backup.sh >> {{ mysql_backup.log }} 2>&1"
+
+- name: install status-mail in mysql_backup.users crontab
+  cron:
+    name: "mysql-backup-status-mail"
+    user: "{{ mysql_backup.user }}"
+    hour: 13
+    minute: 25
+    job: "bash /home/{{ mysql_backup.user }}/bin/status-mail.sh | mail -s 'Mysql Backup Report {{ server_name }}' -a 'From: {{ ssmtp_email }}' -a 'Content-Type:text/html' -a 'Mime-Version: 1.0' {{ ssmtp_email }}"
