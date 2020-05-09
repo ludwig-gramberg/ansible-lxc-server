@@ -16,10 +16,10 @@
 
 - name: create mysql_backup.dir
   file: 
-    path: /home/{{ mysql_backup.user }}/tmp 
+    path: "/home/{{ mysql_backup.user }}/tmp" 
     state: directory
-    owner: {{ mysql_backup.user }}
-    group: {{ mysql_backup.user }} 
+    owner: "{{ mysql_backup.user }}"
+    group: "{{ mysql_backup.user }}"
     mode: 0750
 
 - name: create tmp dir
