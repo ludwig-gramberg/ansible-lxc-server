@@ -9,6 +9,7 @@ KEEP_MONTHS="{{ backup_months|default(24) }}" # keep as many monthly backups
 BACKUP_DIR="{{ backup_access_dir }}"
 LOG="{{ mysql_backup.log }}"
 DBA="-uroot" # host/auth params
+TMP_DIR="/home/{{ mysql_backup.user }}/tmp"
 
 # vars
 HOSTNAME=$(hostname)
@@ -26,7 +27,9 @@ echo "starting backup at $(date +'%Y-%m-%d %H:%M:%S')" >> $LOG
 
 for DB in $DBS
 do
-   # if ignore.cfg exists skip each db with machting name in file
+   DUMP_FILE="${TMP_DIR}/${DB}-dump.sql"
+
+   # if ignore.cfg exists skip each db with matching name in file
    if [ -f ignore.cfg ]
    then
        if grep -Fxq "$DB" ignore.cfg
@@ -50,26 +53,26 @@ do
    fi
 
    # dump structure
-   dump_cmd="mysqldump -d ${DBA} -q --single-transaction $DB > $DB/dump.sql"
+   dump_cmd="mysqldump ${DBA} -d -q --single-transaction $DB > $DUMP_FILE"
    eval $dump_cmd
 
    # dump data
-   dump_cmd="mysqldump --complete-insert --no-create-info ${DBA} -q --single-transaction"
+   dump_cmd="mysqldump ${DBA} --complete-insert --no-create-info -q --single-transaction --lock-tables=false"
    if [ -f $DB/ignore.cfg ]
    then
       while read table; do
          dump_cmd="$dump_cmd --ignore-table=${DB}.${table}"
       done <$DB/ignore.cfg
    fi
-   dump_cmd="$dump_cmd $DB >> $DB/dump.sql"
+   dump_cmd="$dump_cmd $DB >> $DUMP_FILE"
    eval $dump_cmd
 
    # check if backup is complete
-   check_complete=$(grep "Dump completed on" $DB/dump.sql | wc -l)
+   check_complete=$(grep "Dump completed on" $DUMP_FILE | wc -l)
 
    if [ "$check_complete" != "2" ]
    then
-      rm $DB/dump.sql
+      rm $DUMP_FILE
       echo "ERROR: backup of $DB incomplete" >> $LOG
       # skip any other steps like rotation if this fails
       continue
@@ -77,46 +80,14 @@ do
    echo "NOTE: backup of $DB completed" >> $LOG
 
    # remove dump completed line from dump to compare them
-   sed -i '/Dump completed on/d' $DB/dump.sql
+   sed -i '/Dump completed on/d' $DUMP_FILE
 
-   # last backup in hourly
-   last_backup=$(ls -rtp $DB/hourly/ | tail -1)
+   # compress
+   gzip -f $DUMP_FILE
+   size=$(du -k $DUMP_FILE.gz | cut -f1)
+   mv $DUMP_FILE.gz $DB/hourly/$TIME.sql.gz
 
-   echo "NOTE: last backup to compare to: $DB/hourly/$last_backup" >> $LOG
-
-   # copy backup or just link to last one?
-   copy_backup=0
-
-   if [ "$last_backup" == "" ]
-   then
-      echo "NOTE: no last backup for $DB found" >> $LOG
-      copy_backup=1
-   else
-       backup_hash_new=$(cat $DB/dump.sql | md5sum | cut -c 1-32)
-       backup_hash_old=$(zcat $DB/hourly/$last_backup | md5sum | cut -c 1-32)
-
-       if [ "$backup_hash_new" != "$backup_hash_old" ]
-       then
-           copy_backup=1
-       fi
-   fi
-
-   if [ "$copy_backup" == "1" ]
-   then
-      mv $DB/dump.sql $DB/hourly/$TIME.sql
-      gzip -f $DB/hourly/$TIME.sql
-      size=$(du -k $DB/hourly/$TIME.sql.gz | cut -f1)
-      echo "NOTE: backup of $DB stored $size bytes as new backup under $DB/hourly/${TIME}.sql.gz" >> $LOG
-   else
-      if [ "${DB}/hourly/${last_backup}" == "${DB}/hourly/${TIME}.sql.gz" ]
-      then
-         echo "NOTE: backup of $DB at $TIME with same content already exists, doing nothing" >> $LOG
-      else
-         ln -f $DB/hourly/$last_backup $DB/hourly/$TIME.sql.gz
-         echo "NOTE: backup of $DB at $TIME hardlinked to $DB/hourly/$last_back, data has not changed" >> $LOG
-      fi
-      rm $DB/dump.sql
-   fi
+   echo "NOTE: backup of $DB stored $size kbytes under $DB/hourly/${TIME}.sql.gz" >> $LOG
 
    # begin rotation and cleanup
 

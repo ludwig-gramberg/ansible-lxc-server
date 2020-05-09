@@ -15,6 +15,14 @@
   register: backup_dir_exists
 
 - name: create mysql_backup.dir
+  file: 
+    path: /home/{{ mysql_backup.user }}/tmp 
+    state: directory
+    owner: {{ mysql_backup.user }}
+    group: {{ mysql_backup.user }} 
+    mode: 0750
+
+- name: create tmp dir
   file: path={{ mysql_backup.dir }} state=directory owner={{ mysql_backup.user }} group={{ mysql_backup.user }} mode=0750
   when: backup_dir_exists.stat.exists == false
 
