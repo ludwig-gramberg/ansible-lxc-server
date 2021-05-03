@@ -8,7 +8,3 @@
       files: 7
 
 - include: tasks/mysql-server.yml
-- include: tasks/backups.yml
-  tags: mysql-backup
-- include: tasks/munin.yml
-  tags: munin

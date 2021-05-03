@@ -33,3 +33,22 @@
 
 - name: enable mysql
   service: name=mysql enabled=yes
+
+- name: create databases
+  mysql_db: name={{ item.name }}
+    encoding={{ item.encoding }}
+    collation={{ item.collation }}
+    login_user=root
+  with_items: "{{ databases.mysql }}"
+  tags: mysql-accounts
+
+- name: create database users
+  mysql_user: host={{ item.1.host }}
+    name={{ item.1.name }}
+    password={{ item.1.password }}
+    priv="{{ item.0.name }}.*:ALL"
+    login_user=root
+    append_privs=yes
+  with_subelements:
+    - "{{ databases.mysql }}"
+    - users
