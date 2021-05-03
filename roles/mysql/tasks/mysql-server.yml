@@ -16,7 +16,7 @@
     update_cache: yes
 
 - name: install mysql-server
-  apt: name={{ item }} state=present default_release=jessie-backports
+  apt: name={{ item }} state=present
   with_items:
    - python
    - python-mysqldb
@@ -33,27 +33,3 @@
 
 - name: enable mysql
   service: name=mysql enabled=yes
-
-- name: include databases
-  include_vars: "../vars/databases.yml"
-  tags: mysql-accounts
-
-- name: create databases
-  mysql_db: name={{ item.name }}
-            encoding={{ item.encoding }}
-            collation={{ item.collation }}
-            login_user=root
-  with_items: "{{ databases.mysql }}"
-  tags: mysql-accounts
-
-- name: create database users
-  mysql_user: host={{ item.1.host }}
-              name={{ item.1.name }}
-              password={{ item.1.password }}
-              priv="{{ item.0.name }}.*:ALL"
-              login_user=root
-              append_privs=yes
-  with_subelements:
-    - "{{ databases.mysql }}"
-    - users
-  tags: mysql-accounts
